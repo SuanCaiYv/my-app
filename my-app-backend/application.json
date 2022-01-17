@@ -1,0 +1,40 @@
+{
+  "owner": "2508826394@qq.com",
+  "database": {
+    "url": "mongodb://127.0.0.1",
+    "port": 27017,
+    "db": "my_app_dev",
+    "grid_fs_db": "my_app_dev_grid_fs",
+    "user": "",
+    "password": ""
+  },
+  "redis": {
+    "url": "localhost",
+    "port": 6379,
+    "db": 0,
+    "user": "root",
+    "password": ""
+  },
+  "roles": [
+    {
+      "name": "owner",
+      "desc": "网站所有者"
+    },
+    {
+      "name": "reader",
+      "desc": "阅览者"
+    }
+  ],
+  "accounts": [
+    {
+      "username": "2508826394@qq.com",
+      "credential": "123456",
+      "ver_code": "000000"
+    },
+    {
+      "username": "2021601470@qq.com",
+      "credential": "123123",
+      "ver_code": "000000"
+    }
+  ]
+}
