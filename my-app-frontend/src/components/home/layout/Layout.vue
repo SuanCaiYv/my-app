@@ -1,11 +1,16 @@
 <template>
     <div class="layout">
-        <slot></slot>
+        <Header></Header>
+        <Body></Body>
+        <Footer></Footer>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import Header from "../Header.vue"
+import Body from "../Body.vue"
+import Footer from "../Footer.vue"
 
 const name = ref<String>("Layout")
 </script>

@@ -5,7 +5,8 @@ const store: Store<any> = createStore({
         return {
             accessToken: String,
             refreshToken: String,
-            userRole: String
+            userRole: String,
+            logoImg: Image
         }
     },
     mutations: {
@@ -28,6 +29,9 @@ const store: Store<any> = createStore({
         },
         userRole: (state) => {
             return state.userRole
+        },
+        logoImg: (state) => {
+            return state.logoImg
         }
     }
 })

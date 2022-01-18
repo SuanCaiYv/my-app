@@ -1,19 +1,17 @@
 <template>
     <Layout class="layout">
-        <Header></Header>
-        <Body></Body>
-        <Footer></Footer>
     </Layout>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
-import Layout from "../components/home/Layout.vue"
-import Header from "../components/home/Header.vue"
-import Body from "../components/home/Body.vue"
-import Footer from "../components/home/Footer.vue"
+import {provide, ref} from "vue"
+import Layout from "../components/home/layout/Layout.vue"
 
 const name = ref<String>("Home")
+
+provide("searchKey", function (key: String) {
+    console.log(key)
+})
 </script>
 
 <style scoped>

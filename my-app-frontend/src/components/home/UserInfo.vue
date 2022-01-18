@@ -1,16 +1,16 @@
 <template>
-    <div>
-        aaa
+    <div class="userInfo">
+        bbb
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
 
-const name = ref<String>("Logo")
+const name = ref<String>("UserInfo")
 </script>
 
 <style scoped>
-.logo {
+.userInfo {
 }
 </style>

@@ -1,22 +1,22 @@
 <template>
     <div class="header">
-        <slot>
-            <Logo></Logo>
-            <Home></Home>
-            <PH1></PH1>
-            <Search></Search>
-            <PH2></PH2>
-        </slot>
+        <PH1></PH1>
+        <Home></Home>
+        <PH2></PH2>
+        <PH3></PH3>
+        <Search></Search>
+        <PH4></PH4>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Logo from "./Logo.vue"
 import Home from "./Home.vue"
-import PH1 from "./PH1.vue"
 import Search from "./Search.vue"
-import PH2 from "./PH2.vue"
+import PH1 from "../placeholder/PH1.vue"
+import PH2 from "../placeholder/PH2.vue"
+import PH3 from "../placeholder/PH3.vue"
+import PH4 from "../placeholder/PH4.vue"
 
 const name = ref<String>("Header")
 </script>
@@ -26,7 +26,7 @@ const name = ref<String>("Header")
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-areas: "logo home ph1 search ph2";
-    grid-auto-columns: 120px 120px 1fr 200px 60px;
+    grid-template-areas: "ph1 home ph2 ph3 search ph4";
+    grid-auto-columns: 25px 150px 25px 1fr 200px 60px;
 }
 </style>
