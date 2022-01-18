@@ -1,6 +1,7 @@
 <template>
-    <Layout class="layout">
-    </Layout>
+    <div class="home">
+        <Layout></Layout>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +16,7 @@ provide("searchKey", function (key: String) {
 </script>
 
 <style scoped>
-.layout {
+.home {
     width: 100%;
     height: 100%;
 }

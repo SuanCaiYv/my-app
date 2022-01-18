@@ -10,5 +10,8 @@ const name = ref<String>("Footer")
 
 <style scoped>
 .footer {
+    width: 100%;
+    height: 100%;
+    grid-area: footer;
 }
 </style>

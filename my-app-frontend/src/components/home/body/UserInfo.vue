@@ -12,5 +12,8 @@ const name = ref<String>("UserInfo")
 
 <style scoped>
 .userInfo {
+    width: 100%;
+    height: 100%;
+    grid-area: userInfo;
 }
 </style>

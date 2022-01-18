@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import {ref} from "vue";
+
+const name = ref<String>("app")
 </script>
 
 <template>
@@ -11,7 +14,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    /* 字体基准 */
+    /* 字体大小基准 */
     font-size: 20px;
     height: 100%;
     width: 100%;

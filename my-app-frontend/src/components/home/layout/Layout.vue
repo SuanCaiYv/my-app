@@ -8,8 +8,8 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Header from "../Header.vue"
-import Body from "../Body.vue"
+import Header from "../header/Header.vue"
+import Body from "../body/Body.vue"
 import Footer from "../Footer.vue"
 
 const name = ref<String>("Layout")

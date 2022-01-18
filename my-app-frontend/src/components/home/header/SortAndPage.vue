@@ -12,5 +12,8 @@ const name = ref<String>("SortAndPage")
 
 <style scoped>
 .sortAndPage {
+    width: 100%;
+    height: 100%;
+    grid-area: sortAndPage;
 }
 </style>

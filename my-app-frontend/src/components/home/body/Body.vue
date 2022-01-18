@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import SortAndPage from "./SortAndPage.vue"
+import SortAndPage from "../header/SortAndPage.vue"
 import UserInfo from "./UserInfo.vue"
 import ArticleList from "./ArticleList.vue";
 import TagList from "./TagList.vue";
@@ -21,9 +21,10 @@ const name = ref<String>("Body")
 .body {
     width: 100%;
     height: 100%;
+    grid-area: body;
     display: grid;
     grid-template-areas:
-        "sortAndPage"
+        "sortAndPage sortAndPage sortAndPage"
         "userInfo articleList tagList";
     grid-auto-columns: 200px 1fr 200px;
     grid-template-rows: 100px 1fr;
