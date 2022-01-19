@@ -1,5 +1,5 @@
 <template>
-    <div class="footer">ccc</div>
+    <div class="footer">©️ CodeWithBuff</div>
 </template>
 
 <script setup lang="ts">

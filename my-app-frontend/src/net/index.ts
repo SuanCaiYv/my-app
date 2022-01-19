@@ -1,5 +1,4 @@
 import axios from "axios";
-import {Ref} from "vue";
 
 const baseUrl = "http://127.0.0.1:8190/v1"
 

@@ -1,7 +1,7 @@
 <template>
     <div class="body">
         <SortAndPage></SortAndPage>
-        <UserInfo></UserInfo>
+        <UserInfo :nickname="nickname" :email="email" :signature="signature"></UserInfo>
         <ArticleList></ArticleList>
         <TagList></TagList>
     </div>
@@ -9,12 +9,16 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import SortAndPage from "../header/SortAndPage.vue"
+import SortAndPage from "./SortAndPage.vue"
 import UserInfo from "./UserInfo.vue"
 import ArticleList from "./ArticleList.vue";
 import TagList from "./TagList.vue";
 
 const name = ref<String>("Body")
+
+const nickname = "小白白白"
+const email = "codewithbuff@163.comjsdhsdbhaugcyadnajsbdhuasbdad"
+const signature = "Golang+Vue3"
 </script>
 
 <style scoped>

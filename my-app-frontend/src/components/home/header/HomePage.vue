@@ -27,9 +27,7 @@ const homePage = function () {
 .homePage {
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
     border-radius: 8px;
-    border: 0;
     background-color: lightskyblue;
 }
 

@@ -15,5 +15,7 @@ const name = ref<String>("SortAndPage")
     width: 100%;
     height: 100%;
     grid-area: sortAndPage;
+    border: 1px solid lightgrey;
+    box-sizing: border-box;
 }
 </style>

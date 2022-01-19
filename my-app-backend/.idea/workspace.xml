@@ -57,23 +57,14 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.DirectoryMappings" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd">
-    <configuration name="go build github.com/SuanCaiYv/my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="my-app-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/SuanCaiYv/my-app-backend/cmd" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/cmd/main.go" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go Test.TestUserApiHandler_SignUp in my-app-backend/service">
     <configuration name="go build my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="my-app-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -81,6 +72,18 @@
       <package value="my-app-backend/cmd" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/cmd/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestRedisClient_Set in my-app-backend/nosql" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="my-app-backend" />
+      <working_directory value="$PROJECT_DIR$/nosql" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="my-app-backend/nosql" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRedisClient_Set\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestSignRefreshToken in my-app-backend/auth" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -121,11 +124,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd" />
         <item itemvalue="Go Test.TestUserApiHandler_SignUp in my-app-backend/service" />
         <item itemvalue="Go Build.go build my-app-backend/cmd" />
         <item itemvalue="Go Test.TestStaticSrcApiHandler_ADownloadFile in my-app-backend/service" />
         <item itemvalue="Go Test.TestSignRefreshToken in my-app-backend/auth" />
+        <item itemvalue="Go Test.TestRedisClient_Set in my-app-backend/nosql" />
       </list>
     </recent_temporary>
   </component>

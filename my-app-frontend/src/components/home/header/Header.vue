@@ -1,7 +1,7 @@
 <template>
     <div class="header">
         <PH1></PH1>
-        <Home></Home>
+        <HomePage></HomePage>
         <PH2></PH2>
         <PH3></PH3>
         <Search></Search>
@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Home from "./HomePage.vue"
+import HomePage from "./HomePage.vue"
 import Search from "./Search.vue"
 import PH1 from "../../placeholder/PH1.vue"
 import PH2 from "../../placeholder/PH2.vue"

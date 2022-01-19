@@ -29,6 +29,7 @@ let props = defineProps({
     width: 300px;
     margin: 0 auto 0 50px;
     border: 1px solid black;
+    box-sizing: border-box;
     padding: 0;
 }
 
@@ -37,6 +38,7 @@ let props = defineProps({
     width: auto;
     margin: 0 50px 20px;
     border: 1px solid black;
+    box-sizing: border-box;
     padding: 0;
 }
 </style>

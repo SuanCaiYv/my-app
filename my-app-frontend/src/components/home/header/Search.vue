@@ -24,8 +24,8 @@ const searchKey = inject("searchKey")
 .key {
     width: 140px;
     height: 100%;
-    box-sizing: border-box;
     border: 1px solid black;
+    box-sizing: border-box;
     border-radius: 8px;
     background-color: white;
 }
@@ -33,9 +33,17 @@ const searchKey = inject("searchKey")
 .find {
     width: 60px;
     height: 100%;
-    box-sizing: border-box;
     border: 1px solid black;
+    box-sizing: border-box;
     border-radius: 8px;
-    background-color: white;
+    background-color: silver;
+}
+
+.find:hover {
+    background-color: gainsboro;
+}
+
+.find:active {
+    background-color: darkgrey;
 }
 </style>
