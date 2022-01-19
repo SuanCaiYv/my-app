@@ -1,0 +1,87 @@
+{
+  "1": {
+    "username": "",
+    "credential": ""
+  },
+  "2": {
+    "code": 200,
+    "msg": "",
+    "data": {
+      "refresh_token": "",
+      "access_token": ""
+    },
+    "timestamp": ""
+  },
+  "3": {
+    "username": "",
+    "credential": "",
+    "ver_code": ""
+  },
+  "4": {
+    "code": 200,
+    "msg": "",
+    "data": [
+      {
+        "article_id": "",
+        "article_name": "",
+        "author": "",
+        "summary": "",
+        "cover_img": "",
+        "catalog": {
+          "value": "",
+          "child": [
+            {
+              "value": "",
+              "child": [
+                {}
+              ]
+            }
+          ]
+        },
+        "content": "",
+        "tags": [
+          {
+            "tag_id": "",
+            "tag_name": ""
+          }
+        ],
+        "kinds": [
+          {
+            "kind_id": "",
+            "kind_name": ""
+          }
+        ],
+        "release_time": "0001-01-01T00:00:00Z",
+        "visibility": 0
+      }
+    ],
+    "timestamp": ""
+  },
+  "5": {
+    "avatar": "",
+    "nickname": "",
+    "email": "",
+    "Phone": "",
+    "weChat": "",
+    "qq": "",
+    "gitHub": "",
+    "location": "",
+    "signature": ""
+  },
+  "6": {
+    "article_id": "",
+    "article_name": "",
+    "author": "",
+    "summary": "",
+    "cover_img": "",
+    "catalog": {
+      "value": "",
+      "child": []
+    },
+    "content": "",
+    "tags": [],
+    "kinds": [],
+    "release_time": "0001-01-01T00:00:00Z",
+    "visibility": 0
+  }
+}

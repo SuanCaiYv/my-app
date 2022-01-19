@@ -18,6 +18,8 @@ type ArticleApi interface {
 	DeleteArticle(context *gin.Context)
 
 	ListArticle(context *gin.Context)
+
+	ListArticleExactly(context *gin.Context)
 }
 
 type ArticleApiHandler struct {
@@ -62,6 +64,11 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 		return
 	}
 	context.JSON(200, resp.NewOk(articles))
+}
+
+func (a *ArticleApiHandler) ListArticleExactly(context *gin.Context) {
+	// TODO implement me
+	panic("implement me")
 }
 
 func (*ArticleApiHandler) f() {}

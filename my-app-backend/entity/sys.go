@@ -6,7 +6,7 @@ import (
 )
 
 type SysUser struct {
-	Id          string    `bson:"_id" json:"-"`
+	Id          string    `bson:"_id" json:"user_id"`
 	Username    string    `bson:"username" json:"username"`
 	Credential  string    `bson:"credential" json:"credential"`
 	Salt        string    `bson:"salt" json:"salt"`

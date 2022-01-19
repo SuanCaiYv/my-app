@@ -53,7 +53,7 @@ const props = defineProps({
     padding: 0;
     border: 1px solid black;
     box-sizing: border-box;
-    overflow-x: scroll;
+    overflow-x: auto;
     border-radius: 6px;
     font-size: 1rem;
     line-height: 20px;
@@ -67,7 +67,7 @@ const props = defineProps({
     border: 1px solid black;
     box-sizing: border-box;
     border-radius: 6px;
-    overflow-x: scroll;
+    overflow-x: auto;
     font-size: 1rem;
     line-height: 20px;
 }

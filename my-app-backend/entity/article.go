@@ -3,16 +3,16 @@ package entity
 import "time"
 
 type Article struct {
-	Id          string    `bson:"_id" json:"-"`
-	Name        string    `bson:"name" json:"name"`
+	Id          string    `bson:"_id" json:"article_id"`
+	Name        string    `bson:"name" json:"article_name"`
 	Author      string    `bson:"author" json:"author"`
 	Summary     string    `bson:"summary" json:"summary"`
-	CoverImg    string    `bson:"cover_img" json:"coverImg"`
+	CoverImg    string    `bson:"cover_img" json:"cover_img"`
 	Catalog     Catalog   `bson:"catalog" json:"catalog"`
 	Content     string    `bson:"content" json:"content"`
 	Tags        []Tag     `bson:"tags" json:"tags"`
 	Kinds       []Kind    `bson:"kinds" json:"kinds"`
-	ReleaseTime time.Time `bson:"release_time" json:"releaseTime"`
+	ReleaseTime time.Time `bson:"release_time" json:"release_time"`
 	Visibility  int       `bson:"visibility" json:"visibility"`
 	Available   bool      `bson:"available" json:"-"`
 	CreatedTime time.Time `bson:"created_time" json:"-"`
@@ -20,22 +20,22 @@ type Article struct {
 }
 
 type Tag struct {
-	Id          string    `bson:"_id" json:"-"`
-	Name        string    `bson:"name" json:"name"`
+	Id          string    `bson:"_id" json:"tag_id"`
+	Name        string    `bson:"name" json:"tag_name"`
 	Available   bool      `bson:"available" json:"-"`
 	CreatedTime time.Time `bson:"created_time" json:"-"`
 	UpdatedTime time.Time `bson:"updated_time" json:"-"`
 }
 
 type Kind struct {
-	Id          string    `bson:"_id" json:"-"`
-	Name        string    `bson:"name" json:"name"`
+	Id          string    `bson:"_id" json:"kind_id"`
+	Name        string    `bson:"name" json:"tag_name"`
 	Available   bool      `bson:"available" json:"-"`
 	CreatedTime time.Time `bson:"created_time" json:"-"`
 	UpdatedTime time.Time `bson:"updated_time" json:"-"`
 }
 
 type Catalog struct {
-	Value string
-	Child []Catalog
+	Value string    `bson:"value" json:"value"`
+	Child []Catalog `bson:"child" json:"child"`
 }

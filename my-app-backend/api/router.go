@@ -40,15 +40,26 @@ func Route() {
 	versionOne := router.Group("/v1")
 	{
 		// 免登陆部分
-		versionOne.PUT("/user", userApiHandler.Login)
-		versionOne.POST("/user", userApiHandler.SignUp)
-		versionOne.GET("/article/list")
+		versionOne.PUT("/sign", userApiHandler.Login)
+		versionOne.POST("/sign", userApiHandler.SignUp)
+		versionOne.GET("/article_list", articleApi.ListArticle)
+
 		// 静态资源处理器
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
+
 		// 以下需要登录
 		versionOne.Use(authFunc)
-		versionOne.DELETE("/user", userApiHandler.Logout)
-		versionOne.GET("/articles", articleApi.ListArticle)
+
+		// 用户接口
+		userApi := versionOne.Group("/user")
+		userApi.DELETE("", userApiHandler.Logout)
+		userApi.GET("/info")
+
+		// 文章接口
+		article := versionOne.Group("/article")
+		article.GET("/list", articleApi.ListArticle, articleApi.ListArticleExactly)
+		article.POST("", articleApi.AddArticle)
+		article.PUT("", articleApi.UpdateArticle)
 	}
 	err := router.Run(":8190")
 	util.JustPanic(err)
