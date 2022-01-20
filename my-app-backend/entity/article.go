@@ -29,7 +29,7 @@ type Tag struct {
 
 type Kind struct {
 	Id          string    `bson:"_id" json:"kind_id"`
-	Name        string    `bson:"name" json:"tag_name"`
+	Name        string    `bson:"name" json:"kind_name"`
 	Available   bool      `bson:"available" json:"-"`
 	CreatedTime time.Time `bson:"created_time" json:"-"`
 	UpdatedTime time.Time `bson:"updated_time" json:"-"`

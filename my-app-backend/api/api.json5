@@ -20,44 +20,11 @@
   "4": {
     "code": 200,
     "msg": "",
-    "data": [
-      {
-        "article_id": "",
-        "article_name": "",
-        "author": "",
-        "summary": "",
-        "cover_img": "",
-        "catalog": {
-          "value": "",
-          "child": [
-            {
-              "value": "",
-              "child": [
-                {}
-              ]
-            }
-          ]
-        },
-        "content": "",
-        "tags": [
-          {
-            "tag_id": "",
-            "tag_name": ""
-          }
-        ],
-        "kinds": [
-          {
-            "kind_id": "",
-            "kind_name": ""
-          }
-        ],
-        "release_time": "0001-01-01T00:00:00Z",
-        "visibility": 0
-      }
-    ],
+    "data": true,
     "timestamp": ""
   },
   "5": {
+    "user_id": "",
     "avatar": "",
     "nickname": "",
     "email": "",
@@ -83,5 +50,55 @@
     "kinds": [],
     "release_time": "0001-01-01T00:00:00Z",
     "visibility": 0
+  },
+  "7": {
+    "code": 200,
+    "msg": "",
+    "data": {
+      "total": 100,
+      "count": 10,
+      "page_num": 1,
+      "page_size": 10,
+      "next_page_num": 2,
+      "list": [
+        {
+          "article_id": "",
+          "article_name": "",
+          "author": "",
+          "summary": "",
+          "cover_img": "",
+          "catalog": {
+            "value": "一级目录",
+            "child": [
+              {
+                "value": "二级目录",
+                "child": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "content": "",
+          "tags": [
+            {
+              "tag_id": "aaa",
+              "tag_name": "go"
+            }
+          ],
+          "kinds": [
+            {
+              "kind_id": "bbb",
+              "kind_name": "C.S."
+            }
+          ],
+          "release_time": "0001-01-01T00:00:00Z",
+          "visibility": 0
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  "8": {
+    "document_file_name": ""
   }
 }
