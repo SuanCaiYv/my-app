@@ -1,5 +1,5 @@
 {
-  "owner": "2508826394@qq.com",
+  "owner": "codewithbuff@cwb.com",
   "database": {
     "url": "mongodb://127.0.0.1",
     "port": 27017,

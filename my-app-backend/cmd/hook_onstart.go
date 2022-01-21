@@ -9,6 +9,7 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/nosql"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"io/ioutil"
+	"mime"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,4 +66,5 @@ func BeforeStart() {
 		err = gridFsDao.UploadFile(data, "default-avatar.png", make(map[string]interface{}))
 		util.JustPanic(err)
 	}
+	_ = mime.AddExtensionType(".md", "text/x-markdown")
 }

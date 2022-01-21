@@ -54,15 +54,16 @@ func (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {
 }
 
 func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
-	pgSize, _ := strconv.Atoi(context.DefaultQuery("pgSize", "10"))
-	pgNum, _ := strconv.Atoi(context.DefaultQuery("pgNum", "1"))
+	pgSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	pgNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
 	sort := context.DefaultQuery("sort", "created_time")
+	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
 	owner := config.ApplicationConfiguration().Owner
 	articles, err := a.articleDao.ListByAuthor(owner, int64(pgNum), int64(pgSize), sort, desc)
 	if err != nil {
 		a.logger.Errorf("获取文章列表失败: %v", err)
-		context.JSON(200, resp.NewIntervalError("获取文章列表失败"))
+		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
 		return
 	}
 	context.JSON(200, resp.NewOk(articles))

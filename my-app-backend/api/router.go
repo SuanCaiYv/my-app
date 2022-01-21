@@ -18,9 +18,9 @@ func Route() {
 	router.Use(corsMiddleware())
 	router.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
-			context.JSON(http.StatusInternalServerError, resp.NewIntervalError(err))
+			context.JSON(http.StatusInternalServerError, resp.NewInternalError(err))
 		} else {
-			context.AbortWithStatusJSON(http.StatusInternalServerError, resp.NewIntervalError("unknown error occurred."))
+			context.AbortWithStatusJSON(http.StatusInternalServerError, resp.NewInternalError("unknown error occurred."))
 		}
 	}))
 	// ApiHandler实例化

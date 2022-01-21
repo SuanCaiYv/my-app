@@ -67,6 +67,7 @@
       "page_num": 1,
       "page_size": 10,
       "next_page_num": 2,
+      "end_page": false,
       "list": [
         {
           "article_id": "",

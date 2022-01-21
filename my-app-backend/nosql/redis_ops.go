@@ -7,14 +7,9 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
+	"sync"
 	"time"
 )
-
-type RedisClient struct {
-	client *redis.Client
-	logger *logrus.Logger
-	ctx    context.Context
-}
 
 type RedisOps interface {
 	Set(key string, value interface{}) error
@@ -26,7 +21,23 @@ type RedisOps interface {
 	Del(key string) error
 }
 
+type RedisClient struct {
+	client *redis.Client
+	logger *logrus.Logger
+	ctx    context.Context
+}
+
+var (
+	instanceRedisClient *RedisClient
+	onceRedisClient     sync.Once
+)
+
 func NewRedisClient() *RedisClient {
+	onceRedisClient.Do(newRedisClient)
+	return instanceRedisClient
+}
+
+func newRedisClient() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
 	client := redis.NewClient(&redis.Options{
@@ -37,7 +48,7 @@ func NewRedisClient() *RedisClient {
 		DB:       config.RedisConfig.DB,
 	})
 	ctx := context.Background()
-	return &RedisClient{
+	instanceRedisClient = &RedisClient{
 		client,
 		logger,
 		ctx,

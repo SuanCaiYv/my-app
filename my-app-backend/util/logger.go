@@ -5,9 +5,20 @@ import (
 	"github.com/sirupsen/logrus"
 	"path"
 	"runtime"
+	"sync"
+)
+
+var (
+	instanceLogger *logrus.Logger
+	onceLogger     sync.Once
 )
 
 func NewLogger() *logrus.Logger {
+	onceLogger.Do(newLogger)
+	return instanceLogger
+}
+
+func newLogger() {
 	formatter := &logrus.TextFormatter{
 		ForceColors:               true,
 		DisableColors:             false,
@@ -30,5 +41,5 @@ func NewLogger() *logrus.Logger {
 	logger := logrus.New()
 	logger.SetReportCaller(true)
 	logger.SetFormatter(formatter)
-	return logger
+	instanceLogger = logger
 }

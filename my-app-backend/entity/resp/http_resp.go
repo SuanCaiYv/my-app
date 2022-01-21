@@ -46,7 +46,7 @@ func NewNotFound() *Result {
 	return notFound
 }
 
-func NewIntervalError(msg string) *Result {
+func NewInternalError(msg string) *Result {
 	return &Result{
 		Code: 500,
 		Msg:  msg,
@@ -72,4 +72,12 @@ func NewBadRequest(msg string) *Result {
 		}{},
 		Timestamp: time.Now(),
 	}
+}
+
+type r struct {
+	Result bool `json:"result"`
+}
+
+func NewBoolean(result bool) *Result {
+	return NewOk(&r{result})
 }

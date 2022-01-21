@@ -3,6 +3,8 @@ package util
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"mime"
+	"path"
 	"time"
 )
 
@@ -21,4 +23,9 @@ func JustPanic(val interface{}) {
 	if val != nil {
 		logger.Panic(fmt.Sprintf("程序崩溃: %v", val))
 	}
+}
+
+func MIMEType(filename string) string {
+	suffix := path.Ext(filename)
+	return mime.TypeByExtension(suffix)
 }
