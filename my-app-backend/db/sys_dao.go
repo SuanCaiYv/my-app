@@ -11,18 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
+	"sync"
 	"time"
 )
-
-type SysUserDaoService struct {
-	collection *mongo.Collection
-	logger     *logrus.Logger
-}
-
-type SysRoleDaoService struct {
-	collection *mongo.Collection
-	logger     *logrus.Logger
-}
 
 type SysUserDao interface {
 	Insert(sysUser *entity.SysUser) error
@@ -48,7 +39,29 @@ type SysRoleDao interface {
 	SelectByName(name string) (*entity.SysRole, error)
 }
 
+type SysUserDaoService struct {
+	collection *mongo.Collection
+	logger     *logrus.Logger
+}
+
+type SysRoleDaoService struct {
+	collection *mongo.Collection
+	logger     *logrus.Logger
+}
+
+var (
+	instanceSysUserDaoService *SysUserDaoService
+	instanceSysRoleDaoService *SysRoleDaoService
+	onceSysUserDaoService     sync.Once
+	onceSysRoleDaoService     sync.Once
+)
+
 func NewSysUserDaoService() *SysUserDaoService {
+	onceSysUserDaoService.Do(newInstanceSysUserDaoService)
+	return instanceSysUserDaoService
+}
+
+func newInstanceSysUserDaoService() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
 	ctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)
@@ -57,7 +70,7 @@ func NewSysUserDaoService() *SysUserDaoService {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionSysUser)
-	return &SysUserDaoService{
+	instanceSysUserDaoService = &SysUserDaoService{
 		collection,
 		logger,
 	}
@@ -163,6 +176,11 @@ func (s *SysUserDaoService) SelectByNickname(nickname string) (*entity.SysUser, 
 }
 
 func NewSysRoleDaoService() *SysRoleDaoService {
+	onceSysRoleDaoService.Do(newInstanceSysRoleDaoService)
+	return instanceSysRoleDaoService
+}
+
+func newInstanceSysRoleDaoService() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
 	ctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)
@@ -171,7 +189,7 @@ func NewSysRoleDaoService() *SysRoleDaoService {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionSysRole)
-	return &SysRoleDaoService{
+	instanceSysRoleDaoService = &SysRoleDaoService{
 		collection,
 		logger,
 	}

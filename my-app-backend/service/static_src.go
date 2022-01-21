@@ -12,6 +12,8 @@ import (
 
 type StaticSrcApi interface {
 	ADownloadFile(context *gin.Context)
+
+	UploadFile(context *gin.Context)
 }
 
 type StaticSrcApiHandler struct {
@@ -45,4 +47,7 @@ func (s *StaticSrcApiHandler) ADownloadFile(context *gin.Context) {
 	context.DataFromReader(http.StatusOK, int64(contentLength), contentType, reader, extraHeaders)
 }
 
-func (*StaticSrcApiHandler) f() {}
+func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
+	//TODO implement me
+	panic("implement me")
+}

@@ -19,7 +19,9 @@ type ArticleApi interface {
 
 	ListArticle(context *gin.Context)
 
-	ListArticleExactly(context *gin.Context)
+	ListArticleByUser(context *gin.Context)
+
+	ExportArticle(context *gin.Context)
 }
 
 type ArticleApiHandler struct {
@@ -66,9 +68,12 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	context.JSON(200, resp.NewOk(articles))
 }
 
-func (a *ArticleApiHandler) ListArticleExactly(context *gin.Context) {
+func (a *ArticleApiHandler) ListArticleByUser(context *gin.Context) {
 	// TODO implement me
 	panic("implement me")
 }
 
-func (*ArticleApiHandler) f() {}
+func (a *ArticleApiHandler) ExportArticle(context *gin.Context) {
+	//TODO implement me
+	panic("implement me")
+}

@@ -39,7 +39,7 @@ func DefaultSysUser() *SysUser {
 			Phone:     "10086",
 			WeChat:    "d2508826394",
 			QQ:        "2508826394",
-			GitHub:    "github.com/SuanCaiYv",
+			Github:    "github.com/SuanCaiYv",
 			Location:  "HangZhou-China",
 			Signature: "Golang is best!",
 		},

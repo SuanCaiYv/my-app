@@ -5,9 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="backend">
+      <change afterPath="$PROJECT_DIR$/service/site.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/api.json5" beforeDir="false" afterPath="$PROJECT_DIR$/api/api.json5" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entity/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/article.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/article_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/article_dao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/gridfs_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/gridfs_dao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/sys_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/sys_dao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entity/sys.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/sys.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entity/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/article.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/static_src.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/static_src.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/user.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,14 +76,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Go Test.TestUserApiHandler_SignUp in my-app-backend/service">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="my-app-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
     <configuration name="go build my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="my-app-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -130,15 +131,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestUserApiHandler_SignUp\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="my-app-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>

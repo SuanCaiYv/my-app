@@ -22,6 +22,8 @@ type UserApi interface {
 
 	Logout(context *gin.Context)
 
+	SendVerCode(context *gin.Context)
+
 	GetUserInfo(context *gin.Context)
 
 	UpdateUserInfo(context *gin.Context)
@@ -145,6 +147,11 @@ func (u *UserApiHandler) Login(context *gin.Context) {
 		RefreshToken: refreshToken,
 		AccessToken:  accessToken,
 	}))
+}
+
+func (u *UserApiHandler) SendVerCode(context *gin.Context) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (u *UserApiHandler) Logout(context *gin.Context) {

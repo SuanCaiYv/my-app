@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"sync"
 	"time"
 )
 
@@ -37,7 +38,17 @@ type ArticleDaoService struct {
 	logger     *logrus.Logger
 }
 
+var (
+	instanceArticleDaoService *ArticleDaoService
+	onceArticleDaoService     sync.Once
+)
+
 func NewArticleDaoService() *ArticleDaoService {
+	onceArticleDaoService.Do(newInstanceArticleDaoService)
+	return instanceArticleDaoService
+}
+
+func newInstanceArticleDaoService() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -46,7 +57,7 @@ func NewArticleDaoService() *ArticleDaoService {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)
-	return &ArticleDaoService{
+	instanceArticleDaoService = &ArticleDaoService{
 		collection,
 		logger,
 	}

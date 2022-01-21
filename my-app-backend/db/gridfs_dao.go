@@ -12,13 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
+	"sync"
 	"time"
 )
-
-type GridFSDaoService struct {
-	bucket *gridfs.Bucket
-	logger *logrus.Logger
-}
 
 type GridFSDao interface {
 	UploadFile(fileContent []byte, filename string, metaData primitive.M) error
@@ -32,7 +28,22 @@ type GridFSDao interface {
 	ExistFile(filename string) bool
 }
 
+type GridFSDaoService struct {
+	bucket *gridfs.Bucket
+	logger *logrus.Logger
+}
+
+var (
+	instanceGridFSDaoService *GridFSDaoService
+	onceGridFSDaoService     sync.Once
+)
+
 func NewGridFSDaoService() *GridFSDaoService {
+	onceGridFSDaoService.Do(newInstanceGridFSDaoService)
+	return instanceGridFSDaoService
+}
+
+func newInstanceGridFSDaoService() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
 	ctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)
@@ -42,7 +53,7 @@ func NewGridFSDaoService() *GridFSDaoService {
 	util.JustPanic(err)
 	bucket, err := gridfs.NewBucket(client.Database(config.DatabaseConfig.GridFSDB))
 	util.JustPanic(err)
-	return &GridFSDaoService{
+	instanceGridFSDaoService = &GridFSDaoService{
 		bucket,
 		logger,
 	}

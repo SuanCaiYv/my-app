@@ -20,20 +20,27 @@
   "4": {
     "code": 200,
     "msg": "",
-    "data": true,
+    "data": {
+      "result": true
+    },
     "timestamp": ""
   },
   "5": {
-    "user_id": "",
-    "avatar": "",
-    "nickname": "",
-    "email": "",
-    "Phone": "",
-    "weChat": "",
-    "qq": "",
-    "gitHub": "",
-    "location": "",
-    "signature": ""
+    "code": 200,
+    "msg": "",
+    "data": {
+      "user_id": "",
+      "avatar": "",
+      "nickname": "",
+      "email": "",
+      "phone": "",
+      "we_chat": "",
+      "qq": "",
+      "github": "",
+      "location": "",
+      "signature": ""
+    },
+    "timestamp": ""
   },
   "6": {
     "article_id": "",
@@ -99,6 +106,14 @@
     "timestamp": ""
   },
   "8": {
-    "document_file_name": ""
+    "filename": ""
+  },
+  "9": {
+    "code": 200,
+    "msg": "",
+    "data": {
+      "filename": ""
+    },
+    "timestamp": ""
   }
 }

@@ -27,6 +27,7 @@ func Route() {
 	userApiHandler := service.NewUserApiHandler()
 	staticSrcApi := service.NewStaticSrcApiHandler()
 	articleApi := service.NewArticleApiHandler()
+	siteApi := service.NewSiteApiHandler()
 	// 测试用
 	router.GET("/t", func(context *gin.Context) {
 		fmt.Println(context.Query("name"))
@@ -42,9 +43,10 @@ func Route() {
 		// 免登陆部分
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
+		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
 		versionOne.GET("/article_list", articleApi.ListArticle)
 
-		// 静态资源处理器
+		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
 
 		// 以下需要登录
@@ -53,13 +55,24 @@ func Route() {
 		// 用户接口
 		userApi := versionOne.Group("/user")
 		userApi.DELETE("", userApiHandler.Logout)
-		userApi.GET("/info")
+		userApi.GET("/info", userApiHandler.GetUserInfo)
+		userApi.PUT("/info", userApiHandler.UpdateUserInfo)
 
 		// 文章接口
 		article := versionOne.Group("/article")
-		article.GET("/list", articleApi.ListArticle, articleApi.ListArticleExactly)
+		article.GET("/list", articleApi.ListArticle, articleApi.ListArticleByUser)
 		article.POST("", articleApi.AddArticle)
 		article.PUT("", articleApi.UpdateArticle)
+		article.DELETE(":article_id", articleApi.DeleteArticle)
+		article.GET("/doc/:article_id", articleApi.ExportArticle)
+
+		// 静态资源接口
+		file := versionOne.Group("/static")
+		file.POST("/file", staticSrcApi.UploadFile)
+
+		// 其他接口
+		other := versionOne.Group("")
+		other.GET("/backup", siteApi.BackupSite)
 	}
 	err := router.Run(":8190")
 	util.JustPanic(err)
