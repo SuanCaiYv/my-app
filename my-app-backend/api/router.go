@@ -28,17 +28,26 @@ func Route() {
 	staticSrcApi := service.NewStaticSrcApiHandler()
 	articleApi := service.NewArticleApiHandler()
 	siteApi := service.NewSiteApiHandler()
-	// 测试用
-	router.GET("/t", func(context *gin.Context) {
-		fmt.Println(context.Query("name"))
-		context.JSON(200, struct{}{})
-	})
-	router.POST("/t", func(context *gin.Context) {
-		fmt.Println(context.PostForm("name"))
-		context.JSON(200, struct{}{})
-	})
 	// 版本分组
 	versionOne := router.Group("/v1")
+	// 测试用
+	versionOne.GET("/t", func(context *gin.Context) {
+		fmt.Println(context.Query("name"))
+		context.JSON(200, resp.NewBoolean(true))
+	})
+	versionOne.POST("/t", func(context *gin.Context) {
+		m := make(map[string]interface{})
+		_ = context.BindJSON(&m)
+		for k, v := range m {
+			fmt.Println(k, v)
+		}
+		context.JSON(200, resp.NewBoolean(true))
+	})
+	versionOne.POST("/t/upload", func(context *gin.Context) {
+		file, _ := context.FormFile("file")
+		fmt.Println(file.Filename)
+		context.JSON(200, resp.NewBoolean(true))
+	})
 	{
 		// 免登陆部分
 		versionOne.PUT("/sign", userApiHandler.Login)

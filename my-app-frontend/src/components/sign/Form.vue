@@ -10,7 +10,7 @@
         </div>
         <div class="l3">
             <div class="name-show name-show-click" @click="sendVerCode">验证码</div>
-            <input class="value-input" type="text" v-model="verCode" />
+            <input class="value-input" type="text" v-model="verCode" placeholder='点击"验证码"以发送'/>
         </div>
         <div class="l4">
             <button class="sign-button-in">登录</button>
@@ -21,15 +21,34 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
+import {httpClient, Response} from "../../net";
 
-const name = ref<String>("Form")
+const name = ref<string>("Form")
 
-let username = ref<String>("")
-let password = ref<String>("")
-let verCode = ref<String>("")
+let username = ref<string>("")
+let password = ref<string>("")
+let verCode = ref<string>("")
+
+let verCodePL = ref<string>("")
+
+let sendVerCodeAgain = true
 
 const sendVerCode = function () {
-    console.log(username.value)
+    if (!sendVerCodeAgain) {
+        alert("请120秒后重试")
+        return
+    }
+    sendVerCodeAgain = false
+    setInterval(() => {
+        sendVerCodeAgain = true
+    }, 120 * 1000)
+    httpClient.post("/sign/ver_code", {}, {
+        username: username.value
+    }, false, function (resp: Response) {
+        if (resp.ok) {
+            alert("验证码发送成功!")
+        }
+    })
 }
 </script>
 

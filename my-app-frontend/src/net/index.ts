@@ -1,13 +1,11 @@
 import axios, {AxiosResponse} from "axios";
-import {useStore} from "vuex";
+import store from "../store";
 
 const baseUrl = "http://127.0.0.1:8190/v1"
 
 axios.defaults.timeout = 2000
 
-const store = useStore()
-
-class Resp {
+class Response {
     ok: boolean
     errCode: number
     errMsg: string
@@ -34,7 +32,7 @@ const httpClient = {
         if (auth) {
             axios.get(url, {
                 headers: {
-                    "Authorization": "Bearer " + store.getters.accessToken,
+                    "Authorization": "Bearer " + store.getters.accessToken(),
                 }
             }).then(function (resp) {
                 callback(dealResp(resp))
@@ -49,11 +47,112 @@ const httpClient = {
                 console.log(err)
             })
         }
+    },
+    post: function <T extends object>(uri: string, query: T, params: T, auth: boolean, callback: Function) {
+        let str = ""
+        for (let field in query) {
+            str += (field + "=" + query[field])
+        }
+        let url = baseUrl + uri + "?" + str
+        if (auth) {
+            axios.post(url, params, {
+                headers: {
+                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Content-Type": "application/json"
+                }
+            }).then(function (resp) {
+                callback(dealResp(resp))
+            }).catch(err => {
+                console.log(err)
+            })
+        } else {
+            axios.post(url, params, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(function (resp) {
+                callback(dealResp(resp))
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+    },
+    put: function <T extends object>(uri: string, query: T, params: T, auth: boolean, callback: Function) {
+        let str = ""
+        for (let field in query) {
+            str += (field + "=" + query[field])
+        }
+        let url = baseUrl + uri + "?" + str
+        if (auth) {
+            axios.put(url, params, {
+                headers: {
+                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Content-Type": "application/json"
+                }
+            }).then(function (resp) {
+                callback(dealResp(resp))
+            }).catch(err => {
+                console.log(err)
+            })
+        } else {
+            axios.put(url, params, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(function (resp) {
+                callback(dealResp(resp))
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+    },
+    delete: function <T extends object>(uri: string, query: T, auth: boolean, callback: Function) {
+        let str = ""
+        for (let field in query) {
+            str += (field + "=" + query[field])
+        }
+        let url = baseUrl + uri + "?" + str
+        if (auth) {
+            axios.delete(url, {
+                headers: {
+                    "Authorization": "Bearer " + store.getters.accessToken(),
+                }
+            }).then(function (resp) {
+                callback(dealResp(resp))
+            }).catch(err => {
+                console.log(err)
+            })
+        } else {
+            axios.delete(url)
+                .then(function (resp) {
+                    callback(dealResp(resp))
+                }).catch(err => {
+                console.log(err)
+            })
+        }
+    },
+    // 此方法必须携带Token
+    upload: function<T extends object> (uri: string, query: T, formData: FormData, callback: Function) {
+        let str = ""
+        for (let field in query) {
+            str += (field + "=" + query[field])
+        }
+        let url = baseUrl + uri + "?" + str
+        axios.post(url, formData, {
+            headers: {
+                "Authorization": "Bearer " + store.getters.accessToken(),
+                "Content-Type": "multipart/form-data"
+            }
+        }).then(resp => {
+            callback(dealResp(resp))
+        }).catch(err => {
+            console.log(err)
+        })
     }
 }
 
 const dealResp = function (resp: AxiosResponse) {
-    let r = new Resp()
+    let r = new Response()
     if (resp.status === 200) {
         let rawData = resp.data
         r.ok = rawData.code === 200
@@ -71,4 +170,4 @@ const dealResp = function (resp: AxiosResponse) {
     return r
 }
 
-export default httpClient
+export {httpClient, Response}
