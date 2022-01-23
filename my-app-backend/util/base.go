@@ -19,6 +19,10 @@ func GenerateUUID() string {
 	return newUUID.String()
 }
 
+func VerCode() string {
+	return fmt.Sprintf("%d", time.Now().UnixMilli())[:6]
+}
+
 func JustPanic(val interface{}) {
 	if val != nil {
 		logger.Panic(fmt.Sprintf("程序崩溃: %v", val))

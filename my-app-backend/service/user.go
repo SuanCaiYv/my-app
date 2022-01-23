@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"strings"
+	"time"
 )
 
 type UserApi interface {
@@ -39,7 +40,7 @@ type UserApiHandler struct {
 type sign struct {
 	Username   string `json:"username"`
 	Credential string `json:"credential"`
-	VerCode    string `json:"verCode"`
+	VerCode    string `json:"ver_code"`
 }
 
 func NewUserApiHandler() *UserApiHandler {
@@ -63,6 +64,11 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 	if err != nil {
 		u.logger.Errorf("无法读取SysUser数据表: %v", err)
 		context.JSON(200, resp.NewInternalError("无法读取用户表"))
+		return
+	}
+	if sysUser != nil {
+		u.logger.Infof("用户已存在: %s", sign.Username)
+		context.JSON(200, resp.NewBadRequest("用户已存在"))
 		return
 	}
 	verCodeCache := ""
@@ -100,7 +106,7 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 			return
 		}
 	}
-	context.JSON(200, resp.NewOk(&struct{}{}))
+	context.JSON(200, resp.NewBoolean(true))
 }
 
 func (u *UserApiHandler) Login(context *gin.Context) {
@@ -136,13 +142,13 @@ func (u *UserApiHandler) Login(context *gin.Context) {
 	}
 	accessToken, err := auth.SignAccessToken(sysUser.Username, sysUser.Role)
 	if err != nil {
-		u.logger.Errorf("AccessToken: %s; %v", sign.Username, err)
+		u.logger.Errorf("生成AccessToken失败: %s; %v", sign.Username, err)
 		context.JSON(200, resp.NewInternalError("生成令牌失败"))
 		return
 	}
 	context.JSON(200, resp.NewOk(&struct {
-		RefreshToken string `json:"refreshToken"`
-		AccessToken  string `json:"accessToken"`
+		RefreshToken string `json:"refresh_token"`
+		AccessToken  string `json:"access_token"`
 	}{
 		RefreshToken: refreshToken,
 		AccessToken:  accessToken,
@@ -150,8 +156,18 @@ func (u *UserApiHandler) Login(context *gin.Context) {
 }
 
 func (u *UserApiHandler) SendVerCode(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.Param("username")
+	if _, ok := config.ApplicationConfiguration().AccountSet[username]; ok {
+		context.JSON(200, resp.NewBoolean(true))
+		return
+	}
+	err := u.redisOps.SetExp("ver_code_"+username, util.VerCode(), 120*time.Second)
+	if err != nil {
+		u.logger.Errorf("设置验证码失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("设置验证码失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
 }
 
 func (u *UserApiHandler) Logout(context *gin.Context) {

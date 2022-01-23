@@ -1,16 +1,16 @@
 import {createApp} from 'vue'
 import AlertComponent from "../components/Alert.vue"
 
-const Alert = function (options: object, callback0: Function) {
+const alertFunc = function (alertMsg: string, afterDoneCallback: Function) {
     let divElement = document.createElement("div");
     const instance = createApp(AlertComponent, {
-        val: true,
-        el: divElement,
-        callback: callback0
+        divNode: divElement,
+        msg: alertMsg,
+        afterDone: afterDoneCallback,
     })
     instance.mount(divElement)
     // @ts-ignore
     document.getElementById("app").appendChild(divElement)
 }
 
-export {Alert}
+export {alertFunc};

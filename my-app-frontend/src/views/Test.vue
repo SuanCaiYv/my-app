@@ -1,23 +1,23 @@
 <template>
     <div>
-        <button @click="send">测试</button>
-        aaa
+        <button class="test" @click="send">测试</button>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import {Alert} from "../util/alert"
+import {alertFunc} from "../util/alert";
+import {confirmFunc} from "../util/confirm";
+import {useRouter} from "vue-router";
 
 const name = ref<String>("Test")
 
-let str = ref<String>("")
+const router = useRouter()
 
 const send = function () {
-    Alert({}, function (msg: String) {
-        console.log(msg)
-    })
+    router.push("/home")
 }
+
 // <input type="file" name="file" @change="upload0($event)">
 // let file = ""
 //
@@ -36,5 +36,7 @@ const send = function () {
 </script>
 
 <style scoped>
-
+.test:hover {
+    background-color: #9dbbff;
+}
 </style>
