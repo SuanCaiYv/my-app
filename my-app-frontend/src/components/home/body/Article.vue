@@ -26,7 +26,7 @@ let props = defineProps({
 
 .articleHead {
     height: 40px;
-    width: 300px;
+    width: 320px;
     margin: 0 auto 0 50px;
     border: 1px solid black;
     box-sizing: border-box;

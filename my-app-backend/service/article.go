@@ -22,6 +22,8 @@ type ArticleApi interface {
 	ListArticleByUser(context *gin.Context)
 
 	ExportArticle(context *gin.Context)
+
+	KindAndTagList(context *gin.Context)
 }
 
 type ArticleApiHandler struct {
@@ -76,5 +78,10 @@ func (a *ArticleApiHandler) ListArticleByUser(context *gin.Context) {
 
 func (a *ArticleApiHandler) ExportArticle(context *gin.Context) {
 	//TODO implement me
+	panic("implement me")
+}
+
+func (a *ArticleApiHandler) KindAndTagList(context *gin.Context) {
+	// TODO implement me
 	panic("implement me")
 }

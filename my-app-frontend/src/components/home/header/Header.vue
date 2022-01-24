@@ -1,11 +1,9 @@
 <template>
     <div class="header">
-        <PH1></PH1>
         <HomePage></HomePage>
-        <PH2></PH2>
-        <PH3></PH3>
+        <PH1></PH1>
         <Search></Search>
-        <PH4></PH4>
+        <SignButton></SignButton>
     </div>
 </template>
 
@@ -17,6 +15,7 @@ import PH1 from "../../placeholder/PH1.vue"
 import PH2 from "../../placeholder/PH2.vue"
 import PH3 from "../../placeholder/PH3.vue"
 import PH4 from "../../placeholder/PH4.vue"
+import SignButton from "./SignButton.vue";
 
 const name = ref<String>("Header")
 </script>
@@ -27,7 +26,7 @@ const name = ref<String>("Header")
     height: 100%;
     grid-area: header;
     display: grid;
-    grid-template-areas: "ph1 home ph2 ph3 search ph4";
-    grid-auto-columns: 25px 150px 25px 1fr 200px 60px;
+    grid-template-areas: "home-page ph1 search sign-button";
+    grid-auto-columns: 200px 1fr 200px 200px;
 }
 </style>

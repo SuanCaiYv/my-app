@@ -3,6 +3,7 @@ import {createStore, Store} from "vuex";
 const store: Store<any> = createStore({
     state() {
         return {
+            authed: Boolean,
             accessToken: String,
             refreshToken: String,
             userRole: String,
@@ -10,6 +11,9 @@ const store: Store<any> = createStore({
         }
     },
     mutations: {
+        updateAuthed(state, authed) {
+            state.authed = authed
+        },
         updateAccessToken(state, accessToken) {
             state.accessToken = accessToken
         },
@@ -21,6 +25,9 @@ const store: Store<any> = createStore({
         }
     },
     getters: {
+        authed: (state) => {
+            return state.authed
+        },
         accessToken: (state) => {
             return state.accessToken
         },

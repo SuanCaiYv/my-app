@@ -116,5 +116,24 @@
       "filename": ""
     },
     "timestamp": ""
+  },
+  "10": {
+    "code": 200,
+    "msg": "",
+    "data": {
+      "kind_list": [
+        {
+          "kind_id": "",
+          "kind_name": ""
+        }
+      ],
+      "tag_list": [
+        {
+          "tag_id": "",
+          "tag_name": ""
+        }
+      ]
+    },
+    "timestamp": ""
   }
 }

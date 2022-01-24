@@ -1,6 +1,6 @@
 <template>
-    <div class="home">
-        <button class="homePage" @click="homePage">
+    <div class="home-page">
+        <button class="home-page-button" @click="homePage">
             <span style="font-size: 1.2rem">Home</span>
         </button>
     </div>
@@ -19,23 +19,29 @@ const homePage = function () {
 </script>
 
 <style scoped>
-.home {
+.home-page {
     width: 100%;
     height: 100%;
+    grid-area: home-page;
 }
 
-.homePage {
-    width: 100%;
+.home-page-button {
+    width: 120px;
     height: 100%;
+    margin-left: 40px;
+    margin-right: 40px;
+    padding: 0;
+    border: 1px solid silver;
+    box-sizing: border-box;
     border-radius: 8px;
     background-color: lightskyblue;
 }
 
-.homePage:hover {
+.home-page-button:hover {
     background-color: deepskyblue;
 }
 
-.homePage:active {
+.home-page-button:active {
     background-color: dodgerblue;
 }
 </style>

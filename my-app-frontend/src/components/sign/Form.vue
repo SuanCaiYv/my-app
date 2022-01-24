@@ -53,6 +53,7 @@ const sendVerCode = function () {
 }
 
 const jumpHome = function () {
+    store.commit("updateAuthed", true)
     router.push("/home")
 }
 
@@ -67,7 +68,7 @@ const login = function () {
             // @ts-ignore
             store.commit("updateRefreshToken", resp.data.refresh_token)
             alertFunc("登录成功", function () {
-                // jumpHome()
+                jumpHome()
             })
         } else {
             alertFunc(resp.errMsg, function () {})

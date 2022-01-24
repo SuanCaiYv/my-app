@@ -18,8 +18,10 @@ const list = inject("articleList")
 
 <style scoped>
 .articleList {
-    width: 100%;
+    width: auto;
     height: 100%;
     grid-area: articleList;
+    margin-left: 50px;
+    margin-right: 50px;
 }
 </style>

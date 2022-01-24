@@ -72,8 +72,9 @@ func Route() {
 		article.GET("/list", articleApi.ListArticle, articleApi.ListArticleByUser)
 		article.POST("", articleApi.AddArticle)
 		article.PUT("", articleApi.UpdateArticle)
-		article.DELETE(":article_id", articleApi.DeleteArticle)
+		article.DELETE("/:article_id", articleApi.DeleteArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
+		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
 
 		// 静态资源接口
 		file := versionOne.Group("/static")
@@ -115,7 +116,7 @@ func authFunc(context *gin.Context) {
 		context.JSON(resp.NewAuthFailed().Code, resp.NewAuthFailed())
 		return
 	}
-	logger.Errorf("用户: %s 开始操作", username)
+	logger.Infof("用户: %s 开始操作", username)
 	context.Set("username", username)
 	context.Set("role", role)
 }

@@ -31,6 +31,6 @@ const signature = "Golang+Vue3"
         "sortAndPage sortAndPage sortAndPage"
         "userInfo articleList tagList";
     grid-auto-columns: 200px 1fr 200px;
-    grid-template-rows: 100px 1fr;
+    grid-template-rows: 80px 1fr;
 }
 </style>
