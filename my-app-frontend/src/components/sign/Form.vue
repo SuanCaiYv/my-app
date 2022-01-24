@@ -160,7 +160,7 @@ const signup = function () {
     border: none;
     box-sizing: border-box;
     border-radius: 8px;
-    display: inline-block;
+    display: inline-block;0
     vertical-align: bottom;
     line-height: 50px;
     font-size: 1.2rem;

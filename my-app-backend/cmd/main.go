@@ -1,8 +1,13 @@
 package main
 
-import "github.com/SuanCaiYv/my-app-backend/api"
+import (
+	"fmt"
+	"github.com/SuanCaiYv/my-app-backend/api"
+	"time"
+)
 
 func main() {
+	fmt.Println(int64(time.Second / time.Millisecond))
 	BeforeStart()
 	api.Route()
 }

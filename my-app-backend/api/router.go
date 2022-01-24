@@ -28,6 +28,7 @@ func Route() {
 	staticSrcApi := service.NewStaticSrcApiHandler()
 	articleApi := service.NewArticleApiHandler()
 	siteApi := service.NewSiteApiHandler()
+	wsApi := service.NewWSApiHandler()
 	// 版本分组
 	versionOne := router.Group("/v1")
 	// 测试用
@@ -54,6 +55,7 @@ func Route() {
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
 		versionOne.GET("/article_list", articleApi.ListArticle)
+		versionOne.GET("/ws", wsApi.ImageFetch)
 
 		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
@@ -75,6 +77,7 @@ func Route() {
 		article.DELETE("/:article_id", articleApi.DeleteArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
+		article.GET("/img_fetch", wsApi.ImageFetch)
 
 		// 静态资源接口
 		file := versionOne.Group("/static")
