@@ -7,17 +7,16 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {ref, watch} from "vue"
 import {useRouter} from "vue-router";
-import {useStore} from "vuex";
+import storage from "../../../util/storage"
 
 const name = ref<String>("SignButton")
 
 const state = ref<String>("Sign")
-const store = useStore()
 
 // todo
-if (store.getters.authed) {
+if (Boolean(storage.get("authed"))) {
     state.value = "Logout"
 } else {
     state.value = "Sign"
@@ -25,10 +24,10 @@ if (store.getters.authed) {
 
 const router = useRouter()
 const signButton = function () {
-    if (store.getters.authed) {
-        store.commit("updateAuthed", false)
-        store.commit("updateAccessToken", "")
-        store.commit("updateRefreshToken", "")
+    if (Boolean(storage.get("authed"))) {
+        storage.set("authed", "false")
+        storage.set("accessToken", "")
+        storage.set("refreshToken", "")
         state.value = "Logout"
     } else {
         router.push("/sign")

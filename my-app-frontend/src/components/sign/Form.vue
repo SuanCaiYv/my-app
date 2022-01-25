@@ -23,8 +23,8 @@
 import {ref} from "vue"
 import {httpClient, Response} from "../../net";
 import {alertFunc} from "../../util/alert";
-import store from "../../store";
 import router from "../../router";
+import storage from "../../util/storage";
 
 const name = ref<string>("Form")
 
@@ -32,28 +32,28 @@ let username = ref<string>("")
 let password = ref<string>("")
 let verCode = ref<string>("")
 
-let sendVerCodeAgain = true
+storage.setOnce("lastVerCodeSendTimestamp", (new Date().getTime() - 2 * 1000) + "")
 
 const sendVerCode = function () {
-    if (!sendVerCodeAgain) {
+    if (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp")) < 2 * 1000) {
         alertFunc("请120秒后重试", function () {})
         return
     }
     setInterval(() => {
-        sendVerCodeAgain = true
-    }, 120 * 1000)
+        console.log("run")
+        storage.set("lastVerCodeSendTimestamp", new Date().getTime() + "")
+    }, 2 * 1000)
     httpClient.post("/sign/ver_code", {}, {
         username: username.value
     }, false, function (resp: Response) {
         if (resp.ok) {
             alertFunc("验证码发送成功!", function () {})
-            sendVerCodeAgain = false
+            storage.set("lastVerCodeSendTimestamp", new Date().getTime() + "")
         }
     })
 }
 
 const jumpHome = function () {
-    store.commit("updateAuthed", true)
     router.push("/home")
 }
 
@@ -64,9 +64,10 @@ const login = function () {
     }, false, function (resp: Response) {
         if (resp.ok) {
             // @ts-ignore
-            store.commit("updateAccessToken", resp.data.access_token)
+            storage.set("accessToken", resp.data.access_token)
             // @ts-ignore
-            store.commit("updateRefreshToken", resp.data.refresh_token)
+            storage.set("refreshToken", resp.data.refresh_token)
+           storage.set("authed", "true")
             alertFunc("登录成功", function () {
                 jumpHome()
             })
