@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -14,6 +15,8 @@ import (
 
 type WSApi interface {
 	ImageFetch(context *gin.Context)
+
+	Generic(context *gin.Context)
 }
 
 type WSApiHandler struct {
@@ -45,15 +48,9 @@ func newWSApiHandler() {
 }
 
 func (w *WSApiHandler) ImageFetch(context *gin.Context) {
-	usernameInterface, ok := context.Get("username")
-	var username string
-	if !ok {
-		username = "test"
-	} else {
-		username = usernameInterface.(string)
-	}
-	documentId := context.Query("document_id")
-	fmt.Println(documentId)
+	username := context.MustGet("username").(string)
+	articleId := context.Query("article_id")
+	fmt.Println(articleId)
 	request := context.Request
 	responseWriter := context.Writer
 	socket, err := w.upgrader.Upgrade(responseWriter, request, nil)
@@ -61,50 +58,128 @@ func (w *WSApiHandler) ImageFetch(context *gin.Context) {
 		w.logger.Errorf("WebSocket专用连接: %v; %s", err, username)
 		return
 	}
-	// 下次无操作关闭时间
-	timer := time.After(time.Duration(time.Now().UnixMilli()+int64(2+time.Hour/time.Millisecond)) * time.Millisecond)
-	flag := false
-	closed := false
+	socket.SetPingHandler(func(appData string) error {
+		err := socket.WriteControl(websocket.PongMessage, []byte(appData), time.Now().Add(5*time.Second))
+		if err == websocket.ErrCloseSent {
+			return nil
+		} else if e, ok := err.(net.Error); ok && e.Temporary() {
+			return nil
+		}
+		return err
+	})
+	socket.SetPongHandler(func(appData string) error {
+		return nil
+	})
+	socket.SetCloseHandler(func(code int, text string) error {
+		w.logger.Infof("关闭连接: %d, %s", code, text)
+		err := socket.WriteControl(websocket.CloseMessage, []byte("close"), time.Now().Add(5*time.Second))
+		if err != nil {
+			w.logger.Error(err)
+			return err
+		}
+		return nil
+	})
+	lastTimestamp := time.Now()
+	isActive := false
+	// 闲置时间
+	finish := time.After(time.Duration(time.Now().Add(2*time.Hour).UnixMilli() * int64(time.Millisecond)))
 	for {
 		select {
-		case <-timer:
-			if flag {
-				timer = time.After(time.Duration(time.Now().UnixMilli()+int64(2+time.Hour/time.Millisecond)) * time.Millisecond)
-				flag = false
-			} else {
-				w.logger.Infof("连接闲置过长: %s", username)
+		case <-finish:
+			if !isActive {
 				return
+			} else {
+				isActive = false
+				finish = time.After(time.Duration(lastTimestamp.Add(2*time.Hour).UnixMilli() * int64(time.Millisecond)))
 			}
 		default:
+			lastTimestamp = time.Now()
+			isActive = true
 			messageType, bytes, err := socket.ReadMessage()
 			if err != nil {
-				if !closed {
-					w.logger.Errorf("读取失败: %v; %s", err, username)
-				} else {
-					w.logger.Errorf("连接关闭: %v; %s", err, username)
-				}
+				w.logger.Error(err)
 				return
 			}
 			switch messageType {
-			case websocket.CloseMessage:
-				w.logger.Errorf("试图关闭连接: %s", username)
-				closed = true
-				return
 			case websocket.PingMessage:
-				w.logger.Infof("ping msg: %s", username)
-				err := socket.WriteControl(websocket.PongMessage, make([]byte, 0, 0), time.UnixMilli(int64(15*time.Second/time.Millisecond)+time.Now().UnixMilli()))
-				if err != nil {
-					w.logger.Errorf("写入Pong失败: %s", username)
-					return
-				}
+				_ = socket.PingHandler()("pong")
 			case websocket.PongMessage:
-				w.logger.Infof("pong msg: %s", username)
+				_ = socket.PongHandler()("")
+			case websocket.CloseMessage:
+				_ = socket.CloseHandler()(0, "")
 			case websocket.TextMessage:
-				// 不应该走到这里
-				w.logger.Infof("text msg: %s", username)
-				fmt.Println(string(bytes))
+				// 处理文本消息
+				w.logger.Infof("%s: %s", username, string(bytes))
 			case websocket.BinaryMessage:
-				w.logger.Infof("binary msg: %s", username)
+				// 处理二进制消息
+				w.logger.Infof("%s: %d", username, len(bytes))
+			}
+		}
+	}
+}
+
+func (w *WSApiHandler) Generic(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	socket, err := w.upgrader.Upgrade(context.Writer, context.Request, nil)
+	if err != nil {
+		w.logger.Error(err)
+		return
+	}
+	socket.SetPingHandler(func(appData string) error {
+		err := socket.WriteControl(websocket.PongMessage, []byte(appData), time.Now().Add(5*time.Second))
+		if err == websocket.ErrCloseSent {
+			return nil
+		} else if e, ok := err.(net.Error); ok && e.Temporary() {
+			return nil
+		}
+		return err
+	})
+	socket.SetPongHandler(func(appData string) error {
+		return nil
+	})
+	socket.SetCloseHandler(func(code int, text string) error {
+		w.logger.Infof("关闭连接: %d, %s", code, text)
+		err := socket.WriteControl(websocket.CloseMessage, []byte("close"), time.Now().Add(5*time.Second))
+		if err != nil {
+			w.logger.Error(err)
+			return err
+		}
+		return nil
+	})
+	lastTimestamp := time.Now()
+	isActive := false
+	// 闲置时间
+	finish := time.After(time.Duration(time.Now().Add(2*time.Hour).UnixMilli() * int64(time.Millisecond)))
+	for {
+		select {
+		case <-finish:
+			if !isActive {
+				return
+			} else {
+				isActive = false
+				finish = time.After(time.Duration(lastTimestamp.Add(2*time.Hour).UnixMilli() * int64(time.Millisecond)))
+			}
+		default:
+			lastTimestamp = time.Now()
+			isActive = true
+			messageType, bytes, err := socket.ReadMessage()
+			if err != nil {
+				w.logger.Error(err)
+				return
+			}
+			switch messageType {
+			case websocket.PingMessage:
+				_ = socket.PingHandler()("pong")
+			case websocket.PongMessage:
+				_ = socket.PongHandler()("")
+			case websocket.CloseMessage:
+				_ = socket.CloseHandler()(0, "")
+			case websocket.TextMessage:
+				// 处理文本消息
+				w.logger.Infof("%s: %s", username, string(bytes))
+			case websocket.BinaryMessage:
+				// 处理二进制消息
+				w.logger.Infof("%s: %d", username, len(bytes))
 			}
 		}
 	}
