@@ -1,7 +1,7 @@
 <template>
     <div class="userInfo">
         <div class="img">
-            <img style="width: 100%; height: 100%; object-fit: fill" src="../../../assets/IMG_0751.JPG" alt="no-avatar">
+            <img style="width: 100%; height: 100%; object-fit: fill" src="http://127.0.0.1:8190/v1/static/a/default-avatar.png" alt="no-avatar">
         </div>
         <div class="nickname">
             {{nickname}}

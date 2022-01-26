@@ -17,7 +17,6 @@ const name = ref<String>("Layout")
 .layout {
     height: 100%;
     width: 100%;
-    background-image: url("public/BK_FOUR.jpg");
     background-size: cover;
     display: grid;
     grid-template-areas: "ph1 main";

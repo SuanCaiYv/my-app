@@ -7,16 +7,17 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from "vue"
+import {ref} from "vue"
 import {useRouter} from "vue-router";
 import storage from "../../../util/storage"
+import {parseBoolean} from "../../../util/base";
 
 const name = ref<String>("SignButton")
 
 const state = ref<String>("Sign")
 
 // todo
-if (Boolean(storage.get("authed"))) {
+if (parseBoolean(storage.get("authed"))) {
     state.value = "Logout"
 } else {
     state.value = "Sign"
@@ -24,11 +25,11 @@ if (Boolean(storage.get("authed"))) {
 
 const router = useRouter()
 const signButton = function () {
-    if (Boolean(storage.get("authed"))) {
+    if (parseBoolean(storage.get("authed"))) {
         storage.set("authed", "false")
         storage.set("accessToken", "")
         storage.set("refreshToken", "")
-        state.value = "Logout"
+        state.value = "Sign"
     } else {
         router.push("/sign")
     }
@@ -44,10 +45,10 @@ const signButton = function () {
 }
 
 .sign-button-button {
-    width: 120px;
+    width: 150px;
     height: 100%;
-    margin-left: 40px;
-    margin-right: 40px;
+    margin-left: 25px;
+    margin-right: 25px;
     padding: 0;
     border: 1px solid silver;
     box-sizing: border-box;

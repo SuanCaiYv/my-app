@@ -32,17 +32,16 @@ let username = ref<string>("")
 let password = ref<string>("")
 let verCode = ref<string>("")
 
-storage.setOnce("lastVerCodeSendTimestamp", (new Date().getTime() - 2 * 1000) + "")
+storage.setOnce("lastVerCodeSendTimestamp", (new Date().getTime() - 120 * 1000) + "")
 
 const sendVerCode = function () {
-    if (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp")) < 2 * 1000) {
-        alertFunc("请120秒后重试", function () {})
+    if (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp")) < 120 * 1000) {
+        alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp"))) / 1000) + "秒后重试", function () {})
         return
     }
-    setInterval(() => {
-        console.log("run")
-        storage.set("lastVerCodeSendTimestamp", new Date().getTime() + "")
-    }, 2 * 1000)
+    setTimeout(() => {
+        storage.set("lastVerCodeSendTimestamp", (new Date().getTime() - 120 * 1000) + "")
+    }, 120 * 1000)
     httpClient.post("/sign/ver_code", {}, {
         username: username.value
     }, false, function (resp: Response) {

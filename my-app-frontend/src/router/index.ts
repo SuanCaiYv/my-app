@@ -12,6 +12,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/about",
+        alias: "/me",
         name: "about",
         meta: {
             title: "关于我"

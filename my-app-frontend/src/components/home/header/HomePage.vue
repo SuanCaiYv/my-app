@@ -26,10 +26,10 @@ const homePage = function () {
 }
 
 .home-page-button {
-    width: 120px;
+    width: 150px;
     height: 100%;
-    margin-left: 40px;
-    margin-right: 40px;
+    margin-left: 25px;
+    margin-right: 25px;
     padding: 0;
     border: 1px solid silver;
     box-sizing: border-box;

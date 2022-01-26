@@ -5,10 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="backend">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/ws.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/ws.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Header.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Layout.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/User.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/Img.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/util/base.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/SignButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/SignButton.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/sign/Form.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/sign/Form.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/sign/layout/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/sign/layout/Layout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/views/About.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/views/About.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
