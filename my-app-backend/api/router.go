@@ -55,7 +55,7 @@ func Route() {
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
 		versionOne.GET("/article_list", articleApi.ListArticle)
-		versionOne.GET("/ws", wsApi.ImageFetch)
+		versionOne.GET("/ws", wsApi.Generic)
 
 		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
