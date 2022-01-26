@@ -1,6 +1,6 @@
 <template>
     <div class="home-page">
-        <button class="home-page-button" @click="homePage">
+        <button class="home-page-button" @click="router.push('/home')">
             <span style="font-size: 1.2rem">Home</span>
         </button>
     </div>
@@ -13,9 +13,6 @@ import {useRouter} from "vue-router";
 const name = ref<String>("Home")
 
 const router = useRouter()
-const homePage = function () {
-    router.push("/home")
-}
 </script>
 
 <style scoped>
@@ -31,9 +28,10 @@ const homePage = function () {
     margin-left: 25px;
     margin-right: 25px;
     padding: 0;
-    border: 1px solid silver;
-    box-sizing: border-box;
-    border-radius: 8px;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
+    border-radius: 18px;
     background-color: lightskyblue;
 }
 

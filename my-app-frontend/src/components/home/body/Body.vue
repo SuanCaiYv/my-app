@@ -17,7 +17,7 @@ import TagList from "./TagList.vue";
 const name = ref<String>("Body")
 
 const nickname = "小白白白"
-const email = "codewithbuff@163.comjsdhsdbhaugcyadnajsbdhuasbdad"
+const email = "codewithbuff@163.com"
 const signature = "Golang+Vue3"
 </script>
 

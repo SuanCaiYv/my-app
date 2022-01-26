@@ -163,10 +163,12 @@ func (g *GridFSDaoService) DeleteFile(filename string) error {
 		}
 		gFile = &file
 	}
-	err = g.bucket.Delete(gFile.ID)
-	if err != nil {
-		g.logger.Errorf("删除chunks失败，文件名: %s", filename)
-		return err
+	if gFile != nil {
+		err = g.bucket.Delete(gFile.ID)
+		if err != nil {
+			g.logger.Errorf("删除chunks失败，文件名: %s", filename)
+			return err
+		}
 	}
 	return nil
 }

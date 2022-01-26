@@ -1,7 +1,7 @@
 <template>
     <div class="user">
         <div class="col1">
-            <Img class="img" url="http://127.0.0.1:8190/v1/static/a/default-avatar.png"></Img>
+            <Img class="img" url="http://127.0.0.1:8190/v1/static/a/my-avatar.png"></Img>
             <input class="nickname" :value="nickname" />
         </div>
         <div class="col2">
@@ -104,7 +104,6 @@ const testFunc = function () {
     width: 150px;
     height: 150px;
     margin: 25px;
-    border-radius: 6px;
 }
 
 .img:active {
@@ -116,10 +115,10 @@ const testFunc = function () {
     height: 50px;
     border: 1px solid silver;
     box-sizing: border-box;
+    border-radius: 16px;
     margin-top: 15px;
     margin-left: 25px;
     margin-right: 25px;
-    border-radius: 8px;
     overflow-x: auto;
     font-size: 1.2rem;
     text-align: center;
@@ -131,7 +130,7 @@ const testFunc = function () {
     height: 50px;
     border: 1px solid silver;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;
@@ -144,7 +143,7 @@ const testFunc = function () {
     height: 145px;
     border: 1px solid silver;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;

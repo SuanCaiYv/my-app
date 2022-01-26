@@ -1,7 +1,6 @@
 <template>
     <div class="search">
-        <input type="text" class="key" v-model="keyStr"/>
-        <button class="find" @click="searchKey(keyStr)">搜索</button>
+        <input type="text" class="key" v-model="keyStr" @keydown.enter.down="searchKey(keyStr)" placeholder="键入并回车以检索"/>
     </div>
 </template>
 
@@ -22,28 +21,15 @@ const searchKey = inject("searchKey")
 }
 
 .key {
-    width: 140px;
+    width: 200px;
     height: 100%;
-    border: 1px solid black;
-    box-sizing: border-box;
-    border-radius: 8px;
-    background-color: white;
-}
-
-.find {
-    width: 60px;
-    height: 100%;
-    border: 1px solid black;
-    box-sizing: border-box;
-    border-radius: 8px;
-    background-color: silver;
-}
-
-.find:hover {
-    background-color: gainsboro;
-}
-
-.find:active {
-    background-color: darkgrey;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
+    border: none;
+    padding: 0;
+    border-radius: 16px;
+    display: inline-block;
+    font-size: 1rem;
+    background-color: whitesmoke;
 }
 </style>

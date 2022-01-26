@@ -50,9 +50,10 @@ const signButton = function () {
     margin-left: 25px;
     margin-right: 25px;
     padding: 0;
-    border: 1px solid silver;
-    box-sizing: border-box;
-    border-radius: 8px;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
+    border-radius: 18px;
     background-color: lightskyblue;
 }
 

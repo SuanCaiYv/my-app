@@ -1,13 +1,13 @@
 <template>
     <div class="userInfo">
-        <div class="img">
-            <img style="width: 100%; height: 100%; object-fit: fill" src="http://127.0.0.1:8190/v1/static/a/default-avatar.png" alt="no-avatar">
+        <div class="img" @click="router.push('/about')">
+            <Img url="http://127.0.0.1:8190/v1/static/a/my-avatar.png" />
         </div>
         <div class="nickname">
             {{nickname}}
         </div>
         <div class="email">
-            {{email}}
+            <a :href="mailto" style="text-decoration: none; color: inherit">{{email}}</a>
         </div>
         <div class="signature">
             {{signature}}
@@ -17,6 +17,8 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
+import Img from "../../Img.vue"
+import {useRouter} from "vue-router";
 
 const name = ref<String>("UserInfo")
 
@@ -25,6 +27,10 @@ const props = defineProps({
     email: String,
     signature: String
 })
+
+const mailto = ref<String>("mailto:" + props.email)
+
+const router = useRouter()
 </script>
 
 <style scoped>
@@ -46,28 +52,30 @@ const props = defineProps({
     border-radius: 6px;
 }
 
+.img:active {
+    opacity: 70%;
+}
+
 .nickname {
     width: 150px;
     height: 20px;
     margin: 25px 25px 0;
     padding: 0;
-    border: 1px solid black;
-    box-sizing: border-box;
-    overflow-x: auto;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
     border-radius: 6px;
     font-size: 1rem;
     line-height: 20px;
 }
 
 .email {
-    width: 180px;
+    width: 200px;
     height: 20px;
-    margin: 25px 10px 0;
+    margin: 25px 0 0;
     padding: 0;
-    border: 1px solid black;
-    box-sizing: border-box;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
     border-radius: 6px;
-    overflow-x: auto;
     font-size: 1rem;
     line-height: 20px;
 }
@@ -77,8 +85,8 @@ const props = defineProps({
     height: auto;
     margin: 25px 10px 0;
     padding: 0;
-    border: 1px solid black;
-    box-sizing: border-box;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
     border-radius: 4px;
     font-size: 1rem;
 }

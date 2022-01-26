@@ -33,6 +33,21 @@ const routes: Array<RouteRecordRaw> = [
         path: "/sign",
         name: "sign",
         component: () => import("../views/Sign.vue")
+    },
+    {
+        path: "/article_list",
+        name: "article_list",
+        component: () => import("../views/ArticleList.vue")
+    },
+    {
+        path: "/more_article",
+        name: "more_article",
+        component: () => import("../views/MoreArticle.vue")
+    },
+    {
+        path: "/state_manager",
+        name: "state_manager",
+        component: () => import("../views/StateManager.vue")
     }
 ]
 
