@@ -23,6 +23,8 @@ type GridFSDao interface {
 
 	DownloadFile(filename string) ([]byte, primitive.M, error)
 
+	ListByArchive(archive string) ([]string, error)
+
 	DeleteFile(filename string) error
 
 	ExistFile(filename string) bool
@@ -138,6 +140,12 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 		return nil, nil, err
 	}
 	return data, meteData, nil
+}
+
+func (g *GridFSDaoService) ListByArchive(archive string) ([]string, error) {
+	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
+	defer cancel()
+	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"meta": filename})
 }
 
 func (g *GridFSDaoService) DeleteFile(filename string) error {

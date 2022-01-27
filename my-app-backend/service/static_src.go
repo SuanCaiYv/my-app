@@ -70,6 +70,14 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 	metaMap["upload_user"] = username
 	metaMap["file_length"] = formFile.Size
 	metaMap["origin_name"] = formFile.Filename
+	if t, ok := metaMap["archive"]; ok {
+		if t == "avatar" || t == "document_img" {
+		} else {
+			metaMap["archive"] = "other"
+		}
+	} else {
+		metaMap["archive"] = "other"
+	}
 	file, err := formFile.Open()
 	if err != nil {
 		s.logger.Errorf("打开文件失败: %s; %v", username, err)

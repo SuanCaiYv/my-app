@@ -2,7 +2,6 @@
     <div class="body">
         <div class="block-name">分类管理</div>
         <div class="kind-list">
-            <KindOrTagItem></KindOrTagItem>
         </div>
         <div class="block-name">标签管理</div>
         <div class="tag-list"></div>

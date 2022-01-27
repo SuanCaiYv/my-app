@@ -107,7 +107,14 @@
     "timestamp": ""
   },
   "8": {
-    "filename": ""
+    "filename": "",
+    "cover_img": "",
+    "kind": "",
+    "tag_list": [
+      ""
+    ],
+    "visibility": 1,
+    "summary": ""
   },
   "9": {
     "code": 200,
@@ -131,6 +138,25 @@
         {
           "tag_id": "",
           "tag_name": ""
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  "11": {
+    "code": 200,
+    "msg": "",
+    "data": {
+      "total": 100,
+      "count": 10,
+      "page_num": 1,
+      "page_size": 10,
+      "next_page_num": 2,
+      "end_page": false,
+      "list": [
+        {
+          "kind_id": "",
+          "kind_name": ""
         }
       ]
     },

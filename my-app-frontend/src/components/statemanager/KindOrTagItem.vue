@@ -17,10 +17,11 @@ const name = ref<String>("KindOrTagItem")
     height: 30px;
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
+    border-radius: 16px;
     margin-left: 10px;
     margin-top: 10px;
     display: inline-block;
-    background-color: skyblue;
+    background-color: darkgrey;
 }
 
 .value {
@@ -41,10 +42,19 @@ const name = ref<String>("KindOrTagItem")
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
     border: none;
+    border-radius: 16px;
     padding: 0;
     display: inline-block;
     font-size: 1.4rem;
     vertical-align: bottom;
-    background-color: white;
+    background-color: darkgrey;
+}
+
+.delete:hover {
+    background-color: lightgrey;
+}
+
+.delete:active {
+    background-color: snow;
 }
 </style>
