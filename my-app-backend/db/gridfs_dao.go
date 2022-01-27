@@ -11,24 +11,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/net/context"
 	"os"
 	"sync"
 	"time"
 )
 
 type GridFSDao interface {
-	UploadFile(fileContent []byte, filename string, metaData primitive.M) error
+	UploadFile(fileContent []byte, filename string, metaData MetaData) error
 
 	ModifyFile(file os.File) error
 
-	DownloadFile(filename string) ([]byte, primitive.M, error)
+	DownloadFile(filename string) ([]byte, MetaData, int64, time.Time, error)
 
-	ListByArchive(archive string) ([]string, error)
+	ListByArchive(archive string, pnNum, pgSize int64) ([]string, int64, error)
 
 	DeleteFile(filename string) error
 
 	ExistFile(filename string) bool
 }
+
+type MetaData map[string]interface{}
 
 type GridFSDaoService struct {
 	bucket *gridfs.Bucket
@@ -61,7 +64,7 @@ func newInstanceGridFSDaoService() {
 	}
 }
 
-func (g *GridFSDaoService) UploadFile(fileContent []byte, filename string, metaData primitive.M) error {
+func (g *GridFSDaoService) UploadFile(fileContent []byte, filename string, metaData MetaData) error {
 	// 设置自定义元数据
 	option := options.GridFSUpload()
 	option.SetMetadata(metaData)
@@ -88,14 +91,14 @@ func (g *GridFSDaoService) ModifyFile(file os.File) error {
 	panic("implement me")
 }
 
-func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, error) {
+func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, MetaData, int64, time.Time, error) {
 	ctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)
 	defer cancel()
 	// 以文件名作为字段查找Files，目的是为了获取它保存的我们自定义的元数据
 	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"filename": filename})
 	if err != nil {
 		g.logger.Errorf("查找files失败，文件名: %s", filename)
-		return nil, nil, err
+		return nil, nil, 0, time.Time{}, err
 	}
 	defer func(cursor *mongo.Cursor, ctx context2.Context) {
 		err := cursor.Close(ctx)
@@ -108,12 +111,12 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 		file := gridfs.File{}
 		err := cursor.Decode(&file)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, 0, time.Time{}, err
 		}
 		gFile = &file
 	}
 	if gFile == nil {
-		return nil, nil, nil
+		return nil, nil, 0, time.Time{}, nil
 	}
 	// 通过文件Id找到所有文件切片并下载，也可以通过传递文件名实现，传递文件名的实现类似我们上面的写法
 	downloadStream, err := g.bucket.OpenDownloadStream(gFile.ID)
@@ -122,7 +125,7 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 	}(downloadStream)
 	if err != nil {
 		g.logger.Errorf("打开下载流失败: %v", err)
-		return nil, nil, err
+		return nil, nil, 0, time.Time{}, err
 	}
 	size := downloadStream.GetFile().Length
 	data := make([]byte, size, size)
@@ -130,22 +133,60 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 	_, err = downloadStream.Read(data)
 	if err != nil {
 		g.logger.Errorf("读取文件失败: %v", err)
-		return nil, nil, err
+		return nil, nil, 0, time.Time{}, err
 	}
 	meta := gFile.Metadata
 	meteData := make(map[string]interface{})
 	err = bson.Unmarshal(meta, &meteData)
 	if err != nil {
 		g.logger.Error(err)
-		return nil, nil, err
+		return nil, nil, 0, time.Time{}, err
 	}
-	return data, meteData, nil
+	return data, meteData, gFile.Length, gFile.UploadDate, nil
 }
 
-func (g *GridFSDaoService) ListByArchive(archive string) ([]string, error) {
+func (g *GridFSDaoService) ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error) {
 	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
 	defer cancel()
-	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"meta": filename})
+	skip := (pgNum - 1) * pgNum
+	cursor, err := g.bucket.GetFilesCollection().Find(ctx, primitive.M{"metadata": primitive.M{"archive": archive}}, &options.FindOptions{
+		Limit: &pgSize,
+		Skip:  &skip,
+		Sort:  primitive.M{"_id": -1},
+	})
+	if err != nil {
+		g.logger.Error(err)
+		return nil, 0, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			g.logger.Error(err)
+		}
+	}(cursor, ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	results := make([]string, 0, pgSize)
+	for cursor.Next(ctx) {
+		tmp := gridfs.File{}
+		err := cursor.Decode(&tmp)
+		if err != nil {
+			g.logger.Error(err)
+			return nil, 0, err
+		}
+		results = append(results, tmp.Name)
+	}
+	if err := cursor.Err(); err != nil {
+		g.logger.Error(err)
+		return nil, 0, err
+	}
+	total, err := g.bucket.GetFilesCollection().CountDocuments(ctx, primitive.M{"metadata": primitive.M{"archive": archive}})
+	if err != nil {
+		g.logger.Error(err)
+		return nil, 0, err
+	}
+	return results, total, nil
 }
 
 func (g *GridFSDaoService) DeleteFile(filename string) error {
