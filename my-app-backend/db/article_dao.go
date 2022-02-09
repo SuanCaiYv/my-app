@@ -24,7 +24,7 @@ type ArticleDao interface {
 	// ListByAuthor0 未分页版本
 	ListByAuthor0(author string) ([]entity.Article, error)
 
-	ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, error)
+	ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, int64, error)
 
 	Update(article *entity.Article) error
 
@@ -120,7 +120,7 @@ func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, erro
 	panic("implement me")
 }
 
-func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, error) {
+func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, int64, error) {
 	descInt := 1
 	if desc {
 		descInt = -1
@@ -135,7 +135,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 	})
 	if err != nil {
 		a.logger.Error(err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
@@ -144,7 +144,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 		}
 	}(cursor, ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	results := make([]entity.Article, 0, pgSize)
 	for cursor.Next(ctx) {
@@ -152,15 +152,20 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 		err := cursor.Decode(&tmp)
 		if err != nil {
 			a.logger.Error(err)
-			return nil, err
+			return nil, 0, err
 		}
 		results = append(results, tmp)
 	}
 	if err := cursor.Err(); err != nil {
 		a.logger.Error(err)
-		return nil, err
+		return nil, 0, err
 	}
-	return results, nil
+	total, err := a.collection.CountDocuments(ctx, primitive.M{"author": author})
+	if err != nil {
+		a.logger.Error(err)
+		return nil, 0, err
+	}
+	return results, total, nil
 }
 
 func (a *ArticleDaoService) Update(article *entity.Article) error {

@@ -23,7 +23,7 @@ type GridFSDao interface {
 
 	DownloadFile(filename string) ([]byte, primitive.M, error)
 
-	ListByArchive(archive string) ([]string, error)
+	ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error)
 
 	DeleteFile(filename string) error
 
@@ -142,10 +142,35 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 	return data, meteData, nil
 }
 
-func (g *GridFSDaoService) ListByArchive(archive string) ([]string, error) {
+func (g *GridFSDaoService) ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error) {
 	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
 	defer cancel()
-	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"meta": filename})
+	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"metadata": primitive.M{"archive": archive}})
+	if err != nil {
+		g.logger.Errorf("按照归档列举失败，归档名: %s", archive)
+		return nil, 0, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context2.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			g.logger.Error(err)
+		}
+	}(cursor, ctx)
+	results := make([]string, 0, pgNum)
+	for cursor.Next(ctx) {
+		file := gridfs.File{}
+		err := cursor.Decode(&file)
+		if err != nil {
+			return nil, 0, err
+		}
+		results = append(results, file.Name)
+	}
+	total, err := g.bucket.GetFilesCollection().CountDocuments(ctx, bson.M{"metadata": primitive.M{"archive": archive}})
+	if err != nil {
+		g.logger.Error(err)
+		return nil, 0, err
+	}
+	return results, total, nil
 }
 
 func (g *GridFSDaoService) DeleteFile(filename string) error {
