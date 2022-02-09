@@ -53,8 +53,8 @@ const testFunc = function () {
     width: 100%;
     height: 100%;
     grid-area: user;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
     display: grid;
     grid-template-areas: "col1 col2 col3 col4 col5";
     grid-template-columns: 200px 330px 330px 330px 1fr;
@@ -64,40 +64,40 @@ const testFunc = function () {
     width: 100%;
     height: 100%;
     grid-area: col1;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .col2 {
     width: 100%;
     height: 100%;
     grid-area: col2;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .col3 {
     width: 100%;
     height: 100%;
     grid-area: col3;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .col4 {
     width: 100%;
     height: 100%;
     grid-area: col4;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .col5 {
     width: 100%;
     height: 100%;
     grid-area: col5;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .img {
@@ -113,8 +113,9 @@ const testFunc = function () {
 .nickname {
     width: 150px;
     height: 50px;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
     border-radius: 16px;
     margin-top: 15px;
     margin-left: 25px;
@@ -123,31 +124,36 @@ const testFunc = function () {
     font-size: 1.2rem;
     text-align: center;
     line-height: 50px;
+    background-color: rgba(255,0,49,0.05);
 }
 
 .input {
     width: 280px;
     height: 50px;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
     border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;
     display: inline-block;
     vertical-align: bottom;
+    background-color: rgba(0,167,255,0.05);
 }
 
 .signature {
     width: 280px;
     height: 145px;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
     border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;
     display: inline-block;
     vertical-align: bottom;
+    background-color: rgba(29,0,255,0.05);
 }
 </style>

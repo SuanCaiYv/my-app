@@ -8,7 +8,7 @@
             <button class="button-manager" @click="router.push('/state_manager')">其他管理</button>
         </div>
         <div class="collector">
-            <button class="button-collector">回收站</button>
+            <button class="button-collector" @click="alertFunc('暂未开通服务', function() {})">回收站</button>
         </div>
         <div class="page-limit">
             <select class="select-page-limit">
@@ -27,6 +27,7 @@
 import {ref} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import {useRouter} from "vue-router";
+import alertFunc from "../../util/alert";
 
 const name = ref<String>("Option")
 

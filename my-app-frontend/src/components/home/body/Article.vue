@@ -1,9 +1,9 @@
 <template>
     <div class="article">
-        <div class="articleHead">
+        <div class="title">
             {{title}}
         </div>
-        <div class="articleBody">
+        <div class="content">
             {{body}}
         </div>
     </div>
@@ -24,21 +24,28 @@ let props = defineProps({
 .article {
 }
 
-.articleHead {
-    height: 40px;
+.title {
     width: 320px;
-    margin: 0 auto 0 50px;
-    border: 1px solid black;
-    box-sizing: border-box;
-    padding: 0;
+    height: 40px;
+    margin: 0 auto 0 25px;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
+    border-radius: 16px;
+    text-align: left;
+    font-size: 1.4rem;
+    line-height: 40px;
+    background-color: rgba(255,76,0,0.05);
 }
 
-.articleBody {
+.content {
     height: 200px;
     width: auto;
-    margin: 0 50px 20px;
-    border: 1px solid black;
-    box-sizing: border-box;
-    padding: 0;
+    margin: 0 25px 20px;
+    /*border: 1px solid black;*/
+    /*box-sizing: border-box;*/
+    border-radius: 16px;
+    text-align: left;
+    font-size: 1.2rem;
+    background-color: rgba(255,109,0,0.05);
 }
 </style>

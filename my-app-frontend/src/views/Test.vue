@@ -6,10 +6,9 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import {alertFunc} from "../util/alert";
+import alertFunc from "../util/alert";
 import {confirmFunc} from "../util/confirm";
 import {useRouter} from "vue-router";
-import {generateAiToken, generateSignToken} from "../util/token";
 
 const name = ref<String>("Test")
 
@@ -18,9 +17,6 @@ const router = useRouter()
 const send = function () {
     router.push("/home")
 }
-
-console.log(generateAiToken())
-generateSignToken("aaa")
 
 // <input type="file" name="file" @change="upload0($event)">
 // let file = ""

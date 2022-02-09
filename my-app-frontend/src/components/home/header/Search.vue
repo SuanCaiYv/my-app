@@ -1,6 +1,6 @@
 <template>
     <div class="search">
-        <input type="text" class="key" v-model="keyStr" @keydown.enter.down="searchKey(keyStr)" placeholder="键入并回车以检索"/>
+        <input type="text" class="key" v-model="keyStr" @keydown.enter.down="searchKey" placeholder="键入并回车以检索"/>
     </div>
 </template>
 
@@ -11,7 +11,9 @@ const name = ref<String>("Search")
 
 let keyStr = ref<String>("")
 
-const searchKey = inject("searchKey")
+const searchKey = function () {
+    console.log(keyStr.value)
+}
 </script>
 
 <style scoped>

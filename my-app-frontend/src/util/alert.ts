@@ -13,4 +13,4 @@ const alertFunc = function (alertMsg: string, afterDoneCallback: Function) {
     document.getElementById("app").appendChild(divElement)
 }
 
-export {alertFunc};
+export default alertFunc;

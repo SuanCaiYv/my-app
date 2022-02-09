@@ -4,13 +4,13 @@
         <div class="l1">
             <div class="inline-block">
                 <label class="select" for="documentFile">选择文档</label>
-                <input style="display: none" type="file" id="documentFile">
-                <div class="show"></div>
+                <input style="display: none" type="file" id="documentFile" @change="uploadDocument($event)">
+                <div class="show">{{documentFilePath}}</div>
             </div>
             <div class="inline-block">
                 <label class="select" for="coverImg">选择封面</label>
-                <input style="display: none" type="file" id="coverImg">
-                <div class="show"></div>
+                <input style="display: none" type="file" id="coverImg" @change="uploadCovImg($event)">
+                <div class="show">{{covImgPath}}</div>
             </div>
         </div>
         <div class="l2">
@@ -19,14 +19,14 @@
                     <option selected>分类</option>
                     <option  v-for="item in kindList" :value="item">{{item}}</option>
                 </select>
-                <input class="input" type="text" placeholder="键入并回车以新建分类"/>
+                <input class="input" type="text" placeholder="键入并回车以新建分类" v-model="newKind" @keydown.enter.down="createKind"/>
             </div>
             <div class="inline-block">
                 <select class="select">
                     <option selected>标签</option>
                     <option  v-for="item in kindList" :value="item">{{item}}</option>
                 </select>
-                <input class="input" type="text" placeholder="键入并回车以新建标签"/>
+                <input class="input" type="text" placeholder="键入并回车以新建标签" v-model="newTag" @keydown.enter.down="createTag"/>
             </div>
         </div>
         <div class="l3">
@@ -57,12 +57,13 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import PH1 from "../placeholder/PH1.vue";
+import alertFunc from "../../util/alert";
 
-const name = ref<String>("Main")
+const name = ref<string>("Main")
 
-const kindList = ref<Array<String>>([])
-const tagList = ref<Array<String>>([])
-const rollbackList = ref<Array<String>>([])
+const kindList = ref<Array<string>>([])
+const tagList = ref<Array<string>>([])
+const rollbackList = ref<Array<string>>([])
 
 kindList.value.push("bbb")
 kindList.value.push("aaa")
@@ -73,16 +74,45 @@ tagList.value.push("fff")
 rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
+
+let documentFile = ''
+let documentFilePath = ref<string>('')
+let covImg = ''
+let covImgPath = ref<string>('')
+let newKind = ref<string>('')
+let newTag = ref<string>('')
+
+const uploadDocument = function (event: Event) {
+    // @ts-ignore
+    documentFile = event.target.files[0]
+    // @ts-ignore
+    documentFilePath.value = documentFile.name
+}
+
+const uploadCovImg = function (event: Event) {
+    // @ts-ignore
+    covImg = event.target.files[0]
+    // @ts-ignore
+    covImgPath.value = covImg.name
+}
+
+const createKind = function () {
+    console.log(newKind)
+    alertFunc(newKind.value, function () {})
+}
+
+const createTag = function () {}
 </script>
 
 <style scoped>
 .main {
     width: 100%;
-    height: 100%;
+    height: 580px;
     grid-area: main;
     border: 2px solid mediumpurple;
     box-sizing: border-box;
     border-radius: 20px;
+    margin-top: 60px;
     display: grid;
     grid-template-areas:
         "ph1"
@@ -91,7 +121,7 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
         "l3"
         "l4"
         "l5";
-    grid-template-rows: 120px 60px 60px 60px 200px 60px;
+    grid-template-rows: 80px 60px 60px 60px 200px 60px;
 }
 
 .l1 {
@@ -167,13 +197,10 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .show {
     width: 400px;
     height: 40px;
-    border: 1px solid black;
+    border: 1px solid lightpink;
     box-sizing: border-box;
     border-radius: 16px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 8px;
-    margin-right: 10px;
+    margin: 10px 10px 10px 8px;
     display: inline-block;
     vertical-align: bottom;
     text-align: left;
@@ -183,13 +210,10 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .input {
     width: 400px;
     height: 40px;
-    border: 1px solid black;
+    border: 1px solid lightpink;
     box-sizing: border-box;
     border-radius: 16px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 8px;
-    margin-right: 10px;
+    margin: 10px 10px 10px 8px;
     display: inline-block;
     vertical-align: bottom;
     text-align: left;
@@ -199,13 +223,10 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .textarea {
     width: 980px;
     height: 180px;
-    border: 1px solid black;
+    border: 1px solid lightcoral;
     box-sizing: border-box;
     border-radius: 8px;
-    margin-top: 10px;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 10px auto auto;
     font-size: 0.8rem;
 }
 </style>

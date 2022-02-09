@@ -37,8 +37,8 @@ const router = useRouter()
     width: 100%;
     height: 100%;
     grid-area: info;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
     display: grid;
     grid-template-areas: "statistic brief social";
     grid-template-columns: 530px 660px 1fr;
@@ -48,24 +48,27 @@ const router = useRouter()
     width: 100%;
     height: 300px;
     grid-area: statistic;
-    border: 1px solid silver;
+    border: 2px solid lightsalmon;
     box-sizing: border-box;
+    border-radius: 20px;
 }
 
 .brief {
     width: 100%;
     height: 300px;
     grid-area: brief;
-    border: 1px solid silver;
+    border: 2px solid salmon;
     box-sizing: border-box;
+    border-radius: 20px;
 }
 
 .third-party {
     width: 100%;
     height: 300px;
     grid-area: social;
-    border: 1px solid silver;
+    border: 2px solid slateblue;
     box-sizing: border-box;
+    border-radius: 20px;
 }
 
 .name {
@@ -73,27 +76,32 @@ const router = useRouter()
     height: 50px;
     margin-left: 20px;
     margin-top: 20px;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
     border-radius: 18px;
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.2rem;
     text-align: center;
     line-height: 50px;
+    background-color: rgba(255,140,0,0.05);
 }
 
 .value {
     width: 510px;
     height: 50px;
     margin-top: 20px;
-    margin-left: 28px;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    margin-left: 26px;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    border: none;
     border-radius: 16px;
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.2rem;
+    line-height: 50px;
+    background-color: rgba(255,0,188,0.05);
 }
 
 .article-list {

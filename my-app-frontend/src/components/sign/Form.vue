@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import {httpClient, Response} from "../../net";
-import {alertFunc} from "../../util/alert";
+import alertFunc from "../../util/alert";
 import router from "../../router";
 import storage from "../../util/storage";
 

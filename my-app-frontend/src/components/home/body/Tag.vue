@@ -1,6 +1,6 @@
 <template>
     <div class="tag">
-        {{value}}
+        <button class="button" :class="{buttonClicked: isActive}" @click="isActive = !isActive">{{value}}</button>
     </div>
 </template>
 
@@ -12,18 +12,36 @@ const name = ref<String>("Tag")
 const props = defineProps({
     value: String
 })
+
+let isActive = ref<Boolean>(false)
+
+const choiceTag = function () {
+    isActive
+}
 </script>
 
 <style scoped>
 .tag {
-    width: 160px;
+    width: auto;
     height: 40px;
-    margin: 0 20px 10px;
-    padding: 0;
-    border: 1px solid black;
-    box-sizing: border-box;
-    border-radius: 6px;
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 16px;
     line-height: 40px;
     font-size: 1.2rem;
+    display: inline-block;
+    background-color: paleturquoise;
+}
+
+.buttonClicked {
+    background-color: aqua;
 }
 </style>

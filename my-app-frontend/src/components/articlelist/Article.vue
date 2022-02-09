@@ -1,7 +1,9 @@
 <template>
     <div class="article">
         <div class="title"></div>
-        <div class="content"></div>
+        <div class="content">
+            <div class="content-real"></div>
+        </div>
         <div class="update">
             <button class="button">更新</button>
         </div>
@@ -41,7 +43,7 @@ let visibly = ref<String>("公开")
 }
 
 .title {
-    width: 350px;
+    width: 320px;
     height: 100%;
     grid-area: title;
     /*border: 1px solid black;*/
@@ -49,6 +51,7 @@ let visibly = ref<String>("公开")
     border-radius: 16px;
     background-color: darkorange;
     opacity: 10%;
+    margin-left: 25px;
 }
 
 .content {
@@ -60,6 +63,13 @@ let visibly = ref<String>("公开")
     display: inline-block;
     background-color: orange;
     opacity: 10%;
+    margin-left: 25px;
+}
+
+.content-real {
+    width: 100%;
+    height: 100%;
+    margin-right: 25px;
 }
 
 .update {

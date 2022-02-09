@@ -49,7 +49,7 @@ const name = ref<String>("SortAndPage")
     /*box-sizing: border-box;*/
     display: grid;
     grid-template-areas: "ph1 sort page desc ph2";
-    grid-template-columns: 300px 120px 120px 120px 1fr;
+    grid-template-columns: 225px 120px 120px 120px 1fr;
 }
 
 .ph1 {

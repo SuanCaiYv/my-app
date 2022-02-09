@@ -38,8 +38,9 @@ const router = useRouter()
     width: 100%;
     height: 100%;
     grid-area: userInfo;
-    border: 1px solid silver;
+    border: 2px solid salmon;
     box-sizing: border-box;
+    border-radius: 20px;
 }
 
 .img {

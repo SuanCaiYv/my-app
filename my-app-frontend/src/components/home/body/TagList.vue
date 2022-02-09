@@ -1,8 +1,8 @@
 <template>
     <div class="tagList">
         <!--占位符，勿动！-->
-        <div style="margin-bottom: 50px;box-sizing: border-box"></div>
-        <div v-for="t in tagList">
+        <div style="margin-top: 25px;box-sizing: border-box"></div>
+        <div v-for="t in tagList" style="display: inline-block">
             <Tag :value="t"></Tag>
         </div>
     </div>
@@ -17,15 +17,18 @@ const name = ref<String>("TagList")
 const tagList = reactive<Array<String>>([])
 
 tagList.push("aaa")
-tagList.push("bbb")
+tagList.push("bbbbbb")
 tagList.push("ccc")
+tagList.push("dddddddd")
+tagList.push("ee")
 </script>
 
 <style scoped>
 .tagList {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
+    border: 2px solid powderblue;
     box-sizing: border-box;
+    border-radius: 20px;
 }
 </style>

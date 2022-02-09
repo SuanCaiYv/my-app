@@ -33,7 +33,7 @@ const close = function () {
     transform: translate(-50%, 0);
     top: 20%;
     background: white;
-    border-radius: 4px;
+    border-radius: 20px;
     padding: 24px;
     z-index: 1001;
 }
@@ -53,7 +53,7 @@ const close = function () {
     border: 0;
     outline: 0;
     color: white;
-    border-radius: 4px;
+    border-radius: 18px;
     cursor: pointer;
 }
 
