@@ -10,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
-	"time"
 )
 
 type StaticSrcApi interface {
@@ -66,9 +65,7 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("解析元数据失败，元数据应为k-v键值对"))
 		return
 	}
-	metaMap["upload_time"] = time.Now()
 	metaMap["upload_user"] = username
-	metaMap["file_length"] = formFile.Size
 	metaMap["origin_name"] = formFile.Filename
 	if t, ok := metaMap["archive"]; ok {
 		if t == "avatar" || t == "document_img" {
