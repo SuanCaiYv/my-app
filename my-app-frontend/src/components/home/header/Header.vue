@@ -9,13 +9,10 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import HomePage from "./HomePage.vue"
+import HomePage from "../../common/HomePage.vue"
 import Search from "./Search.vue"
 import PH1 from "../../placeholder/PH1.vue"
-import PH2 from "../../placeholder/PH2.vue"
-import PH3 from "../../placeholder/PH3.vue"
-import PH4 from "../../placeholder/PH4.vue"
-import SignButton from "./SignButton.vue";
+import SignButton from "../../common/SignButton.vue";
 
 const name = ref<String>("Header")
 </script>

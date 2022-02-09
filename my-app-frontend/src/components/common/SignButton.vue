@@ -9,8 +9,8 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import {useRouter} from "vue-router";
-import storage from "../../../util/storage"
-import {parseBoolean} from "../../../util/base";
+import storage from "../../util/storage"
+import {parseBoolean} from "../../util/base";
 
 const name = ref<String>("SignButton")
 

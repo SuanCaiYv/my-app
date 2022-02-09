@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="l4">
-            <textarea class="textarea"></textarea>
+            <textarea class="textarea" placeholder="来点文章简介吧！"></textarea>
         </div>
         <div class="l5">
             <button class="select" style="width: 300px;margin-left: auto;margin-right: auto">Done</button>
@@ -80,8 +80,9 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
     width: 100%;
     height: 100%;
     grid-area: main;
-    border: 1px solid silver;
+    border: 2px solid mediumpurple;
     box-sizing: border-box;
+    border-radius: 20px;
     display: grid;
     grid-template-areas:
         "ph1"
@@ -96,36 +97,36 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .l1 {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .l2 {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .l3 {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .l4 {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .l5 {
     width: 100%;
     height: 100%;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .inline-block {
@@ -135,7 +136,7 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .select {
     width: 80px;
     height: 40px;
-    border: 1px solid silver;
+    border: none;
     box-sizing: border-box;
     border-radius: 30px;
     margin-top: 10px;
@@ -144,17 +145,29 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
     vertical-align: bottom;
     font-size: 1rem;
     line-height: 40px;
-    background-color: white;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    background-color: seashell;
 }
 
 .select[type=file] {
     display: none;
 }
 
+.select:hover {
+    background-color: silver;
+}
+
+.select:active {
+    background-color: gainsboro;
+}
+
 .show {
     width: 400px;
     height: 40px;
-    border: 1px solid silver;
+    border: 1px solid black;
     box-sizing: border-box;
     border-radius: 16px;
     margin-top: 10px;
@@ -170,7 +183,7 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .input {
     width: 400px;
     height: 40px;
-    border: 1px solid silver;
+    border: 1px solid black;
     box-sizing: border-box;
     border-radius: 16px;
     margin-top: 10px;
@@ -186,7 +199,7 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 .textarea {
     width: 980px;
     height: 180px;
-    border: 1px solid silver;
+    border: 1px solid black;
     box-sizing: border-box;
     border-radius: 8px;
     margin-top: 10px;

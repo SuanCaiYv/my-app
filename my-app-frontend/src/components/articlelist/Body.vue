@@ -1,16 +1,16 @@
 <template>
     <div class="body">
         <PH1></PH1>
-        <Main></Main>
-        <PH2></PH2>
+        <Options></Options>
+        <ArticleList></ArticleList>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import PH1 from "../placeholder/PH1.vue";
-import Main from "./Main.vue";
-import PH2 from "../placeholder/PH2.vue";
+import PH1 from "../placeholder/PH1.vue"
+import Options from "./Options.vue"
+import ArticleList from "./ArticleList.vue"
 
 const name = ref<String>("Body")
 </script>
@@ -20,10 +20,11 @@ const name = ref<String>("Body")
     width: 100%;
     height: 100%;
     grid-area: body;
+    display: grid;
+    grid-template-areas: "ph1 article-list";
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: 1fr;
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
-    display: grid;
-    grid-template-areas: "ph1 main ph2";
-    grid-auto-columns: 1fr 1000px 1fr;
 }
 </style>

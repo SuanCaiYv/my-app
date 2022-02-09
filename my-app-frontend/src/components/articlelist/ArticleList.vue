@@ -1,12 +1,14 @@
 <template>
     <div class="article-list">
-        <Layout></Layout>
+        <Article></Article>
+        <Article></Article>
+        <Article></Article>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Layout from "../components/articlelist/Layout.vue"
+import Article from "./Article.vue"
 
 const name = ref<String>("ArticleList")
 </script>
@@ -15,5 +17,8 @@ const name = ref<String>("ArticleList")
 .article-list {
     width: 100%;
     height: 100%;
+    grid-area: article-list;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 </style>

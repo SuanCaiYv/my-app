@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, onMounted, ref} from "vue"
+import {ref} from "vue"
 
 const name = ref<String>("Alert")
 

@@ -56,10 +56,8 @@ func BeforeStart() {
 		util.JustPanic(err)
 	}
 	gridFsDao := db.NewGridFSDaoService()
-	gridFsDao.DeleteFile("default-avatar.png")
-	gridFsDao.DeleteFile("my-avatar.png")
-	if !gridFsDao.ExistFile("default-avatar.png") {
-		defaultAvatarPath, err := filepath.Abs("static/default-avatar.png")
+	if !gridFsDao.ExistFile("my-avatar.png") {
+		defaultAvatarPath, err := filepath.Abs("static/my-avatar.png")
 		util.JustPanic(err)
 		defaultAvatar, err := os.OpenFile(defaultAvatarPath, os.O_RDONLY, os.ModePerm)
 		util.JustPanic(err)
@@ -71,7 +69,7 @@ func BeforeStart() {
 		metaMap["archive"] = "avatar"
 		data, err := ioutil.ReadAll(defaultAvatar)
 		util.JustPanic(err)
-		err = gridFsDao.UploadFile(data, "default-avatar.png", metaMap)
+		err = gridFsDao.UploadFile(data, "my-avatar.png", metaMap)
 		util.JustPanic(err)
 	}
 	_ = mime.AddExtensionType(".md", "text/x-markdown")

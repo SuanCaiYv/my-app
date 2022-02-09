@@ -36,6 +36,7 @@ import {ref} from "vue"
 import PH1 from "../../placeholder/PH1.vue"
 import PH2 from "../../placeholder/PH2.vue"
 
+// todo 针对不同浏览器优化select图标
 const name = ref<String>("SortAndPage")
 </script>
 
@@ -88,6 +89,10 @@ const name = ref<String>("SortAndPage")
     border-radius: 18px;
     font-size: 0.8rem;
     text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
     background-color: whitesmoke;
 }
 </style>

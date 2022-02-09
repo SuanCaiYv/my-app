@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="about">
         <Layout></Layout>
     </div>
 </template>
@@ -12,5 +12,8 @@ const name = ref<String>("About")
 </script>
 
 <style scoped>
-
+.about {
+    width: 100%;
+    height: 100%;
+}
 </style>
