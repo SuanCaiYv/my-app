@@ -11,7 +11,7 @@ var notFound = &Result{
 }
 
 var missToken = &Result{
-	Code: 451,
+	Code: 461,
 	Msg:  "miss token",
 	Data: struct {
 	}{},
@@ -19,7 +19,7 @@ var missToken = &Result{
 }
 
 var authFailed = &Result{
-	Code: 452,
+	Code: 462,
 	Msg:  "auth failed",
 	Data: struct {
 	}{},

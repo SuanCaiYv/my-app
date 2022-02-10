@@ -91,9 +91,9 @@ const uploadDocument = function (event: Event) {
 
 const uploadCovImg = function (event: Event) {
     // @ts-ignore
-    covImg = event.target.files[0]
+    covImg = event.target.files[0].fullPath
     // @ts-ignore
-    covImgPath.value = covImg.name
+    covImgPath.value = covImg.mozFullpath
 }
 
 const createKind = function () {
@@ -214,6 +214,7 @@ const createTag = function () {}
     box-sizing: border-box;
     border-radius: 16px;
     margin: 10px 10px 10px 8px;
+    padding: 0;
     display: inline-block;
     vertical-align: bottom;
     text-align: left;
@@ -227,6 +228,7 @@ const createTag = function () {}
     box-sizing: border-box;
     border-radius: 8px;
     margin: 10px auto auto;
+    padding: 0;
     font-size: 0.8rem;
 }
 </style>

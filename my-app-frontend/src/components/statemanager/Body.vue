@@ -23,8 +23,8 @@ const name = ref<String>("Body")
     width: 100%;
     height: 100%;
     grid-area: body;
-    border: 1px solid silver;
-    box-sizing: border-box;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
 }
 
 .block-name {

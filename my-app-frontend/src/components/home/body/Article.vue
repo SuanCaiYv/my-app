@@ -1,51 +1,93 @@
 <template>
     <div class="article">
-        <div class="title">
-            {{title}}
-        </div>
-        <div class="content">
-            {{body}}
-        </div>
+        <PH1></PH1>
+        <div class="title"></div>
+        <div class="content"></div>
+        <PH2></PH2>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import PH1 from "../../placeholder/PH1.vue"
+import PH2 from "../../placeholder/PH2.vue"
 
 const name = ref<String>("Article")
-
-let props = defineProps({
-    title: String,
-    body: String
-})
 </script>
 
 <style scoped>
 .article {
+    width: 100%;
+    height: 280px;
+    display: grid;
+    grid-template-areas:
+        "ph1 title title"
+        "ph1 content ph2"
+        "ph1 content ph2"
+        "ph1 content ph2";
+    grid-template-columns: 25px 1fr 25px;
+    grid-template-rows: 40px 80px 80px 80px;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    margin-top: 25px;
 }
 
 .title {
     width: 320px;
-    height: 40px;
-    margin: 0 auto 0 25px;
+    height: 100%;
+    grid-area: title;
     /*border: 1px solid black;*/
     /*box-sizing: border-box;*/
     border-radius: 16px;
-    text-align: left;
-    font-size: 1.4rem;
-    line-height: 40px;
-    background-color: rgba(255,76,0,0.05);
+    background-color: darkorange;
+    opacity: 10%;
 }
 
 .content {
-    height: 200px;
-    width: auto;
-    margin: 0 25px 20px;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
+    width: 100%;
+    height: 100%;
+    grid-area: content;
+    box-sizing: border-box;
     border-radius: 16px;
-    text-align: left;
+    display: inline-block;
+    background-color: orange;
+    opacity: 10%;
+}
+
+.update {
+    width: 100%;
+    height: 100%;
+    grid-area: update;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    display: inline-block;
+}
+
+.delete {
+    width: 100%;
+    height: 100%;
+    grid-area: delete;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    display: inline-block;
+}
+
+.visible {
+    width: 100%;
+    height: 100%;
+    grid-area: visible;
+    /*border: 1px solid silver;*/
+    /*box-sizing: border-box;*/
+    display: inline-block;
+}
+
+.button {
+    width: 80px;
+    height: 40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 18px;
     font-size: 1.2rem;
-    background-color: rgba(255,109,0,0.05);
 }
 </style>

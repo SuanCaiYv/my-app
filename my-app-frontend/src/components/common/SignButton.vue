@@ -11,13 +11,14 @@ import {ref} from "vue"
 import {useRouter} from "vue-router";
 import storage from "../../util/storage"
 import {parseBoolean} from "../../util/base";
+import {Constant} from "../../common/systemconstant";
 
 const name = ref<String>("SignButton")
 
 const state = ref<String>("Sign")
 
 // todo
-if (parseBoolean(storage.get("authed"))) {
+if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
     state.value = "Logout"
 } else {
     state.value = "Sign"
@@ -25,10 +26,10 @@ if (parseBoolean(storage.get("authed"))) {
 
 const router = useRouter()
 const signButton = function () {
-    if (parseBoolean(storage.get("authed"))) {
-        storage.set("authed", "false")
-        storage.set("accessToken", "")
-        storage.set("refreshToken", "")
+    if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
+        storage.set(Constant.AUTHENTICATED, "false")
+        storage.set(Constant.ACCESS_TOKEN, "")
+        storage.set(Constant.REFRESH_TOKEN, "")
         state.value = "Sign"
     } else {
         router.push("/sign")

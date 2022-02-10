@@ -1,9 +1,9 @@
 <template>
     <div class="article">
+        <PH1></PH1>
         <div class="title"></div>
-        <div class="content">
-            <div class="content-real"></div>
-        </div>
+        <div class="content"></div>
+        <PH2></PH2>
         <div class="update">
             <button class="button">更新</button>
         </div>
@@ -11,35 +11,40 @@
             <button class="button">删除</button>
         </div>
         <div class="visible">
-            <button class="button">{{visibly}}</button>
+            <button class="button" @click="setVisibly">{{visibly}}</button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import PH1 from "../placeholder/PH1.vue"
+import PH2 from "../placeholder/PH2.vue"
 
 const name = ref<String>("Article")
 
 let visibly = ref<String>("公开")
+
+const setVisibly = function () {
+    visibly.value = "私密"
+}
 </script>
 
 <style scoped>
 .article {
     width: 100%;
-    height: 320px;
-    grid-area: article;
+    height: 280px;
     display: grid;
     grid-template-areas:
-        "title title"
-        "content update"
-        "content delete"
-        "content visible";
-    grid-template-columns: 1fr 200px;
+        "ph1 title title title"
+        "ph1 content ph2 update"
+        "ph1 content ph2 delete"
+        "ph1 content ph2 visible";
+    grid-template-columns: 25px 1fr 25px 200px;
     grid-template-rows: 40px 80px 80px 80px;
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
-    margin-top: 40px;
+    margin-top: 25px;
 }
 
 .title {
@@ -51,7 +56,6 @@ let visibly = ref<String>("公开")
     border-radius: 16px;
     background-color: darkorange;
     opacity: 10%;
-    margin-left: 25px;
 }
 
 .content {
@@ -63,13 +67,6 @@ let visibly = ref<String>("公开")
     display: inline-block;
     background-color: orange;
     opacity: 10%;
-    margin-left: 25px;
-}
-
-.content-real {
-    width: 100%;
-    height: 100%;
-    margin-right: 25px;
 }
 
 .update {

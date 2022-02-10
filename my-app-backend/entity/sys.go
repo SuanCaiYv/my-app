@@ -8,8 +8,8 @@ import (
 type SysUser struct {
 	Id          string    `bson:"_id" json:"user_id"`
 	Username    string    `bson:"username" json:"username"`
-	Credential  string    `bson:"credential" json:"credential"`
-	Salt        string    `bson:"salt" json:"salt"`
+	Credential  string    `bson:"credential" json:"-"`
+	Salt        string    `bson:"salt" json:"-"`
 	Role        string    `bson:"role" json:"role"`
 	Info        UserInfo  `bson:"info" json:"info"`
 	Available   bool      `bson:"available" json:"-"`
@@ -33,13 +33,13 @@ func DefaultSysUser() *SysUser {
 		Salt:       util.GenerateUUID(),
 		Role:       "default-role",
 		Info: UserInfo{
-			Avatar:    "default-avatar.jpg",
+			Avatar:    "my-avatar.png",
 			Nickname:  "default-nickname-" + util.GenerateUUID(),
 			Email:     "default-email",
-			Phone:     "10086",
+			Phone:     "15651731700",
 			WeChat:    "d2508826394",
 			QQ:        "2508826394",
-			Github:    "github.com/SuanCaiYv",
+			Github:    "https://github.com/SuanCaiYv",
 			Location:  "HangZhou-China",
 			Signature: "Golang is best!",
 		},

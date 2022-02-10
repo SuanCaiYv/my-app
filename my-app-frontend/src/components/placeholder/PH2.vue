@@ -10,5 +10,8 @@ const name = ref<String>("PH2")
 
 <style scoped>
 .ph2 {
+    width: 100%;
+    height: 100%;
+    grid-area: ph2;
 }
 </style>

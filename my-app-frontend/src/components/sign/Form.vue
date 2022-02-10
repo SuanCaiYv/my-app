@@ -25,6 +25,7 @@ import {httpClient, Response} from "../../net";
 import alertFunc from "../../util/alert";
 import router from "../../router";
 import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("Form")
 
@@ -32,22 +33,22 @@ let username = ref<string>("")
 let password = ref<string>("")
 let verCode = ref<string>("")
 
-storage.setOnce("lastVerCodeSendTimestamp", (new Date().getTime() - 120 * 1000) + "")
+storage.setOnce(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, (new Date().getTime() - 120 * 1000) + "")
 
 const sendVerCode = function () {
-    if (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp")) < 120 * 1000) {
-        alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get("lastVerCodeSendTimestamp"))) / 1000) + "秒后重试", function () {})
+    if (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP)) < 120 * 1000) {
+        alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP))) / 1000) + "秒后重试", function () {})
         return
     }
     setTimeout(() => {
-        storage.set("lastVerCodeSendTimestamp", (new Date().getTime() - 120 * 1000) + "")
+        storage.set(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, (new Date().getTime() - 120 * 1000) + "")
     }, 120 * 1000)
     httpClient.post("/sign/ver_code", {}, {
         username: username.value
     }, false, function (resp: Response) {
         if (resp.ok) {
             alertFunc("验证码发送成功!", function () {})
-            storage.set("lastVerCodeSendTimestamp", new Date().getTime() + "")
+            storage.set(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, new Date().getTime() + "")
         }
     })
 }
@@ -63,10 +64,10 @@ const login = function () {
     }, false, function (resp: Response) {
         if (resp.ok) {
             // @ts-ignore
-            storage.set("accessToken", resp.data.access_token)
+            storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
             // @ts-ignore
-            storage.set("refreshToken", resp.data.refresh_token)
-           storage.set("authed", "true")
+            storage.set(Constant.REFRESH_TOKEN, resp.data.refresh_token)
+           storage.set(Constant.AUTHENTICATED, "true")
             alertFunc("登录成功", function () {
                 jumpHome()
             })
@@ -155,11 +156,11 @@ const signup = function () {
     width: 300px;
     height: 50px;
     opacity: 75%;
-    margin-left: -2px;
     /*border: 1px solid silver;*/
     border: none;
     box-sizing: border-box;
     border-radius: 8px;
+    padding: 0;
     display: inline-block;
     vertical-align: bottom;
     line-height: 50px;

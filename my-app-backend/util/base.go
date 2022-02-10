@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"mime"
 	"path"
+	"reflect"
 	"time"
 )
 
@@ -32,4 +33,25 @@ func JustPanic(val interface{}) {
 func MIMEType(filename string) string {
 	suffix := path.Ext(filename)
 	return mime.TypeByExtension(suffix)
+}
+
+// UpdateStructObject old必须是指针类型
+func UpdateStructObject(old interface{}, m map[string]interface{}) {
+	v := reflect.ValueOf(old).Elem()
+	t := reflect.TypeOf(old).Elem()
+	for i := 0; i < v.NumField(); i += 1 {
+		if val, ok := m[t.Field(i).Name]; ok {
+			v.Field(i).Set(reflect.ValueOf(val))
+		}
+	}
+}
+
+func UpdateStructObjectWithJsonTag(old interface{}, m map[string]interface{}) {
+	v := reflect.ValueOf(old).Elem()
+	t := reflect.TypeOf(old).Elem()
+	for i := 0; i < v.NumField(); i += 1 {
+		if val, ok := m[t.Field(i).Tag.Get("json")]; ok {
+			v.Field(i).Set(reflect.ValueOf(val))
+		}
+	}
 }

@@ -57,6 +57,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "/display",
         name: "display",
         component: () => import("../views/Display.vue")
+    },
+    {
+        path: "/truncate",
+        name: "truncate",
+        component: () => import("../views/Truncate.vue")
     }
 ]
 

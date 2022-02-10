@@ -1,7 +1,6 @@
 <template>
     <div class="articleList">
-        <!--占位符，勿动！-->
-        <div style="margin-bottom: 50px;box-sizing: border-box"></div>
+        <div style="margin-bottom: -25px"></div>
         <div v-for="article in articleList">
             <Article :title="article.title" :body="article.body"></Article>
         </div>
@@ -21,7 +20,7 @@ const articleList: Array<ArticleRaw> = inject("articleList")
 
 <style scoped>
 .articleList {
-    width: auto;
+    width: 100%;
     height: 100%;
     grid-area: articleList;
 }

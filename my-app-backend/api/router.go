@@ -7,7 +7,6 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/service"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"strings"
 )
 
@@ -18,9 +17,9 @@ func Route() {
 	router.Use(corsMiddleware())
 	router.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
-			context.JSON(http.StatusInternalServerError, resp.NewInternalError(err))
+			context.AbortWithStatusJSON(200, resp.NewInternalError(err))
 		} else {
-			context.AbortWithStatusJSON(http.StatusInternalServerError, resp.NewInternalError("unknown error occurred."))
+			context.AbortWithStatusJSON(200, resp.NewInternalError("unknown error occurred."))
 		}
 	}))
 	// ApiHandler实例化
@@ -97,12 +96,10 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, HEAD")
-
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-
 		c.Next()
 	}
 }
@@ -110,13 +107,13 @@ func corsMiddleware() gin.HandlerFunc {
 func authFunc(context *gin.Context) {
 	token := context.GetHeader("Authorization")
 	if !strings.HasPrefix(token, "Bearer ") {
-		context.JSON(resp.NewMissToken().Code, resp.NewMissToken())
+		context.AbortWithStatusJSON(200, resp.NewMissToken())
 		return
 	}
 	token = token[7:]
-	username, role, err := auth.ValidToken(token)
+	username, role, err := auth.ValidAccessToken(token)
 	if err != nil {
-		context.JSON(resp.NewAuthFailed().Code, resp.NewAuthFailed())
+		context.AbortWithStatusJSON(200, resp.NewAuthFailed())
 		return
 	}
 	logger.Infof("用户: %s 开始操作", username)

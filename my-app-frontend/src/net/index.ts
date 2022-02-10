@@ -1,5 +1,6 @@
 import axios, {AxiosResponse} from "axios";
-import store from "../store";
+import storage from "../util/storage";
+import {Constant} from "../common/systemconstant";
 
 const baseUrl = "http://127.0.0.1:8190/v1"
 
@@ -32,7 +33,7 @@ const httpClient = {
         if (auth) {
             axios.get(url, {
                 headers: {
-                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),
                 }
             }).then(function (resp) {
                 callback(dealResp(resp))
@@ -57,7 +58,7 @@ const httpClient = {
         if (auth) {
             axios.post(url, params, {
                 headers: {
-                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),
                     "Content-Type": "application/json"
                 }
             }).then(function (resp) {
@@ -86,7 +87,7 @@ const httpClient = {
         if (auth) {
             axios.put(url, params, {
                 headers: {
-                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),
                     "Content-Type": "application/json"
                 }
             }).then(function (resp) {
@@ -115,7 +116,7 @@ const httpClient = {
         if (auth) {
             axios.delete(url, {
                 headers: {
-                    "Authorization": "Bearer " + store.getters.accessToken(),
+                    "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),
                 }
             }).then(function (resp) {
                 callback(dealResp(resp))
@@ -140,7 +141,7 @@ const httpClient = {
         let url = baseUrl + uri + "?" + str
         axios.post(url, formData, {
             headers: {
-                "Authorization": "Bearer " + store.getters.accessToken(),
+                "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),
                 "Content-Type": "multipart/form-data"
             }
         }).then(resp => {
@@ -151,7 +152,7 @@ const httpClient = {
     }
 }
 
-const dealResp = function (resp: AxiosResponse) {
+const dealResp = function (resp: AxiosResponse): Response {
     let r = new Response()
     if (resp.status === 200) {
         let rawData = resp.data

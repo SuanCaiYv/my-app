@@ -1,7 +1,7 @@
 <template>
     <div class="body">
         <SortAndPage></SortAndPage>
-        <UserInfo :nickname="nickname" :email="email" :signature="signature"></UserInfo>
+        <UserInfo></UserInfo>
         <ArticleList></ArticleList>
         <TagList></TagList>
     </div>
@@ -14,11 +14,7 @@ import UserInfo from "./UserInfo.vue"
 import ArticleList from "./ArticleList.vue";
 import TagList from "./TagList.vue";
 
-const name = ref<String>("Body")
-
-const nickname = "小白白白"
-const email = "codewithbuff@163.com"
-const signature = "Golang+Vue3"
+const name = ref<string>("Body")
 </script>
 
 <style scoped>

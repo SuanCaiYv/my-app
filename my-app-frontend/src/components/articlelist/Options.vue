@@ -37,7 +37,7 @@ const router = useRouter()
 <style scoped>
 .options {
     width: 200px;
-    height: 800px;
+    height: 260px;
     display: grid;
     grid-template-areas:
         "ph1"
@@ -45,7 +45,7 @@ const router = useRouter()
         "manager"
         "collector"
         "page-limit";
-    grid-template-rows: 80px 60px 60px 60px 60px;
+    grid-template-rows: 120px 60px 60px 60px 60px;
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
     position: fixed;

@@ -16,6 +16,8 @@ type StaticSrcApi interface {
 	ADownloadFile(context *gin.Context)
 
 	UploadFile(context *gin.Context)
+
+	ExistFile(context *gin.Context)
 }
 
 type StaticSrcApiHandler struct {
@@ -95,4 +97,17 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 		return
 	}
 	context.JSON(200, resp.NewBoolean(true))
+}
+
+func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
+	username := context.MustGet("username")
+	input := make(map[string]interface{})
+	err := context.BindJSON(&input)
+	if err != nil {
+		s.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	existFile := s.gridFSDao.ExistFile(input["full_path"].(string))
+	context.JSON(200, resp.NewBoolean(existFile))
 }

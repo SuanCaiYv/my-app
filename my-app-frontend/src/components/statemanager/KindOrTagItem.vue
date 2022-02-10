@@ -1,7 +1,7 @@
 <template>
     <div class="kind-or-tag">
         <div class="value">啊嗷嗷</div>
-        <button class="delete">X</button>
+        <button class="delete">✖️</button>
     </div>
 </template>
 

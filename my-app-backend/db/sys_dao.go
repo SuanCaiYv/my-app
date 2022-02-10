@@ -113,7 +113,7 @@ func (s *SysUserDaoService) Update(sysUser *entity.SysUser) error {
 	sysUser.UpdatedTime = time.Now()
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	_, err := s.collection.UpdateByID(timeout, sysUser.Id, sysUser)
+	_, err := s.collection.UpdateByID(timeout, sysUser.Id, primitive.M{"$set": sysUser})
 	return err
 }
 

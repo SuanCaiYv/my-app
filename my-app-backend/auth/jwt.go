@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/nosql"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/go-redis/redis/v8"
@@ -11,8 +12,9 @@ import (
 
 var redisOps = nosql.NewRedisClient()
 var logger = util.NewLogger()
+var sysUserDao = db.NewSysUserDaoService()
 
-func SignAccessToken(username, role string) (refreshToken string, err error) {
+func SignAccessToken(username, role string) (accessToken string, err error) {
 	secretKey := ""
 	err = redisOps.Get(username, &secretKey)
 	if err != nil && err != redis.Nil {
@@ -23,7 +25,7 @@ func SignAccessToken(username, role string) (refreshToken string, err error) {
 		logger.Errorf("账户已锁定: %s", username)
 		return "", fmt.Errorf("账户已锁定: %s", username)
 	}
-	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+	accessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    "CWB",
 		Subject:   "AccessToken",
 		Audience:  []string{0: username, 1: role},
@@ -36,10 +38,10 @@ func SignAccessToken(username, role string) (refreshToken string, err error) {
 		logger.Error("签发访问令牌失败")
 		return "", err
 	}
-	return refreshToken, nil
+	return accessToken, nil
 }
 
-func SignRefreshToken(username string) (accessToken string, err error) {
+func SignRefreshToken(username string) (refreshToken string, err error) {
 	secretKey := ""
 	err = redisOps.Get(username, &secretKey)
 	if err != nil && err != redis.Nil {
@@ -56,7 +58,7 @@ func SignRefreshToken(username string) (accessToken string, err error) {
 		logger.Errorf("设置JwtId异常: %v", err)
 		return "", err
 	}
-	accessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    "CWB",
 		Subject:   "RefreshToken",
 		Audience:  []string{0: "RefreshToken"},
@@ -69,10 +71,10 @@ func SignRefreshToken(username string) (accessToken string, err error) {
 		logger.Error("签发刷新令牌失败")
 		return "", err
 	}
-	return accessToken, err
+	return refreshToken, err
 }
 
-func ValidToken(token string) (username string, role string, err error) {
+func ValidAccessToken(token string) (username string, role string, err error) {
 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
 			secret := ""
@@ -81,7 +83,6 @@ func ValidToken(token string) (username string, role string, err error) {
 			if err != nil {
 				logger.Warn(err)
 			}
-			fmt.Println(secret)
 			return []byte(secret), nil
 		}
 		return []byte("Failed!"), nil
@@ -99,6 +100,41 @@ func ValidToken(token string) (username string, role string, err error) {
 		return username, role, nil
 	} else {
 		return "", "", err
+	}
+}
+
+func ValidRefreshToken(token string) (accessToken string, err error) {
+	username := ""
+	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
+			secret := ""
+			username = claims.ID
+			err = redisOps.Get(username, &secret)
+			if err != nil {
+				logger.Warn(err)
+			}
+			return []byte(secret), nil
+		}
+		return []byte("Failed!"), nil
+	})
+	if err != nil {
+		logger.Errorf("解析Token失败: %v", err)
+		return "", err
+	}
+	if claims, ok := parsedToken.Claims.(*jwt.RegisteredClaims); ok {
+		username = claims.ID
+		user, err := sysUserDao.SelectByUsername(username)
+		if err != nil {
+			logger.Errorf("读取用户信息失败: %s; %v", username, err)
+		}
+		accessToken, err = SignAccessToken(username, user.Role)
+		if err != nil {
+			logger.Errorf("签发访问令牌失败: %s, %v", username, err)
+			return "", err
+		}
+		return accessToken, nil
+	} else {
+		return "", err
 	}
 }
 

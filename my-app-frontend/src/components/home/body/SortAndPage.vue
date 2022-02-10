@@ -65,7 +65,9 @@ const name = ref<String>("SortAndPage")
     height: 40px;
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
-    margin: auto 40px 0 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 20px;
 }
 
 .sort {
@@ -94,5 +96,13 @@ const name = ref<String>("SortAndPage")
     -moz-appearance: none;
     outline: none;
     background-color: whitesmoke;
+}
+
+.select-input:hover {
+    background-color: gainsboro;
+}
+
+.select-input:active {
+    background-color: lightgray;
 }
 </style>

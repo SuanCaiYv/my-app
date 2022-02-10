@@ -27,6 +27,8 @@ type UserApi interface {
 
 	GetUserInfo(context *gin.Context)
 
+	GetUserInfoNoAuth(context *gin.Context)
+
 	UpdateUserInfo(context *gin.Context)
 }
 
@@ -110,6 +112,28 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 }
 
 func (u *UserApiHandler) Login(context *gin.Context) {
+	token := context.GetHeader("Authorization")
+	if token != "" {
+		if !strings.HasPrefix(token, "Bearer ") {
+			context.AbortWithStatusJSON(200, resp.NewBadRequest("what the fucking asshole you are doing?"))
+			return
+		}
+		token = token[7:]
+		accessToken, err := auth.ValidRefreshToken(token)
+		if err != nil {
+			u.logger.Errorf("通过刷新令牌登录失败: %v", err)
+			context.JSON(200, resp.NewAuthFailed())
+			return
+		}
+		context.JSON(200, resp.NewOk(&struct {
+			RefreshToken string `json:"refresh_token"`
+			AccessToken  string `json:"access_token"`
+		}{
+			RefreshToken: token,
+			AccessToken:  accessToken,
+		}))
+		return
+	}
 	sign := &sign{}
 	err := context.BindJSON(sign)
 	if err != nil {
@@ -176,11 +200,48 @@ func (u *UserApiHandler) Logout(context *gin.Context) {
 }
 
 func (u *UserApiHandler) GetUserInfo(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.MustGet("username").(string)
+	user, err := u.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		u.logger.Errorf("获取用户信息失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("获取用户信息失败"))
+		return
+	}
+	context.JSON(200, resp.NewOk(user.Info))
+}
+
+func (u *UserApiHandler) GetUserInfoNoAuth(context *gin.Context) {
+	username := config.ApplicationConfiguration().Owner
+	user, err := u.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		u.logger.Errorf("获取用户信息失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("获取用户信息失败"))
+		return
+	}
+	context.JSON(200, resp.NewOk(user.Info))
 }
 
 func (u *UserApiHandler) UpdateUserInfo(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.MustGet("username").(string)
+	input := make(map[string]interface{})
+	err := context.BindJSON(&input)
+	if err != nil {
+		u.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	user, err := u.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		u.logger.Errorf("获取用户: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("获取用户"))
+		return
+	}
+	util.UpdateStructObjectWithJsonTag(&(user.Info), input)
+	err = u.sysUserDao.Update(user)
+	if err != nil {
+		u.logger.Errorf("更新用户信息失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("更新用户信息失败"))
+		return
+	}
+	context.JSON(200, resp.NewOk(user.Info))
 }
