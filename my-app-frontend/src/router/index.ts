@@ -62,6 +62,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "/truncate",
         name: "truncate",
         component: () => import("../views/Truncate.vue")
+    },
+    // 编辑器
+    {
+        path: "/editor",
+        name: "editor",
+        component: () => import("../views/Editor.vue")
     }
 ]
 

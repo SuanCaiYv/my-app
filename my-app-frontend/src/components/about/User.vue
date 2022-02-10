@@ -2,39 +2,39 @@
     <div class="user">
         <div class="col1">
             <Img class="img" :url="avatar"></Img>
-            <input class="nickname" v-model="nickname" @keydown.enter.down="updateNickname"/>
+            <input class="nickname" v-model="nickname" @change="updateNickname"/>
         </div>
         <div class="col2">
             <div>
-                <input class="input" type="email" v-model="email" @keydown.enter.down="updateEmail">
+                <input class="input" type="email" v-model="email" @change="updateEmail">
                 <div class="name">邮箱</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="phone" @keydown.enter.down="updatePhone">
+                <input class="input" type="text" v-model="phone" @change="updatePhone">
                 <div class="name">手机</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="location" @keydown.enter.down="updateLocation">
+                <input class="input" type="text" v-model="location" @change="updateLocation">
                 <div class="name">地址</div>
             </div>
         </div>
         <div class="col3">
             <div>
-                <input class="input" type="text" v-model="qq" @keydown.enter.down="updateQQ">
+                <input class="input" type="text" v-model="qq" @change="updateQQ">
                 <div class="name">Q&nbsp;Q</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="weChat" @keydown.enter.down="updateWeChat">
+                <input class="input" type="text" v-model="weChat" @change="updateWeChat">
                 <div class="name">微信</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="github" @keydown.enter.down="updateGitHub">
+                <input class="input" type="text" v-model="github" @change="updateGitHub">
                 <div class="name">猫网</div>
             </div>
         </div>
         <div class="col4">
             <div>
-                <textarea class="signature" v-model="signature" @keydown.shift.enter.down="updateSignature"/>
+                <textarea class="signature" v-model="signature" @change="updateSignature"/>
             </div>
         </div>
         <div class="col5"></div>

@@ -8,6 +8,7 @@
 import {provide, reactive, ref} from "vue"
 import Layout from "../components/home/layout/Layout.vue"
 import {ArticleRaw} from "../common/interface";
+import {uploadLocalFile} from "../util/file";
 
 const name = ref<String>("Home")
 
