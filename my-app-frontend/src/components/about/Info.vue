@@ -76,15 +76,15 @@ const router = useRouter()
     height: 50px;
     margin-left: 20px;
     margin-top: 20px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid sandybrown;
+    box-sizing: border-box;
     border-radius: 18px;
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.2rem;
+    font-weight: bolder;
     text-align: center;
-    line-height: 50px;
+    line-height: 46px;
     background-color: rgba(255,140,0,0.05);
 }
 

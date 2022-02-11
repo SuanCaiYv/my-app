@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"encoding/json"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity/resp"
 	"github.com/SuanCaiYv/my-app-backend/util"
@@ -10,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
+	"strings"
 )
 
 type StaticSrcApi interface {
@@ -59,18 +59,20 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("获取文件失败，文件头应为file"))
 		return
 	}
-	metaData := context.PostForm("meta_data")
 	metaMap := make(map[string]interface{})
-	err = json.Unmarshal([]byte(metaData), &metaMap)
-	if err != nil {
-		s.logger.Errorf("解析元数据失败: %s; %v", username, err)
-		context.JSON(200, resp.NewBadRequest("解析元数据失败，元数据应为k-v键值对"))
-		return
+	uri := context.Request.RequestURI
+	queryStr := uri[strings.LastIndex(uri, "?")+1:]
+	if queryStr != "" {
+		queries := strings.Split(queryStr, "&")
+		for _, str := range queries {
+			ss := strings.Split(str, "=")
+			metaMap[ss[0]] = ss[1]
+		}
 	}
 	metaMap["upload_user"] = username
 	metaMap["origin_name"] = formFile.Filename
 	if t, ok := metaMap["archive"]; ok {
-		if t == "avatar" || t == "document_img" {
+		if t == "avatar" || t == "doc_img" {
 		} else {
 			metaMap["archive"] = "other"
 		}
@@ -83,20 +85,21 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 		context.JSON(200, resp.NewInternalError("打开文件失败"))
 		return
 	}
-	content := make([]byte, 0, formFile.Size)
+	content := make([]byte, formFile.Size, formFile.Size)
 	_, err = file.Read(content)
 	if err != nil {
 		s.logger.Errorf("读取文件失败: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("读取文件失败"))
 		return
 	}
-	err = s.gridFSDao.UploadFile(content, util.GenerateUUID()+path.Ext(formFile.Filename), metaMap)
+	newFilename := util.GenerateUUID() + path.Ext(formFile.Filename)
+	err = s.gridFSDao.UploadFile(content, newFilename, metaMap)
 	if err != nil {
 		s.logger.Errorf("写入文件失败: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("写入文件失败"))
 		return
 	}
-	context.JSON(200, resp.NewBoolean(true))
+	context.JSON(200, resp.NewString(newFilename))
 }
 
 func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
@@ -108,6 +111,6 @@ func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
 		return
 	}
-	existFile := s.gridFSDao.ExistFile(input["full_path"].(string))
+	existFile := s.gridFSDao.ExistFile(input["filename"].(string))
 	context.JSON(200, resp.NewBoolean(existFile))
 }

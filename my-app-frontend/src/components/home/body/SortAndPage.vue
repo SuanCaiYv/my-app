@@ -89,7 +89,8 @@ const name = ref<String>("SortAndPage")
     /*box-sizing: border-box;*/
     border: none;
     border-radius: 18px;
-    font-size: 0.8rem;
+    font-size: 1rem;
+    font-weight: normal;
     text-align: center;
     appearance: none;
     -webkit-appearance: none;

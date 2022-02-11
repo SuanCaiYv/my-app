@@ -74,10 +74,18 @@ func NewBadRequest(msg string) *Result {
 	}
 }
 
-type r struct {
+type b struct {
 	Result bool `json:"result"`
 }
 
 func NewBoolean(result bool) *Result {
-	return NewOk(&r{result})
+	return NewOk(&b{result})
+}
+
+type s struct {
+	Result string `json:"result"`
+}
+
+func NewString(result string) *Result {
+	return NewOk(&s{result})
 }

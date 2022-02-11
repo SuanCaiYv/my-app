@@ -2,6 +2,9 @@
     <div class="header">
         <HomePage></HomePage>
         <PH1></PH1>
+        <Publish></Publish>
+        <Draft></Draft>
+        <Manager></Manager>
         <Search></Search>
         <PH2></PH2>
         <SignButton></SignButton>
@@ -15,6 +18,9 @@ import PH1 from "../placeholder/PH1.vue"
 import Search from "./Search.vue"
 import PH2 from "../placeholder/PH2.vue"
 import SignButton from "../common/SignButton.vue";
+import Publish from "./Publish.vue";
+import Draft from "./Draft.vue";
+import Manager from "./Manager.vue";
 
 const name = ref<String>("Header")
 </script>
@@ -22,10 +28,11 @@ const name = ref<String>("Header")
 <style scoped>
 .header {
     width: 100%;
-    height: 100%;
-    grid-area: header;
+    height: 60px;
     display: grid;
-    grid-template-areas: "home-page ph1 search ph2 sign-button";
-    grid-auto-columns: 200px 1fr 200px 25px 200px;
+    grid-template-areas: "home-page ph1 publish draft manager ph2 search ph3 sign-button";
+    grid-auto-columns: 200px 25px 140px 140px 140px 1fr 200px 25px 200px;
+    position: fixed;
+    background-color: white;
 }
 </style>

@@ -13,5 +13,6 @@ const name = ref<String>("PH3")
     width: 100%;
     height: 100%;
     grid-area: ph3;
+    background-color: white;
 }
 </style>

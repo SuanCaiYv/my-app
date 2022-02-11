@@ -17,9 +17,9 @@ type ArticleApi interface {
 
 	DeleteArticle(context *gin.Context)
 
-	ListArticle(context *gin.Context)
+	ListArticleNoAuth(context *gin.Context)
 
-	ListArticleByUser(context *gin.Context)
+	ListArticle(context *gin.Context)
 
 	ExportArticle(context *gin.Context)
 
@@ -55,7 +55,7 @@ func (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {
 	panic("implement me")
 }
 
-func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
+func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 	pgSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
 	pgNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
 	sort := context.DefaultQuery("sort", "created_time")
@@ -71,7 +71,7 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	context.JSON(200, resp.NewOk(articles))
 }
 
-func (a *ArticleApiHandler) ListArticleByUser(context *gin.Context) {
+func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	// TODO implement me
 	panic("implement me")
 }

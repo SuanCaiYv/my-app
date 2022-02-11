@@ -1,7 +1,6 @@
 <template>
     <div class="body">
         <PH1></PH1>
-        <Options></Options>
         <ArticleList></ArticleList>
     </div>
 </template>

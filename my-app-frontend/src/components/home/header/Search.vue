@@ -20,18 +20,21 @@ const searchKey = function () {
 .search {
     width: 100%;
     height: 100%;
+    background-color: white;
 }
 
 .key {
-    width: 200px;
-    height: 100%;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
+    width: 192px;
+    height: 40px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border: none;
-    padding: 0;
     border-radius: 16px;
     display: inline-block;
     font-size: 1rem;
+    font-weight: bold;
     background-color: whitesmoke;
+    padding: 0 0 0 8px;
+    outline: none;
 }
 </style>

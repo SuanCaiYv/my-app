@@ -40,12 +40,6 @@ const routes: Array<RouteRecordRaw> = [
         name: "article_list",
         component: () => import("../views/ArticleList.vue")
     },
-    // 上传文章/更新文章
-    {
-        path: "/more_article",
-        name: "more_article",
-        component: () => import("../views/MoreArticle.vue")
-    },
     // 标签页和分类页管理
     {
         path: "/state_manager",
@@ -58,6 +52,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "display",
         component: () => import("../views/Display.vue")
     },
+    // 清空缓存
     {
         path: "/truncate",
         name: "truncate",

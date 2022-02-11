@@ -1,8 +1,6 @@
 <template>
-    <div class="sign-button">
-        <button class="sign-button-button" @click="signButton">
-            <span style="font-size: 1.2rem">{{ state }}</span>
-        </button>
+    <div class="sign">
+        <button class="button" @click="signButton">{{ state }}</button>
     </div>
 </template>
 
@@ -19,9 +17,9 @@ const state = ref<String>("Sign")
 
 // todo
 if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
-    state.value = "Logout"
+    state.value = "登出"
 } else {
-    state.value = "Sign"
+    state.value = "登录"
 }
 
 const router = useRouter()
@@ -30,7 +28,7 @@ const signButton = function () {
         storage.set(Constant.AUTHENTICATED, "false")
         storage.set(Constant.ACCESS_TOKEN, "")
         storage.set(Constant.REFRESH_TOKEN, "")
-        state.value = "Sign"
+        state.value = "登录"
     } else {
         router.push("/sign")
     }
@@ -39,30 +37,30 @@ const signButton = function () {
 
 <style scoped>
 
-.sign-button {
+.sign {
     width: 100%;
     height: 100%;
     grid-area: sign-button;
 }
 
-.sign-button-button {
-    width: 150px;
-    height: 100%;
-    margin-left: 25px;
-    margin-right: 25px;
+.button {
+    width: 80px;
+    height: 40px;
+    margin: 10px 120px 10px 0;
     padding: 0;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid lightgray;
+    box-sizing: border-box;
     border-radius: 18px;
-    background-color: lightskyblue;
+    font-size: 1.0rem;
+    font-weight: bolder;
+    background-color: white;
 }
 
-.sign-button-button:hover {
-    background-color: deepskyblue;
+.button:hover {
+    background-color: lightgray;
 }
 
-.sign-button-button:active {
-    background-color: dodgerblue;
+.button:active {
+    background-color: gainsboro;
 }
 </style>

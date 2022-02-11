@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import storage from "../util/storage";
 import {Constant} from "../common/systemconstant";
 
-const baseUrl = "http://127.0.0.1:8190/v1"
+export const baseUrl = "http://127.0.0.1:8190/v1"
 
 axios.defaults.timeout = 2000
 

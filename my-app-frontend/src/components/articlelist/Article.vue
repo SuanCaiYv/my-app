@@ -51,22 +51,21 @@ const setVisibly = function () {
     width: 320px;
     height: 100%;
     grid-area: title;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
-    border-radius: 16px;
-    background-color: darkorange;
-    opacity: 10%;
+    border: 2px solid wheat;
+    box-sizing: border-box;
+    border-radius: 16px 16px 0 0;
+    background-color: antiquewhite;
 }
 
 .content {
     width: 100%;
     height: 100%;
     grid-area: content;
+    border: 2px solid wheat;
     box-sizing: border-box;
-    border-radius: 16px;
+    border-radius: 0 16px 16px 16px;
     display: inline-block;
-    background-color: orange;
-    opacity: 10%;
+    background-color: antiquewhite;
 }
 
 .update {
@@ -97,12 +96,23 @@ const setVisibly = function () {
 }
 
 .button {
-    width: 80px;
+    width: 120px;
     height: 40px;
     margin-top: 20px;
     margin-bottom: 20px;
-    border: none;
+    margin-left: -80px;
+    border: 2px solid lightgray;
+    padding: 0;
     border-radius: 18px;
     font-size: 1.2rem;
+    background-color: white;
+}
+
+.button:hover {
+    background-color: lightgray;
+}
+
+.button:active {
+    background-color: gainsboro;
 }
 </style>
