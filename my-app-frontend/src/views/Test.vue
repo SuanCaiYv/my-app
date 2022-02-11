@@ -1,22 +1,25 @@
 <template>
     <div>
-        <button class="test" @click="send">测试</button>
+        <input type="text" v-model="str">
+        <div>{{s}}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
-import alertFunc from "../util/alert";
-import {confirmFunc} from "../util/confirm";
+import {ref, watch} from "vue"
 import {useRouter} from "vue-router";
+import {marked} from "marked";
 
 const name = ref<String>("Test")
 
 const router = useRouter()
 
-const send = function () {
-    router.push("/home")
-}
+const str = ref<string>('')
+const s = ref<string>('')
+
+watch(str, (n, o) => {
+    s.value = marked.parse(n)
+})
 
 // <input type="file" name="file" @change="upload0($event)">
 // let file = ""

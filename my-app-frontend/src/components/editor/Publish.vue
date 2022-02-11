@@ -3,14 +3,13 @@
         <PH1></PH1>
         <div class="l1">
             <div class="inline-block">
-                <label class="select" for="documentFile">选择文档</label>
-                <input style="display: none" type="file" id="documentFile" @change="uploadDocument($event)">
-                <div class="show">{{documentFilePath}}</div>
-            </div>
-            <div class="inline-block">
                 <label class="select" for="coverImg">选择封面</label>
                 <input style="display: none" type="file" id="coverImg" @change="uploadCovImg($event)">
                 <div class="show">{{covImgPath}}</div>
+            </div>
+            <div class="inline-block">
+                <button class="select" style="text-align: left" @click="updateVisibly">{{visiblyButton}}</button>
+                <div class="show">{{visiblyMsg}}</div>
             </div>
         </div>
         <div class="l2">
@@ -32,24 +31,17 @@
         <div class="l3">
             <div class="inline-block">
                 <select class="select">
-                    <option selected>公开</option>
-                    <option>私密</option>
-                </select>
-                <div class="show" style="border: 0"/>
-            </div>
-            <div class="inline-block">
-                <select class="select">
                     <option selected>回退</option>
                     <option  v-for="item in rollbackList" :value="item">{{item}}</option>
                 </select>
-                <div class="show" style="border: 0"/>
+                <div class="show" style="width: 900px"></div>
             </div>
         </div>
         <div class="l4">
             <textarea class="textarea" placeholder="来点文章简介吧！"></textarea>
         </div>
         <div class="l5">
-            <button class="select" style="width: 300px;margin-left: auto;margin-right: auto">Done</button>
+            <button class="select" style="width: 300px;margin-left: auto;margin-right: auto" @click="publish">Done</button>
         </div>
     </div>
 </template>
@@ -60,6 +52,10 @@ import PH1 from "../placeholder/PH1.vue";
 import alertFunc from "../../util/alert";
 
 const name = ref<string>("Main")
+
+const props = defineProps({
+    close: Function,
+})
 
 const kindList = ref<Array<string>>([])
 const tagList = ref<Array<string>>([])
@@ -75,19 +71,13 @@ rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 rollbackList.value.push("aaabbbcccdddeeefffggghhhiii")
 
-let documentFile = ''
-let documentFilePath = ref<string>('')
 let covImg = ''
 let covImgPath = ref<string>('')
+let visibly = ref<boolean>(false)
+let visiblyMsg = ref<string>('此文章仅作者可见')
+let visiblyButton = ref<string>('私密')
 let newKind = ref<string>('')
 let newTag = ref<string>('')
-
-const uploadDocument = function (event: Event) {
-    // @ts-ignore
-    documentFile = event.target.files[0]
-    // @ts-ignore
-    documentFilePath.value = documentFile.name
-}
 
 const uploadCovImg = function (event: Event) {
     // @ts-ignore
@@ -96,23 +86,38 @@ const uploadCovImg = function (event: Event) {
     covImgPath.value = covImg.mozFullpath
 }
 
+const updateVisibly = function () {
+    visibly.value = !visibly.value
+    if (visibly.value === true) {
+        visiblyButton.value = "公开"
+        visiblyMsg.value = "此文章将会公开供所有人可见"
+    } else if (visibly.value === false) {
+        visiblyMsg.value = "此文章仅作者可见"
+        visiblyButton.value = "私密"
+    }
+}
+
 const createKind = function () {
     console.log(newKind)
     alertFunc(newKind.value, function () {})
 }
 
 const createTag = function () {}
+
+const publish = function () {
+    // @ts-ignore
+    props.close()
+}
 </script>
 
 <style scoped>
 .main {
     width: 100%;
-    height: 580px;
+    height: 460px;
     grid-area: main;
     border: 2px solid mediumpurple;
     box-sizing: border-box;
     border-radius: 20px;
-    margin-top: 60px;
     display: grid;
     grid-template-areas:
         "ph1"
@@ -121,7 +126,7 @@ const createTag = function () {}
         "l3"
         "l4"
         "l5";
-    grid-template-rows: 80px 60px 60px 60px 200px 60px;
+    grid-template-rows: 20px 60px 60px 60px 200px 60px;
 }
 
 .l1 {
@@ -204,6 +209,7 @@ const createTag = function () {}
     display: inline-block;
     vertical-align: bottom;
     text-align: left;
+    font-size: 1rem;
     line-height: 40px;
 }
 

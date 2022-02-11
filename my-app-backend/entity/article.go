@@ -39,3 +39,10 @@ type Catalog struct {
 	Value string    `bson:"value" json:"value"`
 	Child []Catalog `bson:"child" json:"child"`
 }
+
+const (
+	_ = iota
+	VisibilityPrivate
+	VisibilityPublic
+	VisibilityDraft
+)

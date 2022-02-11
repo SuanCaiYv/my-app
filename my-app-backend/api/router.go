@@ -50,11 +50,12 @@ func Route() {
 	})
 	{
 		// 免登陆部分
+		versionOne.GET("/ws", wsApi.Generic)
+		versionOne.GET("/article_list/no_auth", articleApi.ListArticleNoAuth)
+		versionOne.GET("/user/info/no_auth", userApiHandler.GetUserInfoNoAuth)
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
-		versionOne.GET("/article_list", articleApi.ListArticle)
-		versionOne.GET("/ws", wsApi.Generic)
 
 		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
@@ -64,19 +65,19 @@ func Route() {
 
 		// 用户接口
 		userApi := versionOne.Group("/user")
-		userApi.DELETE("", userApiHandler.Logout)
 		userApi.GET("/info", userApiHandler.GetUserInfo)
 		userApi.PUT("/info", userApiHandler.UpdateUserInfo)
+		userApi.DELETE("", userApiHandler.Logout)
 
 		// 文章接口
 		article := versionOne.Group("/article")
-		article.GET("/list", articleApi.ListArticle, articleApi.ListArticleByUser)
-		article.POST("", articleApi.AddArticle)
-		article.PUT("", articleApi.UpdateArticle)
-		article.DELETE("/:article_id", articleApi.DeleteArticle)
+		article.GET("/list", articleApi.ListArticleNoAuth, articleApi.ListArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
 		article.GET("/img_fetch", wsApi.ImageFetch)
+		article.PUT("", articleApi.UpdateArticle)
+		article.POST("", articleApi.AddArticle)
+		article.DELETE("/:article_id", articleApi.DeleteArticle)
 
 		// 静态资源接口
 		file := versionOne.Group("/static")

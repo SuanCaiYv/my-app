@@ -1,6 +1,7 @@
 <template>
     <div class="layout">
         <Header></Header>
+        <PH1></PH1>
         <Body></Body>
         <Footer></Footer>
     </div>
@@ -9,6 +10,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import Header from "../header/Header.vue"
+import PH1 from "../../placeholder/PH1.vue"
 import Body from "../body/Body.vue"
 import Footer from "../Footer.vue"
 
@@ -21,9 +23,9 @@ const name = ref<String>("Layout")
     height: 100%;
     display: grid;
     grid-template-areas:
-        "header"
+        "ph1"
         "body"
         "footer";
-    grid-template-rows: 50px 1fr 50px;
+    grid-template-rows: 60px 1fr 50px;
 }
 </style>

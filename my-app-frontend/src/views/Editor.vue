@@ -1,18 +1,18 @@
 <template>
-    <div class="more-article">
+    <div class="editor">
         <Layout></Layout>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Layout from "../components/morearticle/Layout.vue"
+import Layout from "../components/editor/Layout.vue"
 
-const name = ref<String>("MoreArticle")
+const name = ref<String>("Editor")
 </script>
 
 <style scoped>
-.more-article {
+.editor {
     width: 100%;
     height: 100%;
 }

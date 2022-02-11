@@ -216,6 +216,8 @@ const updateSignature = function () {
     width: 150px;
     height: 150px;
     margin: 25px;
+    border: 2px solid pink;
+    box-sizing: border-box;
 }
 
 .img:active {
@@ -225,15 +227,15 @@ const updateSignature = function () {
 .nickname {
     width: 150px;
     height: 50px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid lightskyblue;
+    box-sizing: border-box;
     border-radius: 16px;
     margin-top: 15px;
     margin-left: 25px;
     margin-right: 25px;
     overflow-x: auto;
     font-size: 1rem;
+    font-weight: bolder;
     text-align: center;
     line-height: 50px;
     background-color: rgba(255,0,49,0.05);
@@ -242,14 +244,15 @@ const updateSignature = function () {
 .input {
     width: 220px;
     height: 50px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid cornflowerblue;
+    box-sizing: border-box;
+    border-right: none;
     border-radius: 16px 0 0 16px;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding: 0;
+    padding-left: 4px;
     font-size: 1rem;
+    font-weight: bold;
     display: inline-block;
     vertical-align: top;
     background-color: rgba(0,167,255,0.05);
@@ -263,6 +266,7 @@ const updateSignature = function () {
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;
+    font-weight: bolder;
     display: inline-block;
     vertical-align: top;
     line-height: 50px;
@@ -272,15 +276,18 @@ const updateSignature = function () {
 .signature {
     width: 280px;
     height: 145px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid skyblue;
+    box-sizing: border-box;
     border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 1.2rem;
+    font-weight: bolder;
+    font-style: oblique;
     display: inline-block;
     vertical-align: bottom;
+    outline: none;
+    resize: none;
     background-color: rgba(29,0,255,0.05);
 }
 </style>

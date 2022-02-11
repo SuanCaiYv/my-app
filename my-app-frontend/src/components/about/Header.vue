@@ -18,10 +18,11 @@ const name = ref<String>("Header")
 <style scoped>
 .header {
     width: 100%;
-    height: 100%;
-    grid-area: header;
+    height: 60px;
     display: grid;
     grid-template-areas: "home-page ph1 sign-button";
     grid-auto-columns: 200px 1fr 200px;
+    position: fixed;
+    background-color: white;
 }
 </style>

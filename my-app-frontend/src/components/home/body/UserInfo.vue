@@ -58,14 +58,17 @@ const router = useRouter()
     border: 2px solid salmon;
     box-sizing: border-box;
     border-radius: 20px;
+    background-color: mistyrose;
 }
 
 .img {
     width: 150px;
     height: 150px;
-    margin: 25px 25px 0;
     padding: 0;
-    border: 1px solid white;
+    border: none;
+    margin-top: 23px;
+    margin-left: auto;
+    margin-right: auto;
     box-sizing: border-box;
     border-radius: 6px;
 }
@@ -84,6 +87,8 @@ const router = useRouter()
     border-radius: 6px;
     font-size: 1.2rem;
     line-height: 20px;
+    font-weight: bolder;
+    color: slateblue;
 }
 
 .email {
@@ -95,6 +100,7 @@ const router = useRouter()
     /*box-sizing: border-box;*/
     border-radius: 6px;
     font-size: 1rem;
+    font-weight: bolder;
     line-height: 20px;
 }
 
@@ -107,6 +113,8 @@ const router = useRouter()
     /*box-sizing: border-box;*/
     border-radius: 6px;
     font-size: 1rem;
+    color: dodgerblue;
+    font-weight: bolder;
     line-height: 20px;
 }
 
@@ -119,5 +127,6 @@ const router = useRouter()
     /*box-sizing: border-box;*/
     border-radius: 4px;
     font-size: 1rem;
+    font-weight: bolder;
 }
 </style>

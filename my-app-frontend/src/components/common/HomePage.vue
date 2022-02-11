@@ -1,8 +1,6 @@
 <template>
     <div class="home-page">
-        <button class="home-page-button" @click="router.push('/home')">
-            <span style="font-size: 1.2rem">Home</span>
-        </button>
+        <button class="home-page-button" @click="router.push('/home')">CodeWithBuff</button>
     </div>
 </template>
 
@@ -24,22 +22,22 @@ const router = useRouter()
 
 .home-page-button {
     width: 150px;
-    height: 100%;
-    margin-left: 25px;
-    margin-right: 25px;
+    height: 40px;
+    margin: 10px 25px;
     padding: 0;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid lightgray;
+    box-sizing: border-box;
     border-radius: 18px;
-    background-color: lightskyblue;
+    font-size: 1.0rem;
+    font-weight: bolder;
+    background-color: white;
 }
 
 .home-page-button:hover {
-    background-color: deepskyblue;
+    background-color: lightgray;
 }
 
 .home-page-button:active {
-    background-color: dodgerblue;
+    background-color: gainsboro;
 }
 </style>
