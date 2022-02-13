@@ -22,7 +22,7 @@
 import {ref} from "vue"
 import Img from "../../Img.vue"
 import {useRouter} from "vue-router";
-import {httpClient, Response} from "../../../net";
+import {httpClient, Resp} from "../../../net";
 import alertFunc from "../../../util/alert";
 
 const name = ref<string>("UserInfo")
@@ -34,7 +34,7 @@ const github = ref<string>('https://github.com/SuanCaiYv')
 const signature = ref<string>('Gin+Vue3')
 const mailto = ref<String>("mailto:" + email.value)
 
-httpClient.get("/user/info", {}, true, function (resp: Response) {
+httpClient.get("/user/info", {}, true, function (resp: Resp) {
     if (!resp.ok) {
         alertFunc(resp.errMsg, function () {})
     } else {

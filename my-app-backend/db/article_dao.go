@@ -169,6 +169,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 }
 
 func (a *ArticleDaoService) Update(article *entity.Article) error {
+	article.UpdatedTime = time.Now()
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
 	_, err := a.collection.UpdateByID(timeout, article.Id, primitive.M{"$set": article})

@@ -49,7 +49,7 @@ import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
 import {useRouter} from "vue-router";
-import {Response} from "../../net";
+import {Response} from "../../common/interface";
 
 const name = ref<string>("User")
 const router = useRouter()

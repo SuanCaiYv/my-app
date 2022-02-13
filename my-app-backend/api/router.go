@@ -77,6 +77,7 @@ func Route() {
 		article.GET("/img_fetch", wsApi.ImageFetch)
 		article.PUT("", articleApi.UpdateArticle)
 		article.POST("", articleApi.AddArticle)
+		article.POST("/draft", articleApi.UploadDraft)
 		article.DELETE("/:article_id", articleApi.DeleteArticle)
 
 		// 静态资源接口

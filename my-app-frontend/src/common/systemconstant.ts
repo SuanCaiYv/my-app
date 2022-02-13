@@ -3,4 +3,5 @@ export class Constant {
     static REFRESH_TOKEN: string = "refresh_token"
     static AUTHENTICATED: string = "authenticated"
     static LAST_VERIFY_CODE_SEND_TIMESTAMP = "last_verify_code_send_timestamp"
+    static DRAFT_ARTICLE_ID = "draft_article_id"
 }

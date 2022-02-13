@@ -14,10 +14,6 @@ const props = defineProps({
 })
 
 let isActive = ref<Boolean>(false)
-
-const choiceTag = function () {
-    isActive
-}
 </script>
 
 <style scoped>
@@ -33,12 +29,12 @@ const choiceTag = function () {
 .button {
     width: 100%;
     height: 100%;
-    border: none;
+    border: 2px solid ;
     border-radius: 16px;
     line-height: 40px;
     font-size: 1.2rem;
     display: inline-block;
-    background-color: paleturquoise;
+    background-color: #99dbff;
 }
 
 .buttonClicked {

@@ -6,15 +6,14 @@
 
 <script setup lang="ts">
 import {createApp, ref} from "vue"
-import PublishConfirm from "./PublishConfirm.vue";
+import Publish from "./Publish.vue";
 
 const name = ref<string>("PublishButton")
 
 const publish = function () {
     let divElement = document.createElement("div");
-    const instance = createApp(PublishConfirm, {
+    const instance = createApp(Publish, {
         divNode: divElement,
-        content: "aaa",
     })
     instance.mount(divElement)
     // @ts-ignore

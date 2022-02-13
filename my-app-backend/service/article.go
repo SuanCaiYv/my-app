@@ -1,17 +1,22 @@
 package service
 
 import (
+	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
+	"github.com/SuanCaiYv/my-app-backend/entity"
 	"github.com/SuanCaiYv/my-app-backend/entity/resp"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"strconv"
+	"time"
 )
 
 type ArticleApi interface {
 	AddArticle(context *gin.Context)
+
+	UploadDraft(context *gin.Context)
 
 	UpdateArticle(context *gin.Context)
 
@@ -29,6 +34,7 @@ type ArticleApi interface {
 type ArticleApiHandler struct {
 	articleDao db.ArticleDao
 	gridFsDao  db.GridFSDao
+	sysUserDao db.SysUserDao
 	logger     *logrus.Logger
 }
 
@@ -36,6 +42,7 @@ func NewArticleApiHandler() *ArticleApiHandler {
 	return &ArticleApiHandler{
 		articleDao: db.NewArticleDaoService(),
 		gridFsDao:  db.NewGridFSDaoService(),
+		sysUserDao: db.NewSysUserDaoService(),
 		logger:     util.NewLogger(),
 	}
 }
@@ -43,6 +50,80 @@ func NewArticleApiHandler() *ArticleApiHandler {
 func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	//TODO implement me
 	panic("implement me")
+}
+
+type articleDraft struct {
+	ArticleId      string `json:"article_id"`
+	ArticleName    string `json:"article_name"`
+	ArticleContent string `json:"article_content"`
+}
+
+func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	input := &articleDraft{}
+	err := context.BindJSON(input)
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %v", err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	user, err := a.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		a.logger.Errorf("无法读取SysUser数据表: %v", err)
+		context.JSON(200, resp.NewInternalError("无法读取用户表"))
+		return
+	}
+	fmt.Println(input)
+	if input.ArticleId == "" {
+		if input.ArticleName == "" {
+			input.ArticleName = time.Now().String()
+		}
+		article := entity.Article{
+			Name:        input.ArticleName,
+			Author:      user.Id,
+			Summary:     "",
+			CoverImg:    "",
+			Catalog:     entity.Catalog{},
+			Content:     input.ArticleContent,
+			Kinds:       make([]entity.Kind, 0, 0),
+			Tags:        make([]entity.Tag, 0, 0),
+			ReleaseTime: time.Now(),
+			Visibility:  entity.VisibilityDraft,
+			Available:   false,
+			CreatedTime: time.Now(),
+			UpdatedTime: time.Now(),
+		}
+		err := a.articleDao.Insert(&article)
+		if err != nil {
+			a.logger.Errorf("插入Article失败: %s; %v", username, err)
+			context.JSON(200, resp.NewInternalError("插入文档表失败"))
+			return
+		}
+		input.ArticleId = article.Id
+	} else {
+		article, err := a.articleDao.Select(input.ArticleId)
+		if err != nil {
+			a.logger.Errorf("无法读取Article数据表: %v", err)
+			context.JSON(200, resp.NewInternalError("无法读取文档表"))
+			return
+		}
+		if input.ArticleName != "" {
+			article.Name = input.ArticleName
+		}
+		article.Content = input.ArticleContent
+		err = a.articleDao.Update(article)
+		if err != nil {
+			a.logger.Errorf("更新Article失败: %s; %v", username, err)
+			context.JSON(200, resp.NewInternalError("更新用户文档表失败"))
+			return
+		}
+		input.ArticleId = article.Id
+	}
+	context.JSON(200, resp.NewOk(struct {
+		ArticleId string `json:"article_id"`
+	}{
+		ArticleId: input.ArticleId,
+	}))
 }
 
 func (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {

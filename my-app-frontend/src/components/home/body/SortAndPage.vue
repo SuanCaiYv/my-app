@@ -1,8 +1,8 @@
 <template>
     <div class="sortAndPage">
         <PH1 class="ph1"></PH1>
-        <div class="sort select">
-            <select class="select-input">
+        <div class="sort block">
+            <select class="select">
                 <option selected value="release_time">排序方式</option>
                 <option value="release_time">时间</option>
                 <option value="tag">标签</option>
@@ -10,8 +10,8 @@
                 <option value="name">名称</option>
             </select>
         </div>
-        <div class="page select">
-            <select class="select-input">
+        <div class="page block">
+            <select class="select">
                 <option selected value="10">分页数量</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -20,8 +20,8 @@
                 <option value="50">50</option>
             </select>
         </div>
-        <div class="desc select">
-            <select class="select-input">
+        <div class="desc block">
+            <select class="select">
                 <option selected value="true">显示顺序</option>
                 <option value="true">正序</option>
                 <option value="false">倒序</option>
@@ -45,8 +45,6 @@ const name = ref<String>("SortAndPage")
     width: 100%;
     height: 100%;
     grid-area: sortAndPage;
-    /*border: 1px solid lightgrey;*/
-    /*box-sizing: border-box;*/
     display: grid;
     grid-template-areas: "ph1 sort page desc ph2";
     grid-template-columns: 225px 120px 120px 120px 1fr;
@@ -60,11 +58,9 @@ const name = ref<String>("SortAndPage")
     grid-area: ph2;
 }
 
-.select {
+.block {
     width: 80px;
     height: 40px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     margin-top: auto;
     margin-bottom: auto;
     margin-right: 20px;
@@ -82,13 +78,13 @@ const name = ref<String>("SortAndPage")
     grid-area: desc;
 }
 
-.select-input {
+.select {
     width: 100%;
     height: 100%;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-    border: none;
+    border: 2px solid lightgray;
+    box-sizing: border-box;
     border-radius: 18px;
+    padding: 0;
     font-size: 1rem;
     font-weight: normal;
     text-align: center;
@@ -99,11 +95,11 @@ const name = ref<String>("SortAndPage")
     background-color: whitesmoke;
 }
 
-.select-input:hover {
-    background-color: gainsboro;
+.select:hover {
+    background-color: lightgray;
 }
 
-.select-input:active {
-    background-color: lightgray;
+.select:active {
+    background-color: gainsboro;
 }
 </style>

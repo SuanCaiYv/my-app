@@ -1,13 +1,15 @@
 <template>
     <div class="publish">
-        <button class="button">发布文章</button>
+        <button class="button" @click="router.push('/editor')">发布文章</button>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import {useRouter} from "vue-router";
 
-const name = ref<String>("Publish")
+const name = ref<string>("Publish")
+const router = useRouter()
 </script>
 
 <style scoped>

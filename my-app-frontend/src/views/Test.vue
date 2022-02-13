@@ -1,7 +1,6 @@
 <template>
-    <div>
-        <input type="text" v-model="str">
-        <div>{{s}}</div>
+    <div class="test">
+        <Publish></Publish>
     </div>
 </template>
 
@@ -9,6 +8,7 @@
 import {ref, watch} from "vue"
 import {useRouter} from "vue-router";
 import {marked} from "marked";
+import Publish from "../components/editor/Publish.vue"
 
 const name = ref<String>("Test")
 
@@ -39,7 +39,42 @@ watch(str, (n, o) => {
 </script>
 
 <style scoped>
-.test:hover {
-    background-color: #9dbbff;
+.test {
+    width: 100%;
+    height: 100%;
+}
+
+.a {
+    width: 100%;
+    height: 100%;
+    grid-area: a;
+}
+
+.b {
+    width: 100%;
+    height: 100%;
+    grid-area: b;
+    grid-template-areas: "left right";
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 10px;
+}
+
+.left {
+    grid-area: left;
+    background: red;
+    width: 200px;
+    overflow: scroll;
+    word-break: break-all;
+    float: left;
+    height: 100%;
+}
+
+.right {
+    grid-area: right;
+    background: green;
+    margin-left: 200px;
+    height: 100%;
+    word-break: break-all;
+    overflow: scroll;
 }
 </style>

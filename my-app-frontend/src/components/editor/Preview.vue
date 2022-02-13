@@ -21,7 +21,7 @@ watch(contentRaw, (n, o) => {
 <style scoped>
 .preview {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 101px);
     grid-area: preview;
     border-top: 1px solid lightgray;
     border-left: 2px solid lightgray;
@@ -32,5 +32,32 @@ watch(contentRaw, (n, o) => {
     padding-right: 10px;
     padding-top: 10px;
     text-align: left;
+    word-break: break-all;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+:deep(a) {
+    text-decoration: none;
+    color: dodgerblue;
+    word-break: break-word;
+}
+
+:deep(code) {
+    word-break: break-all;
+}
+
+:deep(strong) {
+    color: dodgerblue;
+}
+
+:deep(h3) {
+    color: deepskyblue;
+}
+
+:deep(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 </style>

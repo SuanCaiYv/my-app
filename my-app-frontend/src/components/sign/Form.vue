@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import {httpClient, Response} from "../../net";
+import {httpClient, Resp} from "../../net";
 import alertFunc from "../../util/alert";
 import router from "../../router";
 import storage from "../../util/storage";
@@ -45,7 +45,7 @@ const sendVerCode = function () {
     }, 120 * 1000)
     httpClient.post("/sign/ver_code", {}, {
         username: username.value
-    }, false, function (resp: Response) {
+    }, false, function (resp: Resp) {
         if (resp.ok) {
             alertFunc("验证码发送成功!", function () {})
             storage.set(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, new Date().getTime() + "")
@@ -61,7 +61,7 @@ const login = function () {
     httpClient.put("/sign", {}, {
         username: username.value,
         credential: password.value,
-    }, false, function (resp: Response) {
+    }, false, function (resp: Resp) {
         if (resp.ok) {
             // @ts-ignore
             storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
@@ -82,7 +82,7 @@ const signup = function () {
         username: username.value,
         credential: password.value,
         ver_code: verCode.value
-    }, false, function (resp: Response) {
+    }, false, function (resp: Resp) {
         if (resp.ok) {
             alertFunc("注册成功", function () {})
         } else {

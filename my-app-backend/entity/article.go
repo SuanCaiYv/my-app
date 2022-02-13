@@ -10,8 +10,8 @@ type Article struct {
 	CoverImg    string    `bson:"cover_img" json:"cover_img"`
 	Catalog     Catalog   `bson:"catalog" json:"catalog"`
 	Content     string    `bson:"content" json:"content"`
-	Tags        []Tag     `bson:"tags" json:"tags"`
 	Kinds       []Kind    `bson:"kinds" json:"kinds"`
+	Tags        []Tag     `bson:"tags" json:"tags"`
 	ReleaseTime time.Time `bson:"release_time" json:"release_time"`
 	Visibility  int       `bson:"visibility" json:"visibility"`
 	Available   bool      `bson:"available" json:"-"`

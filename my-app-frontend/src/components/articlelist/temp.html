@@ -1,67 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Document</title>
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
+        span {
+            width: 100px;
+            border: solid;
+            display: inline-block;
+            text-align: justify;
+            text-align-last: justify;
         }
-        .a {
+
+        span:after {
+            content: '';
             width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-areas:
-                    "b c d"
-                    "b c f";
-            grid-template-columns: 200px 300px 1fr;
-            grid-template-rows: 1fr 1fr;
-        }
-        .b {
-            width: 100%;
-            height: 100%;
-            grid-area: b;
-            border: 1px solid silver;
-        }
-        .c {
-            width: 100%;
-            height: 100%;
-            grid-area: c;
-            border: 1px solid salmon;
-        }
-        .d {
-            width: 100%;
-            height: 100%;
-            grid-area: d;
-            border: 1px solid skyblue;
-        }
-        .e {
-            width: 100%;
-            height: 100%;
-            grid-area: e;
-            border: 1px solid dodgerblue;
-        }
-        .e {
-            width: 100%;
-            height: 100%;
-            grid-area: f;
-            border: 1px solid darkseagreen;
+            display: inline-block;
+            overflow: hidden;
+            height: 0;
         }
     </style>
 </head>
+
 <body>
-<div class="a">
-    <div class="b"></div>
-    <div class="c"></div>
-    <div class="d"></div>
-    <div class="f"></div>
-</div>
+<span>
+    a a a
+</span>
 </body>
+
 </html>
-<script>
-    import Body from "./Body";
-    export default {
-        components: {Body}
-    }
-</script>
+

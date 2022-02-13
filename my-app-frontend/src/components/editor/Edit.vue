@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import {inject, ref} from "vue"
 import {baseUrl, httpClient} from "../../net";
-import {Response} from "../../net";
+import {Response} from "../../common/interface";
 
 const name = ref<string>("Edit")
 
@@ -57,11 +57,12 @@ document.addEventListener('paste', function (event: ClipboardEvent) {
     padding-left: 10px;
     padding-right: 3px;
     padding-top: 10px;
+    overflow-y: auto;
 }
 
 .edit-area {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 111px);
     border: none;
     box-sizing: border-box;
     font-size: 1rem;

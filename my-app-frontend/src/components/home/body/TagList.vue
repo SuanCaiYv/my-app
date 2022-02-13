@@ -27,8 +27,9 @@ tagList.push("ee")
 .tagList {
     width: 100%;
     height: 100%;
-    border: 2px solid powderblue;
+    border: 2px solid ;
     box-sizing: border-box;
     border-radius: 20px;
+    background-color: ivory;
 }
 </style>

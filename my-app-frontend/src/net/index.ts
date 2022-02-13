@@ -1,12 +1,13 @@
 import axios, {AxiosResponse} from "axios";
 import storage from "../util/storage";
 import {Constant} from "../common/systemconstant";
+import {Response} from "../common/interface";
 
 export const baseUrl = "http://127.0.0.1:8190/v1"
 
 axios.defaults.timeout = 2000
 
-class Response {
+class ResponseClass implements Response {
     ok: boolean
     errCode: number
     errMsg: string
@@ -152,8 +153,8 @@ const httpClient = {
     }
 }
 
-const dealResp = function (resp: AxiosResponse): Response {
-    let r = new Response()
+const dealResp = function (resp: AxiosResponse): ResponseClass {
+    let r = new ResponseClass()
     if (resp.status === 200) {
         let rawData = resp.data
         r.ok = rawData.code === 200
@@ -171,4 +172,4 @@ const dealResp = function (resp: AxiosResponse): Response {
     return r
 }
 
-export {httpClient, Response}
+export {httpClient, ResponseClass}

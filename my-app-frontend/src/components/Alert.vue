@@ -39,7 +39,8 @@ const close = function () {
 }
 
 .alert-message {
-    font-size: 14px;
+    font-size: 1rem;
+    font-weight: bolder;
     line-height: 22px;
     color: black;
     margin-bottom: 32px;
@@ -53,6 +54,8 @@ const close = function () {
     border: 0;
     outline: 0;
     color: white;
+    font-size: 1rem;
+    font-weight: bolder;
     border-radius: 18px;
     cursor: pointer;
 }

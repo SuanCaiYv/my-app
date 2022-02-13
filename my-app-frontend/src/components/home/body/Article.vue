@@ -39,7 +39,7 @@ const name = ref<String>("Article")
     border: 2px solid wheat;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
-    background-color: antiquewhite;
+    background-color: #f5ecff;
 }
 
 .content {
@@ -50,6 +50,6 @@ const name = ref<String>("Article")
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
-    background-color: antiquewhite;
+    background-color: #f5ecff;
 }
 </style>
