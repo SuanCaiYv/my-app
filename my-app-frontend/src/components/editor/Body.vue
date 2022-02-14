@@ -14,37 +14,37 @@ import Preview from "./Preview.vue"
 import {httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
-import {useStore} from "vuex";
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("Body")
-const store = useStore()
 
 const id = ref<string>('')
 const title = ref<string>('')
 const content = ref<string>('')
 
 const saveDraft = function () {
+    console.log("run draft")
     httpClient.post("/article/draft", {}, {
         article_id: id.value,
         article_name: title.value,
         article_content: content.value
     }, true, function (resp: Response) {
-        if (store.getters.draftArticleId === "" || store.getters.draftArticleId === null) {
-            clearInterval(cancel)
-        }
         if (!resp.ok) {
             clearInterval(cancel)
+            console.log("http failed")
             alertFunc(resp.errMsg, function () {
             })
         } else {
             // @ts-ignore
             id.value = resp.data.article_id
-            store.commit("updatedDraftArticleId", id.value)
         }
     })
 }
 
+saveDraft()
 const cancel = setInterval(saveDraft, 5000)
+storage.set(Constant.DRAFT_INTERVAL_CANCEL, cancel + "")
 
 provide("id", id)
 provide("title", title)

@@ -89,3 +89,25 @@ type s struct {
 func NewString(result string) *Result {
 	return NewOk(&s{result})
 }
+
+type l struct {
+	Total       int64       `json:"total"`
+	Count       int64       `json:"count"`
+	PageNum     int64       `json:"page_num"`
+	PageSize    int64       `json:"page_size"`
+	NextPageNum int64       `json:"next_page_num"`
+	EndPage     bool        `json:"end_page"`
+	List        interface{} `json:"list"`
+}
+
+func NewList(total, count, pageNum, pageSize, nextPageNum int64, endPage bool, list interface{}) *Result {
+	return NewOk(&l{
+		Total:       total,
+		Count:       count,
+		PageNum:     pageNum,
+		PageSize:    pageSize,
+		NextPageNum: nextPageNum,
+		EndPage:     endPage,
+		List:        list,
+	})
+}

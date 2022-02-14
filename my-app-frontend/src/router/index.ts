@@ -1,4 +1,6 @@
 import {createRouter, createWebHistory, Router, RouteRecordRaw} from "vue-router";
+import storage from "../util/storage";
+import {Constant} from "../common/systemconstant";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -69,6 +71,13 @@ const routes: Array<RouteRecordRaw> = [
 const router: Router = createRouter({
     history: createWebHistory(),
     routes: routes
+})
+
+router.beforeEach((to, from) => {
+    if (from.name === "editor") {
+        let cancel = parseInt(storage.get(Constant.DRAFT_INTERVAL_CANCEL))
+        clearInterval(cancel)
+    }
 })
 
 export default router

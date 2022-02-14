@@ -33,7 +33,45 @@ type ArticleDao interface {
 	Delete(id string) error
 }
 
+type KindDao interface {
+	Insert(kind *entity.Kind) error
+
+	Select(id string) (*entity.Kind, error)
+
+	SelectByName(name string) (*entity.Kind, error)
+
+	Update(kind *entity.Kind) error
+
+	Delete(id string) error
+
+	ListAll() ([]entity.Kind, error)
+}
+
+type TagDao interface {
+	Insert(tag *entity.Tag) error
+
+	Select(id string) (*entity.Tag, error)
+
+	SelectByName(name string) (*entity.Tag, error)
+
+	Update(tag *entity.Tag) error
+
+	Delete(id string) error
+
+	ListAll() ([]entity.Tag, error)
+}
+
 type ArticleDaoService struct {
+	collection *mongo.Collection
+	logger     *logrus.Logger
+}
+
+type KindDaoService struct {
+	collection *mongo.Collection
+	logger     *logrus.Logger
+}
+
+type TagDaoService struct {
 	collection *mongo.Collection
 	logger     *logrus.Logger
 }
@@ -41,6 +79,10 @@ type ArticleDaoService struct {
 var (
 	instanceArticleDaoService *ArticleDaoService
 	onceArticleDaoService     sync.Once
+	instanceKindDaoService    *KindDaoService
+	onceKindDaoService        sync.Once
+	instanceTagDaoService     *TagDaoService
+	onceTagDaoService         sync.Once
 )
 
 func NewArticleDaoService() *ArticleDaoService {
@@ -191,4 +233,250 @@ func (a *ArticleDaoService) Delete(id string) error {
 	article.UpdatedTime = time.Now()
 	article.Available = false
 	return a.Update(article)
+}
+
+func NewKindDaoService() *KindDaoService {
+	onceKindDaoService.Do(newInstanceKindDaoService)
+	return instanceKindDaoService
+}
+
+func newInstanceKindDaoService() {
+	logger := util.NewLogger()
+	config := config2.ApplicationConfiguration()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	url := fmt.Sprintf("%s:%d", config.DatabaseConfig.Url, config.DatabaseConfig.Port)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
+	util.JustPanic(err)
+	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionKind)
+	instanceKindDaoService = &KindDaoService{
+		collection,
+		logger,
+	}
+}
+
+func (k *KindDaoService) Insert(kind *entity.Kind) error {
+	kind.Available = true
+	kind.CreatedTime = time.Now()
+	kind.UpdatedTime = time.Now()
+	kind.Id = primitive.NewObjectID().Hex()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err := k.collection.InsertOne(ctx, kind)
+	return err
+}
+
+func (k *KindDaoService) Select(id string) (*entity.Kind, error) {
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	one := k.collection.FindOne(timeout, primitive.M{"_id": id})
+	if err := one.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		k.logger.Error(err)
+		return nil, err
+	}
+	result := entity.Kind{}
+	err := one.Decode(&result)
+	if err != nil {
+		k.logger.Error(err)
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (k *KindDaoService) SelectByName(name string) (*entity.Kind, error) {
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	one := k.collection.FindOne(timeout, primitive.M{"name": name})
+	if err := one.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		k.logger.Error(err)
+		return nil, err
+	}
+	result := entity.Kind{}
+	err := one.Decode(&result)
+	if err != nil {
+		k.logger.Error(err)
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (k *KindDaoService) Update(kind *entity.Kind) error {
+	kind.UpdatedTime = time.Now()
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	_, err := k.collection.UpdateByID(timeout, kind.Id, primitive.M{"$set": kind})
+	return err
+}
+
+func (k *KindDaoService) Delete(id string) error {
+	kind, err := k.Select(id)
+	if err != nil {
+		return err
+	}
+	kind.UpdatedTime = time.Now()
+	kind.Available = false
+	return k.Update(kind)
+}
+
+func (k *KindDaoService) ListAll() ([]entity.Kind, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	cursor, err := k.collection.Find(ctx, primitive.M{})
+	if err != nil {
+		k.logger.Error(err)
+		return nil, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			k.logger.Error(err)
+		}
+	}(cursor, ctx)
+	if err != nil {
+		return nil, err
+	}
+	results := make([]entity.Kind, 0, 10)
+	for cursor.Next(ctx) {
+		tmp := entity.Kind{}
+		err := cursor.Decode(&tmp)
+		if err != nil {
+			k.logger.Error(err)
+			return nil, err
+		}
+		results = append(results, tmp)
+	}
+	if err := cursor.Err(); err != nil {
+		k.logger.Error(err)
+		return nil, err
+	}
+	return results, nil
+}
+
+func NewTagDaoService() *TagDaoService {
+	onceTagDaoService.Do(newInstanceTagDaoService)
+	return instanceTagDaoService
+}
+
+func newInstanceTagDaoService() {
+	logger := util.NewLogger()
+	config := config2.ApplicationConfiguration()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	url := fmt.Sprintf("%s:%d", config.DatabaseConfig.Url, config.DatabaseConfig.Port)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
+	util.JustPanic(err)
+	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionTag)
+	instanceTagDaoService = &TagDaoService{
+		collection,
+		logger,
+	}
+}
+
+func (t *TagDaoService) Insert(tag *entity.Tag) error {
+	tag.Available = true
+	tag.CreatedTime = time.Now()
+	tag.UpdatedTime = time.Now()
+	tag.Id = primitive.NewObjectID().Hex()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err := t.collection.InsertOne(ctx, tag)
+	return err
+}
+
+func (t *TagDaoService) Select(id string) (*entity.Tag, error) {
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	one := t.collection.FindOne(timeout, primitive.M{"_id": id})
+	if err := one.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		t.logger.Error(err)
+		return nil, err
+	}
+	result := entity.Tag{}
+	err := one.Decode(&result)
+	if err != nil {
+		t.logger.Error(err)
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (t *TagDaoService) SelectByName(name string) (*entity.Tag, error) {
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	one := t.collection.FindOne(timeout, primitive.M{"name": name})
+	if err := one.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		t.logger.Error(err)
+		return nil, err
+	}
+	result := entity.Tag{}
+	err := one.Decode(&result)
+	if err != nil {
+		t.logger.Error(err)
+		return nil, err
+	}
+	return &result, nil
+}
+
+func (t *TagDaoService) Update(tag *entity.Tag) error {
+	tag.UpdatedTime = time.Now()
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancelFunc()
+	_, err := t.collection.UpdateByID(timeout, tag.Id, primitive.M{"$set": tag})
+	return err
+}
+
+func (t *TagDaoService) Delete(id string) error {
+	tag, err := t.Select(id)
+	if err != nil {
+		return err
+	}
+	tag.UpdatedTime = time.Now()
+	tag.Available = false
+	return t.Update(tag)
+}
+
+func (t *TagDaoService) ListAll() ([]entity.Tag, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	cursor, err := t.collection.Find(ctx, primitive.M{})
+	if err != nil {
+		t.logger.Error(err)
+		return nil, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			t.logger.Error(err)
+		}
+	}(cursor, ctx)
+	if err != nil {
+		return nil, err
+	}
+	results := make([]entity.Tag, 0, 10)
+	for cursor.Next(ctx) {
+		tmp := entity.Tag{}
+		err := cursor.Decode(&tmp)
+		if err != nil {
+			t.logger.Error(err)
+			return nil, err
+		}
+		results = append(results, tmp)
+	}
+	if err := cursor.Err(); err != nil {
+		t.logger.Error(err)
+		return nil, err
+	}
+	return results, nil
 }

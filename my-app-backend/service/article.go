@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
@@ -29,10 +28,20 @@ type ArticleApi interface {
 	ExportArticle(context *gin.Context)
 
 	KindAndTagList(context *gin.Context)
+
+	AddKind(context *gin.Context)
+
+	AddTag(context *gin.Context)
+
+	KindList(context *gin.Context)
+
+	TagList(context *gin.Context)
 }
 
 type ArticleApiHandler struct {
 	articleDao db.ArticleDao
+	kindDao    db.KindDao
+	tagDao     db.TagDao
 	gridFsDao  db.GridFSDao
 	sysUserDao db.SysUserDao
 	logger     *logrus.Logger
@@ -41,6 +50,8 @@ type ArticleApiHandler struct {
 func NewArticleApiHandler() *ArticleApiHandler {
 	return &ArticleApiHandler{
 		articleDao: db.NewArticleDaoService(),
+		kindDao:    db.NewKindDaoService(),
+		tagDao:     db.NewTagDaoService(),
 		gridFsDao:  db.NewGridFSDaoService(),
 		sysUserDao: db.NewSysUserDaoService(),
 		logger:     util.NewLogger(),
@@ -63,17 +74,16 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 	input := &articleDraft{}
 	err := context.BindJSON(input)
 	if err != nil {
-		a.logger.Errorf("参数解析失败: %v", err)
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
 		context.JSON(200, resp.NewBadRequest("参数解析失败"))
 		return
 	}
 	user, err := a.sysUserDao.SelectByUsername(username)
 	if err != nil {
-		a.logger.Errorf("无法读取SysUser数据表: %v", err)
+		a.logger.Errorf("无法读取SysUser数据表: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("无法读取用户表"))
 		return
 	}
-	fmt.Println(input)
 	if input.ArticleId == "" {
 		if input.ArticleName == "" {
 			input.ArticleName = time.Now().String()
@@ -103,7 +113,7 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 	} else {
 		article, err := a.articleDao.Select(input.ArticleId)
 		if err != nil {
-			a.logger.Errorf("无法读取Article数据表: %v", err)
+			a.logger.Errorf("无法读取Article数据表: %s; %v", username, err)
 			context.JSON(200, resp.NewInternalError("无法读取文档表"))
 			return
 		}
@@ -143,18 +153,37 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
 	owner := config.ApplicationConfiguration().Owner
-	articles, _, err := a.articleDao.ListByAuthor(owner, int64(pgNum), int64(pgSize), sort, desc)
+	articles, total, err := a.articleDao.ListByAuthor(owner, int64(pgNum), int64(pgSize), sort, desc)
 	if err != nil {
-		a.logger.Errorf("获取文章列表失败: %v", err)
+		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
 		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
 		return
 	}
-	context.JSON(200, resp.NewOk(articles))
+	endPage := false
+	if len(articles) != pgSize {
+		endPage = true
+	}
+	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pgNum), int64(pgSize), int64(pgNum+1), endPage, articles))
 }
 
 func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
-	// TODO implement me
-	panic("implement me")
+	username := context.MustGet("username").(string)
+	pgSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	pgNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	sort := context.DefaultQuery("sort", "created_time")
+	// 是否倒序
+	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	articles, total, err := a.articleDao.ListByAuthor(username, int64(pgNum), int64(pgSize), sort, desc)
+	if err != nil {
+		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
+		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
+		return
+	}
+	endPage := false
+	if len(articles) != pgSize {
+		endPage = true
+	}
+	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pgNum), int64(pgSize), int64(pgNum+1), endPage, articles))
 }
 
 func (a *ArticleApiHandler) ExportArticle(context *gin.Context) {
@@ -162,7 +191,137 @@ func (a *ArticleApiHandler) ExportArticle(context *gin.Context) {
 	panic("implement me")
 }
 
+type addKind struct {
+	KindName string `json:"kind_name"`
+}
+
+func (a *ArticleApiHandler) AddKind(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	input := &addKind{}
+	err := context.BindJSON(input)
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	temp, err := a.kindDao.SelectByName(input.KindName)
+	if err != nil {
+		a.logger.Errorf("查询ArticleKind失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("查询分类表失败"))
+		return
+	}
+	if temp != nil {
+		a.logger.Infof("分类已存在，重复创建: %s, %s", username, input.KindName)
+		context.JSON(200, resp.NewBadRequest("请勿重复创建分类"))
+		return
+	}
+	kind := entity.Kind{
+		Name: input.KindName,
+	}
+	err = a.kindDao.Insert(&kind)
+	if err != nil {
+		a.logger.Errorf("插入ArticleKind失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("插入分类表失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
+}
+
+type addTag struct {
+	TagName string `json:"tag_name"`
+}
+
+func (a *ArticleApiHandler) AddTag(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	input := &addTag{}
+	err := context.BindJSON(input)
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	temp, err := a.tagDao.SelectByName(input.TagName)
+	if err != nil {
+		a.logger.Errorf("查询Articletag失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("查询标签表失败"))
+		return
+	}
+	if temp != nil {
+		a.logger.Infof("标签已存在，重复创建: %s, %s", username, input.TagName)
+		context.JSON(200, resp.NewBadRequest("请勿重复创建标签"))
+		return
+	}
+	tag := entity.Tag{
+		Name: input.TagName,
+	}
+	err = a.tagDao.Insert(&tag)
+	if err != nil {
+		a.logger.Errorf("插入ArticleTag失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("插入标签表失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
+}
+
 func (a *ArticleApiHandler) KindAndTagList(context *gin.Context) {
 	// TODO implement me
 	panic("implement me")
+}
+
+func (a *ArticleApiHandler) KindList(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	a.logger.Info(pageNum, pageSize)
+	var list []entity.Kind
+	if pageNum == -1 {
+		list, err = a.kindDao.ListAll()
+		if err != nil {
+			a.logger.Errorf("获取分类列表失败: %s; %v", username, err)
+			context.JSON(200, resp.NewInternalError("获取分类列表失败"))
+			return
+		}
+	} else {
+		// TODO
+	}
+	context.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))
+}
+
+func (a *ArticleApiHandler) TagList(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	a.logger.Info(pageNum, pageSize)
+	var list []entity.Tag
+	if pageNum == -1 {
+		list, err = a.tagDao.ListAll()
+		if err != nil {
+			a.logger.Errorf("获取分类列表失败: %s; %v", username, err)
+			context.JSON(200, resp.NewInternalError("获取分类列表失败"))
+			return
+		}
+	} else {
+		// TODO
+	}
+	context.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))
 }

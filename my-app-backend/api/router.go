@@ -74,9 +74,13 @@ func Route() {
 		article.GET("/list", articleApi.ListArticleNoAuth, articleApi.ListArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
+		article.GET("/kind_list", articleApi.KindList)
+		article.GET("/tag_list", articleApi.TagList)
 		article.GET("/img_fetch", wsApi.ImageFetch)
 		article.PUT("", articleApi.UpdateArticle)
 		article.POST("", articleApi.AddArticle)
+		article.POST("/kind", articleApi.AddKind)
+		article.POST("/tag", articleApi.AddTag)
 		article.POST("/draft", articleApi.UploadDraft)
 		article.DELETE("/:article_id", articleApi.DeleteArticle)
 

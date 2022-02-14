@@ -1,25 +1,28 @@
 <template>
     <div class="test">
-        <Publish></Publish>
+        <input type="text" v-model="str" @keydown.enter.down="update">
+        <div v-for="v in arr">{{v}}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from "vue"
+import {reactive, ref, watch} from "vue"
 import {useRouter} from "vue-router";
 import {marked} from "marked";
 import Publish from "../components/editor/Publish.vue"
 
 const name = ref<String>("Test")
 
-const router = useRouter()
-
 const str = ref<string>('')
-const s = ref<string>('')
+const arr = reactive<Array<string>>([])
 
-watch(str, (n, o) => {
-    s.value = marked.parse(n)
+watch(arr, () => {
+    console.log(arr.length)
 })
+
+const update = function () {
+    arr.push(str.value)
+}
 
 // <input type="file" name="file" @change="upload0($event)">
 // let file = ""

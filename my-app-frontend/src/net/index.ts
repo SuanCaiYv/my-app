@@ -28,9 +28,9 @@ const httpClient = {
     get: function <T extends object>(uri: string, query: T, auth: boolean, callback: Function) {
         let str = ""
         for (let field in query) {
-            str += (field + "=" + query[field])
+            str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str
+        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
         if (auth) {
             axios.get(url, {
                 headers: {
@@ -53,9 +53,9 @@ const httpClient = {
     post: function <T extends object>(uri: string, query: T, params: T, auth: boolean, callback: Function) {
         let str = ""
         for (let field in query) {
-            str += (field + "=" + query[field])
+            str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str
+        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
         if (auth) {
             axios.post(url, params, {
                 headers: {
@@ -82,9 +82,9 @@ const httpClient = {
     put: function <T extends object>(uri: string, query: T, params: T, auth: boolean, callback: Function) {
         let str = ""
         for (let field in query) {
-            str += (field + "=" + query[field])
+            str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str
+        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
         if (auth) {
             axios.put(url, params, {
                 headers: {
@@ -111,9 +111,9 @@ const httpClient = {
     delete: function <T extends object>(uri: string, query: T, auth: boolean, callback: Function) {
         let str = ""
         for (let field in query) {
-            str += (field + "=" + query[field])
+            str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str
+        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
         if (auth) {
             axios.delete(url, {
                 headers: {
@@ -137,9 +137,9 @@ const httpClient = {
     upload: function<T extends object> (uri: string, query: T, formData: FormData, callback: Function) {
         let str = ""
         for (let field in query) {
-            str += (field + "=" + query[field])
+            str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str
+        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
         axios.post(url, formData, {
             headers: {
                 "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),

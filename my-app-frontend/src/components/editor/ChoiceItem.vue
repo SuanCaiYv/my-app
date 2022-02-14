@@ -1,7 +1,7 @@
 <template>
     <div class="choice-item">
-        <div class="value">{{value}}</div>
-        <button class="delete" @click="deleteFunc(id)">✖️</button>
+        <div class="value">{{props.value}}</div>
+        <button class="delete" @click="props.deleteFunc(id)">✖️</button>
     </div>
 </template>
 
