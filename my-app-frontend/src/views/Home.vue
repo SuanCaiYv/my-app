@@ -6,22 +6,22 @@
 
 <script setup lang="ts">
 import {provide, reactive, ref} from "vue"
-import Layout from "../components/home/layout/Layout.vue"
-import {ArticleRaw} from "../common/interface";
+import Layout from "../components/home/Layout.vue"
+import {ArticleLiteRaw} from "../common/interface";
 import {uploadLocalFile} from "../util/file";
 
 const name = ref<String>("Home")
 
-class ArticleRawClass implements ArticleRaw {
-    title: String
-    body: String
+class ArticleRawClass implements ArticleLiteRaw {
+    articleName: String
+    content: String
     constructor(t: String, b: String) {
-        this.title = t
-        this.body = b
+        this.articleName = t
+        this.content = b
     }
 }
 
-const articleList = reactive<Array<ArticleRaw>>([])
+const articleList = reactive<Array<ArticleLiteRaw>>([])
 
 articleList.push(new ArticleRawClass("aaa", "bbb"))
 articleList.push(new ArticleRawClass("ccc", "ddd"))

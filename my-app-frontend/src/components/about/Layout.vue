@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Header from "./Header.vue";
+import Header from "../common/HeaderWithoutSearch.vue";
 import PH1 from "../placeholder/PH1.vue"
 import User from "./User.vue";
 import Info from "./Info.vue"

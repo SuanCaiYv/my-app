@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import KindOrTagItem from "./KindOrTagItem.vue"
+import KindOrTagItem from "../common/KindOrTagItem.vue"
 
 const name = ref<String>("Body")
 </script>

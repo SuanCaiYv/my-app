@@ -13,34 +13,34 @@
         <div class="kind-list">
             <select class="select" v-model="chosenKind" @change="commitKindList">
                 <option value="" selected>选择分类</option>
-                <option v-for="item in kindList" :value="item.id">{{ item.value }}</option>
+                <option v-for="item in kindList" :value="item.id">{{ item.name }}</option>
             </select>
             <input class="input" type="text" placeholder="键入并回车以新建分类" v-model="newKind"
                    @keydown.enter.down="createKind"/>
         </div>
         <div class="chosen-kind-list">
             <div class="full-show-value">
-                <ChoiceItem v-for="item in chosenKindList" :id="item.id" :value="item.value"
+                <ChoiceItem v-for="item in chosenKindList" :id="item.id" :value="item.name"
                             :delete-func="cancelKindList"></ChoiceItem>
             </div>
         </div>
         <div class="tag-list">
             <select class="select" v-model="chosenTag" @change="commitTagList">
                 <option value="" selected>选择标签</option>
-                <option v-for="item in tagList" :value="item.id">{{ item.value }}</option>
+                <option v-for="item in tagList" :value="item.id">{{ item.name }}</option>
             </select>
             <input class="input" type="text" placeholder="键入并回车以新建标签" v-model="newTag" @keydown.enter.down="createTag"/>
         </div>
         <div class="chosen-tag-list">
             <div class="full-show-value">
-                <ChoiceItem v-for="item in chosenTagList" :id="item.id" :value="item.value"
+                <ChoiceItem v-for="item in chosenTagList" :id="item.id" :value="item.name"
                             :delete-func="cancelTagList"></ChoiceItem>
             </div>
         </div>
         <div class="rollback">
             <select class="select" v-model="chosenRollback">
                 <option value="" selected>选择回滚</option>
-                <option v-for="item in rollbackList" :value="item.id">{{ item.value }}</option>
+                <option v-for="item in rollbackList" :value="item.id">{{ item.name }}</option>
             </select>
             <div class="fill-all-show-value">{{ chosenRollback }}</div>
         </div>
@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from "vue"
 import ChoiceItem from "./ChoiceItem.vue"
-import {IdValue} from "../../common/interface";
+import {IdName} from "../../common/interface";
 import {baseUrl, httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import storage from "../../util/storage";
@@ -79,33 +79,33 @@ let visibility = ref<boolean>(false)
 let visibilityFlag = ref<string>("私密文章")
 let visibilityMsg = ref<string>("此文章仅允许作者阅览")
 
-const kindList = reactive<Array<IdValue>>([])
-const chosenKindList = reactive<Array<IdValue>>([])
+const kindList = reactive<Array<IdName>>([])
+const chosenKindList = reactive<Array<IdName>>([])
 const chosenKind = ref<string>('')
 const kindMap = new Map<string, string>()
 const newKind = ref<string>('')
 
-const tagList = reactive<Array<IdValue>>([])
-const chosenTagList = reactive<Array<IdValue>>([])
+const tagList = reactive<Array<IdName>>([])
+const chosenTagList = reactive<Array<IdName>>([])
 const chosenTag = ref<string>('')
 const tagMap = new Map<string, string>()
 const newTag = ref<string>('')
 
-const rollbackList = reactive<Array<IdValue>>([])
+const rollbackList = reactive<Array<IdName>>([])
 const chosenRollback = ref<string>('')
 
 const summary = ref<string>('')
 
-class IdAndValue implements IdValue {
+class IdAndValue implements IdName {
     id: string
-    value: string
+    name: string
 
     constructor(id0: string, value0: string | undefined) {
         this.id = id0
         if (value0 === undefined) {
-            this.value = ""
+            this.name = ""
         } else {
-            this.value = value0
+            this.name = value0
         }
     }
 }
@@ -168,6 +168,7 @@ const createKind = function () {
             errorNotification(resp.errMsg)
         } else {
             infoNotification("创建分类成功")
+            newKind.value = ""
             kindList.splice(0, kindList.length)
             getKindList()
         }
@@ -194,6 +195,7 @@ const createTag = function () {
             errorNotification(resp.errMsg)
         } else {
             infoNotification("创建标签成功")
+            newTag.value = ""
             tagList.splice(0, tagList.length)
             getTagList()
         }
@@ -237,13 +239,13 @@ const getRollBackList = function () {}
 
 const syncKindList = function () {
     for (let item of kindList) {
-        kindMap.set(item.id, item.value)
+        kindMap.set(item.id, item.name)
     }
 }
 
 const syncTagList = function () {
     for (let item of tagList) {
-        tagMap.set(item.id, item.value)
+        tagMap.set(item.id, item.name)
     }
 }
 

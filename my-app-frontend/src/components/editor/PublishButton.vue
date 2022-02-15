@@ -40,8 +40,10 @@ const publish = function () {
 .button {
     width: 80px;
     height: 40px;
-    margin: 10px 120px 10px 0;
-    padding: 0;
+    margin-top: 10px;
+    margin-left: 0;
+    margin-right: calc(100% - 80px);
+    padding: 0 20px;
     border: 2px solid lightgray;
     box-sizing: border-box;
     border-radius: 18px;

@@ -33,8 +33,8 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import PH1 from "../../placeholder/PH1.vue"
-import PH2 from "../../placeholder/PH2.vue"
+import PH1 from "../placeholder/PH1.vue"
+import PH2 from "../placeholder/PH2.vue"
 
 // todo 针对不同浏览器优化select图标
 const name = ref<String>("SortAndPage")

@@ -23,7 +23,9 @@ const router = useRouter()
 .home-page-button {
     width: auto;
     height: 40px;
-    margin: 10px auto;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 20px;
     border: 2px solid lightgray;
     box-sizing: border-box;

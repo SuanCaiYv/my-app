@@ -23,11 +23,11 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Img from "../../Img.vue"
+import Img from "../Img.vue"
 import {useRouter} from "vue-router";
-import {httpClient} from "../../../net";
-import {Response} from "../../../common/interface";
-import alertFunc from "../../../util/alert";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alertFunc from "../../util/alert";
 
 const name = ref<string>("UserInfo")
 

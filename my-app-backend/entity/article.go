@@ -36,7 +36,7 @@ type Kind struct {
 }
 
 type Catalog struct {
-	Value string    `bson:"value" json:"value"`
+	Name  string    `bson:"name" json:"name"`
 	Child []Catalog `bson:"child" json:"child"`
 }
 

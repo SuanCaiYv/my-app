@@ -9,10 +9,10 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Header from "../header/Header.vue"
-import PH1 from "../../placeholder/PH1.vue"
-import Body from "../body/Body.vue"
-import Footer from "../Footer.vue"
+import Header from "../common/HeaderWithSearch.vue"
+import PH1 from "../placeholder/PH1.vue"
+import Body from "./Body.vue"
+import Footer from "./Footer.vue"
 
 const name = ref<String>("Layout")
 </script>

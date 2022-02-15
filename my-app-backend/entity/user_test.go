@@ -15,7 +15,7 @@ func Test(t *testing.T) {
 		Summary:  "",
 		CoverImg: "",
 		Catalog: Catalog{
-			Value: "",
+			Name:  "",
 			Child: []Catalog{},
 		},
 		Content:     "",

@@ -63,6 +63,7 @@ const setVisibly = function () {
     border: 2px solid wheat;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
+    padding: 0 0 0 8px;
     font-size: 1.4rem;
     font-weight: bolder;
     text-align: left;

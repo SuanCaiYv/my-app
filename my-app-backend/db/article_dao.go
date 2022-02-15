@@ -199,7 +199,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	skip := (pgNum - 1) * pgNum
-	cursor, err := a.collection.Find(ctx, primitive.M{"author": author}, &options.FindOptions{
+	cursor, err := a.collection.Find(ctx, primitive.M{"author": author, "visibility": entity.VisibilityPublic}, &options.FindOptions{
 		Limit: &pgSize,
 		Skip:  &skip,
 		Sort:  primitive.M{sort: descInt},

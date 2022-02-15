@@ -5,14 +5,19 @@
 </template>
 
 <script setup lang="ts">
-import {inject, ref} from "vue"
+import {ref} from "vue"
 
-const name = ref<String>("Search")
+const name = ref<string>("Search")
 
-let keyStr = ref<String>("")
+const props = defineProps({
+    searchFunc: Function
+})
+
+const keyStr = ref<string>("")
 
 const searchKey = function () {
-    console.log(keyStr.value)
+    // @ts-ignore
+    props.searchFunc(keyStr.value)
 }
 </script>
 
@@ -24,17 +29,16 @@ const searchKey = function () {
 }
 
 .key {
-    width: 192px;
+    width: calc(100% - 10px);
     height: 40px;
     margin-top: 10px;
-    margin-bottom: 10px;
+    padding: 0 0 0 10px;
     border: none;
     border-radius: 16px;
     display: inline-block;
     font-size: 1rem;
     font-weight: bold;
     background-color: whitesmoke;
-    padding: 0 0 0 8px;
     outline: none;
 }
 </style>
