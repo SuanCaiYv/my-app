@@ -158,8 +158,37 @@ func (a *ArticleDaoService) SelectByAuthorName(author, name string) (*entity.Art
 }
 
 func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, error) {
-	//TODO implement me
-	panic("implement me")
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	cursor, err := a.collection.Find(ctx, primitive.M{"author": author})
+	if err != nil {
+		a.logger.Error(err)
+		return nil, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			a.logger.Error(err)
+		}
+	}(cursor, ctx)
+	if err != nil {
+		return nil, err
+	}
+	results := make([]entity.Article, 0, 10)
+	for cursor.Next(ctx) {
+		tmp := entity.Article{}
+		err := cursor.Decode(&tmp)
+		if err != nil {
+			a.logger.Error(err)
+			return nil, err
+		}
+		results = append(results, tmp)
+	}
+	if err := cursor.Err(); err != nil {
+		a.logger.Error(err)
+		return nil, err
+	}
+	return results, nil
 }
 
 func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, int64, error) {

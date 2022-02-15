@@ -9,9 +9,6 @@ const store: Store<any> = createStore({
             userRole: String,
             logoImg: Image,
             draftArticleId: String,
-            articleId: String,
-            articleTitle: String,
-            articleContent: String,
         }
     },
     mutations: {

@@ -18,6 +18,7 @@ import (
 
 func BeforeStart() {
 	config := config2.ApplicationConfiguration()
+	// 添加角色
 	sysRoleDao := db.NewSysRoleDaoService()
 	for _, val := range config.Roles {
 		result, err := sysRoleDao.SelectByName(val.Name)
@@ -31,6 +32,7 @@ func BeforeStart() {
 			util.JustPanic(err)
 		}
 	}
+	// 设置验证码，添加用户
 	sysUserDao := db.NewSysUserDaoService()
 	redisOps := nosql.NewRedisClient()
 	for _, val := range config.Accounts {
@@ -55,6 +57,7 @@ func BeforeStart() {
 		err = sysUserDao.Insert(sysUser)
 		util.JustPanic(err)
 	}
+	// 设置默认头像
 	gridFsDao := db.NewGridFSDaoService()
 	if !gridFsDao.ExistFile("my-avatar.png") {
 		defaultAvatarPath, err := filepath.Abs("static/my-avatar.png")
@@ -72,5 +75,19 @@ func BeforeStart() {
 		err = gridFsDao.UploadFile(data, "my-avatar.png", metaMap)
 		util.JustPanic(err)
 	}
+	// 设置文件后缀识别
 	_ = mime.AddExtensionType(".md", "text/x-markdown")
+	// 启动文章清除器
+	articleDao := db.NewArticleDaoService()
+	ownerUser, err := sysUserDao.SelectByUsername(config.Owner)
+	util.JustPanic(err)
+	articles, err := articleDao.ListByAuthor0(ownerUser.Id)
+	util.JustPanic(err)
+	threshold := time.UnixMilli(time.Now().UnixMilli() - 2*time.Hour.Milliseconds())
+	for i := range articles {
+		if articles[i].UpdatedTime.Before(threshold) && articles[i].Content == "" {
+			err := articleDao.Delete0(articles[i].Id)
+			util.JustPanic(err)
+		}
+	}
 }

@@ -23,7 +23,7 @@ const title = inject("title")
     height: 100%;
     width: 100%;
     border: none;
-    padding: 0;
+    padding: 0 0 0 4px;
     font-size: 1.6rem;
     font-weight: bolder;
     outline: none;

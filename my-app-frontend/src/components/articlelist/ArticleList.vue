@@ -8,10 +8,31 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {reactive, ref} from "vue"
 import Article from "./Article.vue"
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alertFunc from "../../util/alert";
 
 const name = ref<String>("ArticleList")
+
+let pageNum = 1
+let pageSize = 10
+
+const articleList = reactive<Array<{}>>([])
+
+const fetchArticles = function (pageNum: number, pageSize: number) {
+    httpClient.get("/article/list", {
+        page_num: pageNum,
+        page_size: pageSize
+    }, true, function (resp: Response) {
+        if (!resp.ok) {
+            alertFunc(resp.errMsg, function () {})
+        } else {
+            pageNum = resp.data.next_page_num
+        }
+    })
+}
 </script>
 
 <style scoped>

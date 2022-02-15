@@ -4,52 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天">
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Body.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Edit.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Header.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Layout.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Preview.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/PublishButton.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/PublishConfirm.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Title.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/src/views/Editor.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/gridfs_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/gridfs_dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entity/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/article.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entity/resp/http_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/resp/http_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/article.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/static_src.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/static_src.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/about/User.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/User.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Search.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/articlelist/Search.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/common/HomePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/common/HomePage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/common/SignButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/common/SignButton.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/Article.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/Article.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/SortAndPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/SortAndPage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/UserInfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/body/UserInfo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/Search.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/header/Search.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/home/layout/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/home/layout/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/morearticle/Body.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/morearticle/Header.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/morearticle/Layout.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/morearticle/Main.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/editor/Publish.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH1.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH1.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH2.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH2.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH3.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH3.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH4.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/placeholder/PH4.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/net/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/net/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/views/MoreArticle.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/views/Test.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/views/Test.vue" afterDir="false" />
-    </list>
+    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,14 +63,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="my-app-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
     <configuration name="go build github.com/SuanCaiYv/my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="my-app-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -147,15 +94,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestUpdateStructObjectWithJsonTag\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="my-app-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -209,6 +147,11 @@
           <url>file://$PROJECT_DIR$/service/static_src.go</url>
           <line>101</line>
           <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/service/article.go</url>
+          <line>287</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

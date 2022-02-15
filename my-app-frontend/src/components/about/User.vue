@@ -1,34 +1,35 @@
 <template>
     <div class="user">
+        <PH1></PH1>
         <div class="col1">
             <Img class="img" :url="avatar"></Img>
-            <input class="nickname" v-model="nickname" @change="updateNickname"/>
+            <input class="nickname" v-model="nickname" @keydown.enter.down="updateNickname"/>
         </div>
         <div class="col2">
             <div>
-                <input class="input" type="email" v-model="email" @change="updateEmail">
+                <input class="input" type="email" v-model="email" @keydown.enter.down="updateEmail">
                 <div class="name">邮箱</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="phone" @change="updatePhone">
+                <input class="input" type="text" v-model="phone" @keydown.enter.down="updatePhone">
                 <div class="name">手机</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="location" @change="updateLocation">
+                <input class="input" type="text" v-model="location" @keydown.enter.down="updateLocation">
                 <div class="name">地址</div>
             </div>
         </div>
         <div class="col3">
             <div>
-                <input class="input" type="text" v-model="qq" @change="updateQQ">
+                <input class="input" type="text" v-model="qq" @keydown.enter.down="updateQQ">
                 <div class="name">Q&nbsp;Q</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="weChat" @change="updateWeChat">
+                <input class="input" type="text" v-model="weChat" @keydown.enter.down="updateWeChat">
                 <div class="name">微信</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="github" @change="updateGitHub">
+                <input class="input" type="text" v-model="github" @keydown.enter.down="updateGitHub">
                 <div class="name">猫网</div>
             </div>
         </div>
@@ -37,7 +38,7 @@
                 <textarea class="signature" v-model="signature" @change="updateSignature"/>
             </div>
         </div>
-        <div class="col5"></div>
+        <PH2></PH2>
     </div>
 </template>
 
@@ -50,6 +51,8 @@ import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
 import {useRouter} from "vue-router";
 import {Response} from "../../common/interface";
+import PH1 from "../placeholder/PH1.vue"
+import PH2 from "../placeholder/PH2.vue"
 
 const name = ref<string>("User")
 const router = useRouter()
@@ -168,8 +171,8 @@ const updateSignature = function () {
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
     display: grid;
-    grid-template-areas: "col1 col2 col3 col4 col5";
-    grid-template-columns: 200px 330px 330px 330px 1fr;
+    grid-template-areas: "ph1 col1 col2 col3 col4 ph2";
+    grid-template-columns: 1fr 200px 330px 330px 330px 1fr;
 }
 
 .col1 {
@@ -256,6 +259,7 @@ const updateSignature = function () {
     display: inline-block;
     vertical-align: top;
     background-color: rgba(0,167,255,0.05);
+    outline: none;
 }
 
 .name {

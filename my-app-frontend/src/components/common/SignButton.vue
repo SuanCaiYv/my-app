@@ -41,13 +41,16 @@ const signButton = function () {
     width: 100%;
     height: 100%;
     grid-area: sign-button;
+    text-align: left;
 }
 
 .button {
-    width: 80px;
+    width: auto;
     height: 40px;
-    margin: 10px 120px 10px 0;
-    padding: 0;
+    margin-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0 20px;
     border: 2px solid lightgray;
     box-sizing: border-box;
     border-radius: 18px;

@@ -1,5 +1,6 @@
 <template>
     <div class="info">
+        <PH1></PH1>
         <div class="statistic"></div>
         <div class="brief">
             <div>
@@ -19,13 +20,15 @@
                 <div class="value"></div>
             </div>
         </div>
-        <div class="third-party"></div>
+        <PH2></PH2>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
 import {useRouter} from "vue-router";
+import PH1 from "../placeholder/PH1.vue"
+import PH2 from "../placeholder/PH2.vue"
 
 const name = ref<String>("Info")
 
@@ -40,8 +43,8 @@ const router = useRouter()
     /*border: 1px solid silver;*/
     /*box-sizing: border-box;*/
     display: grid;
-    grid-template-areas: "statistic brief social";
-    grid-template-columns: 530px 660px 1fr;
+    grid-template-areas: "ph1 statistic brief ph2";
+    grid-template-columns: 1fr 570px 570px 1fr;
 }
 
 .statistic {
@@ -58,15 +61,6 @@ const router = useRouter()
     height: 300px;
     grid-area: brief;
     border: 2px solid salmon;
-    box-sizing: border-box;
-    border-radius: 20px;
-}
-
-.third-party {
-    width: 100%;
-    height: 300px;
-    grid-area: social;
-    border: 2px solid slateblue;
     box-sizing: border-box;
     border-radius: 20px;
 }
@@ -89,12 +83,11 @@ const router = useRouter()
 }
 
 .value {
-    width: 510px;
+    width: calc(100% - 150px);
     height: 50px;
     margin-top: 20px;
-    margin-left: 26px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
+    margin-left: 20px;
+    margin-right: 10px;
     border: none;
     border-radius: 16px;
     display: inline-block;

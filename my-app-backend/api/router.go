@@ -16,6 +16,7 @@ func Route() {
 	router := gin.New()
 	router.Use(corsMiddleware())
 	router.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {
+		fmt.Println("run")
 		if err, ok := recovered.(string); ok {
 			context.AbortWithStatusJSON(200, resp.NewInternalError(err))
 		} else {
@@ -51,7 +52,7 @@ func Route() {
 	{
 		// 免登陆部分
 		versionOne.GET("/ws", wsApi.Generic)
-		versionOne.GET("/article_list/no_auth", articleApi.ListArticleNoAuth)
+		versionOne.GET("/article/list/no_auth", articleApi.ListArticleNoAuth)
 		versionOne.GET("/user/info/no_auth", userApiHandler.GetUserInfoNoAuth)
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
@@ -122,7 +123,7 @@ func authFunc(context *gin.Context) {
 		context.AbortWithStatusJSON(200, resp.NewAuthFailed())
 		return
 	}
-	logger.Infof("用户: %s 开始操作", username)
+	logger.Debugf("用户: %s 开始操作", username)
 	context.Set("username", username)
 	context.Set("role", role)
 }

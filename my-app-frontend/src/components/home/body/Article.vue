@@ -1,18 +1,29 @@
 <template>
     <div class="article">
         <PH1></PH1>
-        <div class="title"></div>
-        <div class="content"></div>
+        <div class="title">{{title}}</div>
+        <div class="content">{{contentRendered}}</div>
         <PH2></PH2>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {ref, watch} from "vue"
 import PH1 from "../../placeholder/PH1.vue"
 import PH2 from "../../placeholder/PH2.vue"
+import {marked} from "marked";
 
 const name = ref<String>("Article")
+const contentRendered = ref<string>('')
+
+const props = defineProps({
+    title: String,
+    body: String,
+})
+
+watch(props, () => {
+    contentRendered.value = marked.parse(props.body)
+})
 </script>
 
 <style scoped>
@@ -39,6 +50,9 @@ const name = ref<String>("Article")
     border: 2px solid wheat;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
+    font-size: 1.4rem;
+    font-weight: bolder;
+    text-align: left;
     background-color: #f5ecff;
 }
 
@@ -50,6 +64,8 @@ const name = ref<String>("Article")
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
+    font-size: 1rem;
+    text-align: left;
     background-color: #f5ecff;
 }
 </style>

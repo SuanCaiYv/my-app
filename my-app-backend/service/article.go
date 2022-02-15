@@ -58,9 +58,64 @@ func NewArticleApiHandler() *ArticleApiHandler {
 	}
 }
 
+type newArticle struct {
+	ArticleId   string   `json:"article_id"`
+	ArticleName string   `son:"article_name"`
+	Summary     string   `json:"summary"`
+	CoverImg    string   `json:"cover_img"`
+	Content     string   `json:"content"`
+	Kind        string   `json:"kind"`
+	TagList     []string `json:"tag_list"`
+	Visibility  int      `bson:"visibility" json:"visibility"`
+}
+
 func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.MustGet("username").(string)
+	input := &newArticle{}
+	err := context.Bind(input)
+	if err != nil {
+		a.logger.Errorf("参数解析失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	article, err := a.articleDao.Select(input.ArticleId)
+	if err != nil {
+		a.logger.Errorf("无法读取Article数据表: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("无法读取文档表"))
+		return
+	}
+	kind, err := a.kindDao.Select(input.Kind)
+	if err != nil {
+		a.logger.Errorf("无法读取ArticleKind数据表: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("无法读取分类表"))
+		return
+	}
+	tagList := make([]entity.Tag, 0, len(input.TagList))
+	for i := range input.TagList {
+		tag, err := a.tagDao.Select(input.TagList[i])
+		if err != nil {
+			a.logger.Errorf("无法读取ArticleTag数据表: %s; %v", username, err)
+			context.JSON(200, resp.NewInternalError("无法读取标签表"))
+			return
+		}
+		tagList = append(tagList, *tag)
+	}
+	article.Name = input.ArticleName
+	article.Summary = input.Summary
+	article.CoverImg = input.CoverImg
+	article.Content = input.Content
+	article.Kind = *kind
+	article.TagList = tagList
+	article.Visibility = input.Visibility
+	err = a.articleDao.Update(article)
+	if err != nil {
+		a.logger.Errorf("更新Article失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("上传文档失败"))
+		return
+	}
+	context.JSON(200, resp.NewOk(struct {
+		ArticleId string `json:"article_id"`
+	}{ArticleId: article.Id}))
 }
 
 type articleDraft struct {
@@ -72,7 +127,7 @@ type articleDraft struct {
 func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 	username := context.MustGet("username").(string)
 	input := &articleDraft{}
-	err := context.BindJSON(input)
+	err := context.Bind(input)
 	if err != nil {
 		a.logger.Errorf("参数解析失败: %s; %v", username, err)
 		context.JSON(200, resp.NewBadRequest("参数解析失败"))
@@ -95,8 +150,8 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 			CoverImg:    "",
 			Catalog:     entity.Catalog{},
 			Content:     input.ArticleContent,
-			Kinds:       make([]entity.Kind, 0, 0),
-			Tags:        make([]entity.Tag, 0, 0),
+			Kind:        entity.Kind{},
+			TagList:     make([]entity.Tag, 0, 0),
 			ReleaseTime: time.Now(),
 			Visibility:  entity.VisibilityDraft,
 			Available:   false,
@@ -153,7 +208,13 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
 	owner := config.ApplicationConfiguration().Owner
-	articles, total, err := a.articleDao.ListByAuthor(owner, int64(pgNum), int64(pgSize), sort, desc)
+	user, err := a.sysUserDao.SelectByUsername(owner)
+	if err != nil {
+		a.logger.Errorf("无法读取SysUser数据表: %s; %v", owner, err)
+		context.JSON(200, resp.NewInternalError("无法读取用户表"))
+		return
+	}
+	articles, total, err := a.articleDao.ListByAuthor(user.Id, int64(pgNum), int64(pgSize), sort, desc)
 	if err != nil {
 		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
 		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
@@ -173,7 +234,13 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	sort := context.DefaultQuery("sort", "created_time")
 	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
-	articles, total, err := a.articleDao.ListByAuthor(username, int64(pgNum), int64(pgSize), sort, desc)
+	user, err := a.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		a.logger.Errorf("无法读取SysUser数据表: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("无法读取用户表"))
+		return
+	}
+	articles, total, err := a.articleDao.ListByAuthor(user.Id, int64(pgNum), int64(pgSize), sort, desc)
 	if err != nil {
 		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
 		context.JSON(200, resp.NewInternalError("获取文章列表失败"))

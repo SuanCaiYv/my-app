@@ -21,10 +21,10 @@ const router = useRouter()
 }
 
 .home-page-button {
-    width: 150px;
+    width: auto;
     height: 40px;
-    margin: 10px 25px;
-    padding: 0;
+    margin: 10px auto;
+    padding: 0 20px;
     border: 2px solid lightgray;
     box-sizing: border-box;
     border-radius: 18px;

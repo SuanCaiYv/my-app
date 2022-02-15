@@ -1,8 +1,8 @@
 <template>
     <div class="article">
         <PH1></PH1>
-        <div class="title"></div>
-        <div class="content"></div>
+        <div class="title">{{title}}</div>
+        <div class="content">{{contentRendered}}</div>
         <PH2></PH2>
         <div class="update">
             <button class="button">更新</button>
@@ -17,13 +17,24 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {ref, watch} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
+import {marked} from "marked";
 
-const name = ref<String>("Article")
+const name = ref<string>("Article")
+const props = defineProps({
+    title: String,
+    summary: String,
+    content: String,
+})
 
-let visibly = ref<String>("公开")
+let visibly = ref<string>("公开")
+const contentRendered = ref<string>('')
+
+watch(props, () => {
+    contentRendered.value = marked.parse(props.content)
+})
 
 const setVisibly = function () {
     visibly.value = "私密"
@@ -42,8 +53,6 @@ const setVisibly = function () {
         "ph1 content ph2 visible";
     grid-template-columns: 25px 1fr 25px 200px;
     grid-template-rows: 40px 80px 80px 80px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     margin-top: 25px;
 }
 
@@ -54,6 +63,9 @@ const setVisibly = function () {
     border: 2px solid wheat;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
+    font-size: 1.4rem;
+    font-weight: bolder;
+    text-align: left;
     background-color: antiquewhite;
 }
 
@@ -65,15 +77,16 @@ const setVisibly = function () {
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
+    font-size: 1rem;
+    text-align: left;
     background-color: antiquewhite;
+    overflow: hidden;
 }
 
 .update {
     width: 100%;
     height: 100%;
     grid-area: update;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     display: inline-block;
 }
 
@@ -81,8 +94,6 @@ const setVisibly = function () {
     width: 100%;
     height: 100%;
     grid-area: delete;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     display: inline-block;
 }
 
@@ -90,8 +101,6 @@ const setVisibly = function () {
     width: 100%;
     height: 100%;
     grid-area: visible;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     display: inline-block;
 }
 
@@ -105,6 +114,7 @@ const setVisibly = function () {
     padding: 0;
     border-radius: 18px;
     font-size: 1.2rem;
+    font-weight: bolder;
     background-color: white;
 }
 

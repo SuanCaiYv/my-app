@@ -3,12 +3,15 @@
         <div class="img" @click="router.push('/about')">
             <Img :url="avatar" />
         </div>
+        <!--最多七个字或10个大写字母-->
         <div class="nickname">
             {{nickname}}
         </div>
+        <!--最多20个字符-->
         <div class="email">
             <a :href="mailto" style="text-decoration: none; color: inherit">{{email}}</a>
         </div>
+        <!--同上-->
         <div class="github">
             <a :href="github" style="text-decoration: none; color: inherit">{{github}}</a>
         </div>
@@ -22,7 +25,8 @@
 import {ref} from "vue"
 import Img from "../../Img.vue"
 import {useRouter} from "vue-router";
-import {httpClient, Resp} from "../../../net";
+import {httpClient} from "../../../net";
+import {Response} from "../../../common/interface";
 import alertFunc from "../../../util/alert";
 
 const name = ref<string>("UserInfo")
@@ -34,14 +38,13 @@ const github = ref<string>('https://github.com/SuanCaiYv')
 const signature = ref<string>('Gin+Vue3')
 const mailto = ref<String>("mailto:" + email.value)
 
-httpClient.get("/user/info", {}, true, function (resp: Resp) {
+httpClient.get("/user/info", {}, true, function (resp: Response) {
     if (!resp.ok) {
         alertFunc(resp.errMsg, function () {})
     } else {
         avatar.value = resp.data.avatar
         nickname.value = resp.data.nickname
         email.value = resp.data.email
-        location.value = resp.data.location
         github.value = resp.data.github
         signature.value = resp.data.signature
     }
@@ -78,53 +81,55 @@ const router = useRouter()
 }
 
 .nickname {
-    width: 150px;
+    width: 100%;
     height: auto;
-    margin: 25px 25px 0;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
     border-radius: 6px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     line-height: 20px;
     font-weight: bolder;
     color: slateblue;
 }
 
 .email {
-    width: 200px;
+    width: 100%;
     height: auto;
-    margin: 25px 0 0;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
     border-radius: 6px;
     font-size: 1rem;
     font-weight: bolder;
     line-height: 20px;
+    word-break: break-all;
 }
 
 .github {
     width: 200px;
     height: auto;
-    margin: 25px 0 0;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
     border-radius: 6px;
     font-size: 1rem;
     color: dodgerblue;
     font-weight: bolder;
     line-height: 20px;
+    word-break: break-all;
 }
 
 .signature {
-    width: 180px;
+    width: 100%;
     height: auto;
-    margin: 25px 10px 0;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0;
-    /*border: 1px solid black;*/
-    /*box-sizing: border-box;*/
     border-radius: 4px;
     font-size: 1rem;
     font-weight: bolder;

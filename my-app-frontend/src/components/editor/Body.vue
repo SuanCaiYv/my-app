@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import {provide, ref} from "vue"
+import {inject, ref} from "vue"
 import Title from "./Title.vue"
 import Edit from "./Edit.vue"
 import Preview from "./Preview.vue"
@@ -19,12 +19,14 @@ import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("Body")
 
-const id = ref<string>('')
-const title = ref<string>('')
-const content = ref<string>('')
+const id = inject("id")
+const title = inject("title")
+const content = inject("content")
 
 const saveDraft = function () {
-    console.log("run draft")
+    storage.set(Constant.ARTICLE_ID, id.value)
+    storage.set(Constant.ARTICLE_TITLE, title.value)
+    storage.set(Constant.ARTICLE_CONTENT, content.value)
     httpClient.post("/article/draft", {}, {
         article_id: id.value,
         article_name: title.value,
@@ -43,12 +45,9 @@ const saveDraft = function () {
 }
 
 saveDraft()
+
 const cancel = setInterval(saveDraft, 5000)
 storage.set(Constant.DRAFT_INTERVAL_CANCEL, cancel + "")
-
-provide("id", id)
-provide("title", title)
-provide("content", content)
 </script>
 
 <style scoped>

@@ -45,21 +45,23 @@
             <div class="fill-all-show-value">{{ chosenRollback }}</div>
         </div>
         <div class="brief">
-            <textarea class="textarea" placeholder="来点文章简介吧！"></textarea>
+            <textarea class="textarea" placeholder="来点文章简介吧！" v-model="summary"></textarea>
         </div>
         <div class="done">
-            <button class="button done-button"><span>完成</span></button>
+            <button class="button done-button" @click="publish"><span>完成</span></button>
         </div>
     </div>
     <div class="publish-mask" @click="close"></div>
 </template>
 
 <script setup lang="ts">
-import {inject, reactive, ref, watch} from "vue"
+import {reactive, ref, watch} from "vue"
 import ChoiceItem from "./ChoiceItem.vue"
 import {IdValue} from "../../common/interface";
-import {httpClient} from "../../net";
+import {baseUrl, httpClient} from "../../net";
 import {Response} from "../../common/interface";
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
 
 const name = ref<string>("Publish")
@@ -68,13 +70,9 @@ const props = defineProps({
     divNode: Node
 })
 
-const id = inject("id")
-const title = inject("title")
-const content = inject("content")
-
 const notification = ref<string>("")
 const notificationColor = ref<string>("blue")
-let covImg = null
+let covImg: string | Blob | null = null
 let covImgPath = ref<string>("")
 
 let visibility = ref<boolean>(false)
@@ -96,6 +94,8 @@ const newTag = ref<string>('')
 const rollbackList = reactive<Array<IdValue>>([])
 const chosenRollback = ref<string>('')
 
+const summary = ref<string>('')
+
 class IdAndValue implements IdValue {
     id: string
     value: string
@@ -108,6 +108,18 @@ class IdAndValue implements IdValue {
             this.value = value0
         }
     }
+}
+
+const errorNotification = function (msg: string) {
+    notificationColor.value = "red"
+    notification.value = msg
+    clearNotification()
+}
+
+const infoNotification = function (msg: string) {
+    notificationColor.value = "dodgerblue"
+    notification.value = msg
+    clearNotification()
 }
 
 const clearNotification = function () {
@@ -133,6 +145,9 @@ const commitVisibility = function () {
     }
 }
 const commitKindList = function () {
+    if (chosenKind.value === "") {
+        return
+    }
     chosenKindList.splice(0, chosenKindList.length)
     chosenKindList.push(new IdAndValue(chosenKind.value, kindMap.get(chosenKind.value)))
 }
@@ -150,19 +165,18 @@ const createKind = function () {
         kind_name: newKind.value
     }, true, function (resp: Response) {
         if (!resp.ok) {
-            notificationColor.value = "red"
-            notification.value = resp.errMsg
-            clearNotification()
+            errorNotification(resp.errMsg)
         } else {
+            infoNotification("创建分类成功")
             kindList.splice(0, kindList.length)
-            notificationColor.value = "dodgerblue"
-            notification.value = "创建分类成功"
-            clearNotification()
             getKindList()
         }
     })
 }
 const commitTagList = function () {
+    if (chosenTag.value === "") {
+        return
+    }
     chosenTagList.push(new IdAndValue(chosenTag.value, tagMap.get(chosenTag.value)))
 }
 const cancelTagList = function (id: string) {
@@ -170,23 +184,17 @@ const cancelTagList = function (id: string) {
 }
 const createTag = function () {
     if (newTag.value === "") {
-        notificationColor.value = "red"
-        notification.value = "标签不可为空"
-        clearNotification()
+        infoNotification("标签不可为空")
         return
     }
     httpClient.post("/article/tag", {}, {
         tag_name: newTag.value
     }, true, function (resp: Response) {
         if (!resp.ok) {
-            notificationColor.value = "red"
-            notification.value = resp.errMsg
-            clearNotification()
+            errorNotification(resp.errMsg)
         } else {
+            infoNotification("创建标签成功")
             tagList.splice(0, tagList.length)
-            notificationColor.value = "dodgerblue"
-            notification.value = "创建标签成功"
-            clearNotification()
             getTagList()
         }
     })
@@ -198,8 +206,7 @@ const getKindList = function () {
         page_size: 10
     }, true, function (resp: Response) {
         if (!resp.ok) {
-            alertFunc(resp.errMsg, function () {
-            })
+            errorNotification(resp.errMsg)
         } else {
             // @ts-ignore
             let list = resp.data.list
@@ -215,8 +222,7 @@ const getTagList = function () {
         page_size: 10
     }, true, function (resp: Response) {
         if (!resp.ok) {
-            alertFunc(resp.errMsg, function () {
-            })
+            errorNotification(resp.errMsg)
         } else {
             // @ts-ignore
             let list = resp.data.list
@@ -251,11 +257,67 @@ watch(tagList, () => {
 getKindList()
 getTagList()
 
-console.log(tagList)
-
 const close = function () {
     // @ts-ignore
     document.getElementById("app").removeChild(props.divNode)
+}
+const publish = function () {
+    const id = storage.get(Constant.ARTICLE_ID)
+    const title = storage.get(Constant.ARTICLE_TITLE)
+    const content = storage.get(Constant.ARTICLE_CONTENT)
+    let covImgUrl = ""
+    if (id === "") {
+        console.log("fucking error occurred!")
+        return;
+    }
+    if (title === "") {
+        errorNotification("标题不可为空")
+        return
+    }
+    if (content === "") {
+        errorNotification("你就发布个标题搞得我很尴尬啊！")
+        return;
+    }
+    if (covImg !== null) {
+        let formData = new FormData()
+        formData.append("file", covImg)
+        httpClient.upload("/file/static", {}, formData, function (resp: Response) {
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                covImgUrl = baseUrl + "/file/static/a/" + resp.data.filename
+            }
+        })
+    }
+    if (chosenKindList.length === 0) {
+        errorNotification("分类不可为空")
+        return
+    }
+    if (chosenTagList.length === 0) {
+        errorNotification("标签不可为空")
+        return
+    }
+    const tagList: Array<String> = []
+    chosenTagList.forEach(p => {
+        tagList.push(p.id)
+    })
+    httpClient.post("/article", {}, {
+        article_id: id,
+        article_name: title,
+        summary: summary.value,
+        cover_img: covImgUrl,
+        content: content,
+        kind: chosenKindList[0].id,
+        tag_list: tagList,
+        visibility: visibility.value === false ? 1 : 2
+    }, true, function (resp: Response) {
+        if (!resp.ok) {
+            console.log(resp.errMsg)
+        } else {
+            close()
+            alertFunc("发布成功", function () {})
+        }
+    })
 }
 </script>
 
@@ -503,8 +565,8 @@ span:after {
     display: inline-block;
     vertical-align: bottom;
     text-align: left;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background-color: rgba(0, 0, 0, 0.07);
 }
 
