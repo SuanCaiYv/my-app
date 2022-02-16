@@ -19,6 +19,8 @@ watch(contentRaw, (n, o) => {
 </script>
 
 <style scoped>
+@import "../../components/common/render.css";
+
 .preview {
     width: 100%;
     height: calc(100vh - 101px);
@@ -37,27 +39,4 @@ watch(contentRaw, (n, o) => {
     overflow-x: auto;
 }
 
-:deep(a) {
-    text-decoration: none;
-    color: dodgerblue;
-    word-break: break-word;
-}
-
-:deep(code) {
-    word-break: break-all;
-}
-
-:deep(strong) {
-    color: dodgerblue;
-}
-
-:deep(h3) {
-    color: deepskyblue;
-}
-
-:deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
 </style>

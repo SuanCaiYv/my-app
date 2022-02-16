@@ -99,7 +99,9 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 		context.JSON(200, resp.NewInternalError("写入文件失败"))
 		return
 	}
-	context.JSON(200, resp.NewString(newFilename))
+	context.JSON(200, resp.NewOk(struct {
+		Filename string `json:"filename"`
+	}{Filename: newFilename}))
 }
 
 func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {

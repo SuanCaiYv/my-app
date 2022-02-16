@@ -1,5 +1,5 @@
 <template>
-    <div class="article">
+    <div class="article" @click="router.push('/view/' + id)">
         <PH1></PH1>
         <div class="title">{{title}}</div>
         <div class="content" v-html="contentRendered"></div>
@@ -12,8 +12,10 @@ import {onMounted, ref, watch} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
 import {marked} from "marked";
+import {useRouter} from "vue-router";
 
 const name = ref<String>("Article")
+const router = useRouter()
 const contentRendered = ref<string>('')
 
 const props = defineProps({
@@ -25,6 +27,7 @@ const props = defineProps({
 onMounted(() => {
     // @ts-ignore
     contentRendered.value = marked.parse(props.content)
+    contentRendered.value = contentRendered.value.replaceAll(/<[^>]+>|&[^>]+;/g, "")
 })
 </script>
 
@@ -44,7 +47,7 @@ onMounted(() => {
 }
 
 .title {
-    width: 600px;
+    width: 40%;
     height: 100%;
     grid-area: title;
     border: 2px solid wheat;
@@ -53,6 +56,7 @@ onMounted(() => {
     padding: 0 0 0 8px;
     font-size: 1.4rem;
     font-weight: bolder;
+    line-height: 40px;
     text-align: left;
     background-color: #f5ecff;
 }
@@ -65,8 +69,9 @@ onMounted(() => {
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
-    font-size: 1rem;
+    font-size: 1.2rem;
     text-align: left;
+    overflow: hidden;
     background-color: #f5ecff;
 }
 </style>

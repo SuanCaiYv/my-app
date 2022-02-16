@@ -57,7 +57,7 @@ const setVisibly = function () {
 }
 
 .title {
-    width: 320px;
+    width: 40%;
     height: 100%;
     grid-area: title;
     border: 2px solid wheat;

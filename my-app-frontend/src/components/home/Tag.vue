@@ -1,6 +1,6 @@
 <template>
     <div class="tag">
-        <button class="button" :class="{buttonClicked: isActive}" @click="isActive = !isActive">{{value}}</button>
+        <button class="button" :class="{buttonClicked: isActive}" @click="clicked">{{props.name}}</button>
     </div>
 </template>
 
@@ -10,16 +10,24 @@ import {ref} from "vue"
 const name = ref<String>("Tag")
 
 const props = defineProps({
-    value: String
+    id: String,
+    name: String,
+    clickFunc: Function
 })
 
-let isActive = ref<Boolean>(false)
+const isActive = ref<Boolean>(false)
+
+const clicked = function () {
+    isActive.value = !isActive.value
+    // @ts-ignore
+    props.clickFunc(props.id, isActive.value)
+}
 </script>
 
 <style scoped>
 .tag {
     width: auto;
-    height: 40px;
+    height: 30px;
     margin-top: 10px;
     margin-left: 5px;
     margin-right: 5px;
@@ -31,8 +39,10 @@ let isActive = ref<Boolean>(false)
     height: 100%;
     border: 2px solid ;
     border-radius: 16px;
-    line-height: 40px;
-    font-size: 1.2rem;
+    padding: 0 8px;
+    line-height: 30px;
+    font-size: 1rem;
+    font-weight: bolder;
     display: inline-block;
     background-color: #99dbff;
 }

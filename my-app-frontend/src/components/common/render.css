@@ -1,0 +1,39 @@
+:deep(a) {
+    text-decoration: none;
+    color: dodgerblue;
+    word-break: break-word;
+}
+
+:deep(code) {
+    word-break: break-all;
+}
+
+:deep(strong) {
+    color: dodgerblue;
+}
+
+:deep(h5) {
+    color: lightskyblue;
+}
+
+:deep(h4) {
+    color: skyblue;
+}
+
+:deep(h3) {
+    color: deepskyblue;
+}
+
+:deep(h2) {
+    color: cornflowerblue;
+}
+
+:deep(h1) {
+    color: dodgerblue;
+}
+
+:deep(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

@@ -38,7 +38,7 @@ const github = ref<string>('https://github.com/SuanCaiYv')
 const signature = ref<string>('Gin+Vue3')
 const mailto = ref<String>("mailto:" + email.value)
 
-httpClient.get("/user/info", {}, true, function (resp: Response) {
+httpClient.get("/user/info/no_auth", {}, false, function (resp: Response) {
     if (!resp.ok) {
         alertFunc(resp.errMsg, function () {})
     } else {
@@ -55,13 +55,14 @@ const router = useRouter()
 
 <style scoped>
 .userInfo {
-    width: 100%;
+    width: 200px;
     height: 100%;
-    grid-area: userInfo;
     border: 2px solid salmon;
     box-sizing: border-box;
     border-radius: 20px;
     background-color: mistyrose;
+    position: fixed;
+    top: 140px;
 }
 
 .img {

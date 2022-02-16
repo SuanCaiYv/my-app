@@ -40,7 +40,7 @@ const props = defineProps({
     display: inline-block;
     text-align: left;
     line-height: 30px;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     vertical-align: bottom;
 }
 

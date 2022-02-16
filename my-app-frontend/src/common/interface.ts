@@ -43,5 +43,5 @@ export interface ListResult {
     pageSize: number,
     nextPageNum: number,
     endPage: boolean,
-    list: Array<object>,
+    list: Array<any>,
 }

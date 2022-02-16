@@ -16,7 +16,6 @@ func Route() {
 	router := gin.New()
 	router.Use(corsMiddleware())
 	router.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {
-		fmt.Println("run")
 		if err, ok := recovered.(string); ok {
 			context.AbortWithStatusJSON(200, resp.NewInternalError(err))
 		} else {
@@ -54,6 +53,8 @@ func Route() {
 		versionOne.GET("/ws", wsApi.Generic)
 		versionOne.GET("/article/list/no_auth", articleApi.ListArticleNoAuth)
 		versionOne.GET("/user/info/no_auth", userApiHandler.GetUserInfoNoAuth)
+		versionOne.GET("/article/kind_list", articleApi.KindList)
+		versionOne.GET("/article/tag_list", articleApi.TagList)
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
@@ -75,8 +76,7 @@ func Route() {
 		article.GET("/list", articleApi.ListArticleNoAuth, articleApi.ListArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
-		article.GET("/kind_list", articleApi.KindList)
-		article.GET("/tag_list", articleApi.TagList)
+		article.GET("/detail/:article_id", articleApi.ArticleDetail)
 		article.GET("/img_fetch", wsApi.ImageFetch)
 		article.PUT("", articleApi.UpdateArticle)
 		article.POST("", articleApi.AddArticle)
@@ -126,4 +126,8 @@ func authFunc(context *gin.Context) {
 	logger.Debugf("用户: %s 开始操作", username)
 	context.Set("username", username)
 	context.Set("role", role)
+}
+
+func todoImplement(context *gin.Context) {
+	context.JSON(200, resp.NewString("此接口暂未实现"))
 }

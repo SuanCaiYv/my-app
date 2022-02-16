@@ -43,11 +43,13 @@ const name = ref<String>("SortAndPage")
 <style scoped>
 .sortAndPage {
     width: 100%;
-    height: 100%;
-    grid-area: sortAndPage;
+    height: 80px;
     display: grid;
     grid-template-areas: "ph1 sort page desc ph2";
     grid-template-columns: 225px 120px 120px 120px 1fr;
+    position: fixed;
+    top: 60px;
+    background-color: white;
 }
 
 .ph1 {
@@ -86,13 +88,13 @@ const name = ref<String>("SortAndPage")
     border-radius: 18px;
     padding: 0;
     font-size: 1rem;
-    font-weight: normal;
+    font-weight: bolder;
     text-align: center;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     outline: none;
-    background-color: whitesmoke;
+    background-color: white;
 }
 
 .select:hover {

@@ -36,8 +36,8 @@ type Kind struct {
 }
 
 type Catalog struct {
-	Name  string    `bson:"name" json:"name"`
-	Child []Catalog `bson:"child" json:"child"`
+	Name     string    `bson:"name" json:"name"`
+	Children []Catalog `bson:"children" json:"children"`
 }
 
 const (

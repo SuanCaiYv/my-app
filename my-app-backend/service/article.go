@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
@@ -24,6 +25,8 @@ type ArticleApi interface {
 	ListArticleNoAuth(context *gin.Context)
 
 	ListArticle(context *gin.Context)
+
+	ArticleDetail(context *gin.Context)
 
 	ExportArticle(context *gin.Context)
 
@@ -60,7 +63,7 @@ func NewArticleApiHandler() *ArticleApiHandler {
 
 type newArticle struct {
 	ArticleId   string   `json:"article_id"`
-	ArticleName string   `son:"article_name"`
+	ArticleName string   `json:"article_name"`
 	Summary     string   `json:"summary"`
 	CoverImg    string   `json:"cover_img"`
 	Content     string   `json:"content"`
@@ -78,6 +81,7 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("参数解析失败"))
 		return
 	}
+	fmt.Println(input.ArticleName)
 	article, err := a.articleDao.Select(input.ArticleId)
 	if err != nil {
 		a.logger.Errorf("无法读取Article数据表: %s; %v", username, err)
@@ -104,6 +108,10 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	article.Summary = input.Summary
 	article.CoverImg = input.CoverImg
 	article.Content = input.Content
+	article.Catalog = entity.Catalog{
+		Name:     "",
+		Children: []entity.Catalog{},
+	}
 	article.Kind = *kind
 	article.TagList = tagList
 	article.Visibility = input.Visibility
@@ -253,6 +261,23 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pgNum), int64(pgSize), int64(pgNum+1), endPage, articles))
 }
 
+func (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	articleId := context.Param("article_id")
+	if articleId == "" {
+		a.logger.Errorf("文章ID为空: %s", username)
+		context.JSON(200, resp.NewBadRequest("文章ID为空"))
+		return
+	}
+	article, err := a.articleDao.Select(articleId)
+	if err != nil {
+		a.logger.Errorf("无法读取Article数据表: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("无法读取文档表"))
+		return
+	}
+	context.JSON(200, resp.NewOk(article))
+}
+
 func (a *ArticleApiHandler) ExportArticle(context *gin.Context) {
 	//TODO implement me
 	panic("implement me")
@@ -336,7 +361,7 @@ func (a *ArticleApiHandler) KindAndTagList(context *gin.Context) {
 }
 
 func (a *ArticleApiHandler) KindList(context *gin.Context) {
-	username := context.MustGet("username").(string)
+	username := "no-auth"
 	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
 	if err != nil {
 		a.logger.Errorf("参数解析失败: %s; %v", username, err)
@@ -365,7 +390,7 @@ func (a *ArticleApiHandler) KindList(context *gin.Context) {
 }
 
 func (a *ArticleApiHandler) TagList(context *gin.Context) {
-	username := context.MustGet("username").(string)
+	username := "no-auth"
 	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
 	if err != nil {
 		a.logger.Errorf("参数解析失败: %s; %v", username, err)

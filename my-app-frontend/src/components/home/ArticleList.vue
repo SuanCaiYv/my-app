@@ -4,7 +4,7 @@
         <div v-for="article in articleList">
             <Article :id="article.articleId" :title="article.articleName" :content="article.content"></Article>
         </div>
-        <button class="button" @click="fetchArticles" :style="{ display: display }">more</button>
+        <button class="button" @click="fetchArticles" :style="{ display: displayStr }">more</button>
     </div>
 </template>
 
@@ -16,11 +16,13 @@ import {httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 import {toListResult} from "../../util/base";
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("ArticleList")
 // @ts-ignore
 const articleList = reactive<Array<ArticleLiteRaw>>([])
-const display = ref<string>("none")
+const displayStr = ref<string>("none")
 
 let pageNum = 1
 let pageSize = 10
@@ -47,6 +49,7 @@ const fetchArticles = function () {
             for (let l of list.list) {
                 // @ts-ignore
                 articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.content))
+                storage.set(Constant.ARTICLE_ID + "_" + l.article_id, JSON.stringify(l))
             }
         }
     })
@@ -55,7 +58,7 @@ const fetchArticles = function () {
 fetchArticles()
 
 if (articleList.length > 0) {
-    display.value = "inline-block"
+    displayStr.value = "inline-block"
 }
 </script>
 

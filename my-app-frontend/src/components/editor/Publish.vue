@@ -280,46 +280,51 @@ const publish = function () {
         errorNotification("你就发布个标题搞得我很尴尬啊！")
         return;
     }
-    if (covImg !== null) {
-        let formData = new FormData()
-        formData.append("file", covImg)
-        httpClient.upload("/file/static", {}, formData, function (resp: Response) {
+    const afterCoverImgUploaded = function () {
+        if (chosenKindList.length === 0) {
+            errorNotification("分类不可为空")
+            return
+        }
+        if (chosenTagList.length === 0) {
+            errorNotification("标签不可为空")
+            return
+        }
+        const tagList: Array<String> = []
+        chosenTagList.forEach(p => {
+            tagList.push(p.id)
+        })
+        httpClient.post("/article", {}, {
+            article_id: id,
+            article_name: title,
+            summary: summary.value,
+            cover_img: covImgUrl,
+            content: content,
+            kind: chosenKindList[0].id,
+            tag_list: tagList,
+            visibility: visibility.value === false ? 1 : 2
+        }, true, function (resp: Response) {
             if (!resp.ok) {
                 console.log(resp.errMsg)
             } else {
-                covImgUrl = baseUrl + "/file/static/a/" + resp.data.filename
+                close()
+                alertFunc("发布成功", function () {})
             }
         })
     }
-    if (chosenKindList.length === 0) {
-        errorNotification("分类不可为空")
-        return
+    if (covImg !== null) {
+        let formData = new FormData()
+        formData.append("file", covImg)
+        httpClient.upload("/static/file", {}, formData, function (resp: Response) {
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                covImgUrl = baseUrl + "/static/a/" + resp.data.filename
+                afterCoverImgUploaded()
+            }
+        })
+    } else {
+        afterCoverImgUploaded()
     }
-    if (chosenTagList.length === 0) {
-        errorNotification("标签不可为空")
-        return
-    }
-    const tagList: Array<String> = []
-    chosenTagList.forEach(p => {
-        tagList.push(p.id)
-    })
-    httpClient.post("/article", {}, {
-        article_id: id,
-        article_name: title,
-        summary: summary.value,
-        cover_img: covImgUrl,
-        content: content,
-        kind: chosenKindList[0].id,
-        tag_list: tagList,
-        visibility: visibility.value === false ? 1 : 2
-    }, true, function (resp: Response) {
-        if (!resp.ok) {
-            console.log(resp.errMsg)
-        } else {
-            close()
-            alertFunc("发布成功", function () {})
-        }
-    })
 }
 </script>
 
@@ -482,7 +487,7 @@ span:after {
     width: 300px;
     height: 44px;
     margin: 8px 5px 8px 10px;
-    padding: 0 0 0 4px;
+    padding: 0 0 0 8px;
     border: none;
     border-radius: 30px;
     box-sizing: border-box;

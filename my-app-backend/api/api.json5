@@ -76,10 +76,10 @@
           "summary": "",
           "cover_img": "",
           "catalog": {
-            "value": "一级目录",
+            "name": "一级目录",
             "child": [
               {
-                "value": "二级目录",
+                "name": "二级目录",
                 "child": [
                   {}
                 ]
@@ -93,12 +93,10 @@
               "tag_name": "go"
             }
           ],
-          "kinds": [
-            {
-              "kind_id": "bbb",
-              "kind_name": "C.S."
-            }
-          ],
+          "kind": {
+            "kind_id": "bbb",
+            "kind_name": "C.S."
+          },
           "release_time": "0001-01-01T00:00:00Z",
           "visibility": 0
         }

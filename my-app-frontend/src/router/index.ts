@@ -65,6 +65,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "/editor",
         name: "editor",
         component: () => import("../views/Editor.vue")
+    },
+    // 阅读文章
+    {
+        path: "/view/:article_id",
+        name: "view",
+        component: () => import("../views/View.vue")
     }
 ]
 
