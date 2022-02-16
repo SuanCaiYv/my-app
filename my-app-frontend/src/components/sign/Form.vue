@@ -1,27 +1,28 @@
 <template>
     <div class="form">
         <div class="l1">
-            <div class="name-show" style="background-color: #f0bbff">用户名</div>
+            <div class="name-show">用户名</div>
             <input class="value-input" type="email" v-model="username"/>
         </div>
         <div class="l2">
-            <div class="name-show" style="background-color: #ffbabf">密&nbsp;&nbsp;&nbsp;&nbsp;码</div>
+            <div class="name-show">密&nbsp;&nbsp;&nbsp;&nbsp;码</div>
             <input class="value-input" type="password" v-model="password"/>
         </div>
         <div class="l3">
-            <div class="name-show name-show-click ver-code-button" @click="sendVerCode">验证码</div>
+            <button class="name-show click" @click="sendVerCode">验证码</button>
             <input class="value-input" type="text" v-model="verCode" placeholder='点击"验证码"以发送'/>
         </div>
         <div class="l4">
-            <button class="sign-button-in" @click="login">登录</button>
-            <button class="sign-button-up" @click="signup">注册</button>
+            <button class="name-show click" @click="login">登录</button>
+            <button class="name-show click" @click="signup">注册</button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import {httpClient, Resp} from "../../net";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 import router from "../../router";
 import storage from "../../util/storage";
@@ -45,7 +46,7 @@ const sendVerCode = function () {
     }, 120 * 1000)
     httpClient.post("/sign/ver_code", {}, {
         username: username.value
-    }, false, function (resp: Resp) {
+    }, false, function (resp: Response) {
         if (resp.ok) {
             alertFunc("验证码发送成功!", function () {})
             storage.set(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, new Date().getTime() + "")
@@ -61,7 +62,7 @@ const login = function () {
     httpClient.put("/sign", {}, {
         username: username.value,
         credential: password.value,
-    }, false, function (resp: Resp) {
+    }, false, function (resp: Response) {
         if (resp.ok) {
             // @ts-ignore
             storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
@@ -82,7 +83,7 @@ const signup = function () {
         username: username.value,
         credential: password.value,
         ver_code: verCode.value
-    }, false, function (resp: Resp) {
+    }, false, function (resp: Response) {
         if (resp.ok) {
             alertFunc("注册成功", function () {})
         } else {
@@ -95,131 +96,81 @@ const signup = function () {
 <style scoped>
 .form {
     width: 450px;
-    height: 315px;
-    /*border: 1px solid silver;*/
-    box-sizing: border-box;
-    margin: 35% auto auto;
+    height: 325px;
+    grid-area: form;
+    border: 2px solid darkgray;
+    border-radius: 18px;
+    background-color: white;
 }
 
 .l1 {
-    width: 420px;
+    width: 100%;
     height: 50px;
-    /*border: 1px solid silver;*/
     box-sizing: border-box;
     border-radius: 8px;
-    margin: 20px auto auto;
+    margin-top: 25px;
 }
 
 .l2 {
-    width: 420px;
+    width: 100%;
     height: 50px;
-    /*border: 1px solid silver;*/
     box-sizing: border-box;
     border-radius: 8px;
-    margin: 25px auto 0;
+    margin-top: 25px;
 }
 
 .l3 {
-    width: 420px;
+    width: 100%;
     height: 50px;
-    /*border: 1px solid silver;*/
     box-sizing: border-box;
     border-radius: 8px;
-    margin: 25px auto 0;
+    margin-top: 25px;
 }
 
 .l4 {
-    width: 420px;
+    width: 100%;
     height: 50px;
-    /*border: 1px solid silver;*/
     box-sizing: border-box;
     border-radius: 8px;
-    margin: 25px auto auto;
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .name-show {
     width: 100px;
     height: 50px;
-    opacity: 75%;
     margin-left: 10px;
     margin-right: 10px;
-    /*border: 1px solid silver;*/
+    border-radius: 30px;
     box-sizing: border-box;
-    border-radius: 8px;
     display: inline-block;
     font-size: 1.2rem;
     vertical-align: bottom;
-    line-height: 50px;
+    line-height: 46px;
+    font-weight: bolder;
+    border: 2px solid lightgray;
+    background-color: white;
 }
 
 .value-input {
-    width: 300px;
+    width: calc(100% - 130px);
     height: 50px;
-    opacity: 75%;
-    /*border: 1px solid silver;*/
-    border: none;
+    border: 2px solid lightgray;
     box-sizing: border-box;
-    border-radius: 8px;
-    padding: 0;
+    border-radius: 16px;
+    margin-right: 10px;
+    padding: 0 0 0 8px;
     display: inline-block;
     vertical-align: bottom;
     line-height: 50px;
     font-size: 1.2rem;
 }
 
-.ver-code-button {
-    background-color: #ffe0ad;
+.click:hover {
+    background-color: lightgray;
 }
 
-.sign-button-in {
-    width: 150px;
-    height: 50px;
-    opacity: 85%;
-    background-color: #b4d4ff;
-    /*border: 1px solid silver;*/
-    border: none;
-    box-sizing: border-box;
-    border-radius: 8px;
-    margin-left: auto;
-    margin-right: 25px;
-    font-size: 1.2rem;
-}
-
-.sign-button-up {
-    width: 150px;
-    height: 50px;
-    opacity: 65%;
-    background-color: #c5ffea;
-    /*border: 1px solid silver;*/
-    border: none;
-    box-sizing: border-box;
-    border-radius: 8px;
-    margin-left: 25px;
-    margin-right: auto;
-    font-size: 1.2rem;
-}
-
-.ver-code-button:hover {
-    background-color: #ffd792;
-}
-
-.ver-code-button:active {
-    background-color: #ffcf6e;
-}
-
-.sign-button-in:hover {
-    background-color: #9dbbff;
-}
-
-.sign-button-in:active {
-    background-color: #809dff;
-}
-
-.sign-button-up:hover {
-    background-color: #82ffaf;
-}
-
-.sign-button-up:active {
-    background-color: #5dff8a;
+.click:active {
+    background-color: gainsboro;
 }
 </style>

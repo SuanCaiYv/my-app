@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天" />
+    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="backend" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -99,8 +99,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd" />
-        <item itemvalue="Go Test.TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util" />
         <item itemvalue="Go Test.TestUpdateStructObject in github.com/SuanCaiYv/my-app-backend/util" />
+        <item itemvalue="Go Test.TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util" />
       </list>
     </recent_temporary>
   </component>

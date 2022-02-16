@@ -1,0 +1,13 @@
+.click {
+    border: 2px solid lightgray;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.click:hover {
+    background-color: lightgray;
+}
+
+.click:active {
+    background-color: gainsboro;
+}

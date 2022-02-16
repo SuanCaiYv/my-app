@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Layout from "../components/sign/layout/Layout.vue";
+import Layout from "../components/sign/Layout.vue";
 
 const name = ref<String>("Sign")
 </script>

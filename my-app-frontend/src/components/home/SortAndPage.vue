@@ -66,6 +66,7 @@ const name = ref<String>("SortAndPage")
     margin-top: auto;
     margin-bottom: auto;
     margin-right: 20px;
+    text-align: center;
 }
 
 .sort {
@@ -81,15 +82,16 @@ const name = ref<String>("SortAndPage")
 }
 
 .select {
-    width: 100%;
+    width: auto;
     height: 100%;
     border: 2px solid lightgray;
     box-sizing: border-box;
     border-radius: 18px;
-    padding: 0;
+    padding: 0 8px;
     font-size: 1rem;
     font-weight: bolder;
-    text-align: center;
+    text-align: -webkit-center;
+    text-align-last: center;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;

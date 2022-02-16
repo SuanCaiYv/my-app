@@ -1,14 +1,16 @@
 <template>
     <div class="layout">
-        <PH1 class="ph1"></PH1>
-        <Main></Main>
+        <PH1></PH1>
+        <PH2></PH2>
+        <Form></Form>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
-import PH1 from "../../placeholder/PH1.vue";
-import Main from "../Main.vue";
+import PH1 from "../placeholder/PH1.vue";
+import PH2 from "../placeholder/PH2.vue"
+import Form from "./Form.vue";
 
 const name = ref<String>("Layout")
 </script>
@@ -19,7 +21,10 @@ const name = ref<String>("Layout")
     width: 100%;
     background-size: cover;
     display: grid;
-    grid-template-areas: "ph1 main";
+    grid-template-areas:
+        "ph1 ph1"
+        "ph2 form";
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 3fr;
 }
 </style>

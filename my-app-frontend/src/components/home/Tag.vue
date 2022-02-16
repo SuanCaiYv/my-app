@@ -37,10 +37,11 @@ const clicked = function () {
 .button {
     width: 100%;
     height: 100%;
-    border: 2px solid ;
+    border: 2px solid slateblue;
+    box-sizing: border-box;
     border-radius: 16px;
     padding: 0 8px;
-    line-height: 30px;
+    line-height: 26px;
     font-size: 1rem;
     font-weight: bolder;
     display: inline-block;
@@ -48,6 +49,6 @@ const clicked = function () {
 }
 
 .buttonClicked {
-    background-color: aqua;
+    background-color: #9dbbff;
 }
 </style>
