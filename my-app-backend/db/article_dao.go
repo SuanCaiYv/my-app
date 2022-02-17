@@ -99,10 +99,14 @@ func newInstanceArticleDaoService() {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)
-	collection.Indexes().CreateOne(cancel, mongo.IndexModel{
-		Keys:    "name",
-		Options: nil,
-	})
+	//_, err = collection.Indexes().CreateMany(ctx, []mongo.IndexModel{
+	//	{
+	//		Keys: bsonx.Doc{
+	//			{Key: "content", Value: bsonx.String("text")},
+	//		},
+	//	},
+	//})
+	//util.JustPanic(err)
 	instanceArticleDaoService = &ArticleDaoService{
 		collection,
 		logger,
@@ -201,25 +205,41 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 		descInt = -1
 	}
 	skip := (pgNum - 1) * pgNum
-	if len(tagIdList) == 0 {
-	} else {
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	cursor, err := a.collection.Find(ctx,
-		primitive.M{
-			"author":     author,
-			"visibility": entity.VisibilityPublic,
-			"tag_list._id": primitive.M{
-				"$all": tagIdList,
+	var cursor *mongo.Cursor
+	var err error
+	if len(tagIdList) == 0 {
+		cursor, err = a.collection.Find(ctx,
+			primitive.M{
+				"author":     author,
+				"visibility": entity.VisibilityPublic,
 			},
-		},
-		&options.FindOptions{
-			Limit: &pgSize,
-			Skip:  &skip,
-			Sort:  primitive.M{sort: descInt},
-		},
-	)
+			&options.FindOptions{
+				Limit: &pgSize,
+				Skip:  &skip,
+				Sort:  primitive.M{sort: descInt},
+			},
+		)
+	} else {
+		cursor, err = a.collection.Find(ctx,
+			primitive.M{
+				"author":     author,
+				"visibility": entity.VisibilityPublic,
+				"tag_list._id": primitive.M{
+					"$all": tagIdList,
+				},
+				"$text": primitive.M{
+					"$search": searchKey,
+				},
+			},
+			&options.FindOptions{
+				Limit: &pgSize,
+				Skip:  &skip,
+				Sort:  primitive.M{sort: descInt},
+			},
+		)
+	}
 	if err != nil {
 		a.logger.Error(err)
 		return nil, 0, err
