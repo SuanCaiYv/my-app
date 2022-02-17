@@ -1,7 +1,8 @@
 <template>
     <div class="test">
-        <input type="text" v-model="str" @keydown.enter.down="update">
-        <div v-for="v in arr">{{v}}</div>
+        <div style="width: 100px; height: 100px">
+            <img src="../../public/icons/100.svg" style="width: 100px; height: 100px">
+        </div>
     </div>
 </template>
 

@@ -59,8 +59,9 @@ func BeforeStart() {
 	}
 	// 设置默认头像
 	gridFsDao := db.NewGridFSDaoService()
-	if !gridFsDao.ExistFile("my-avatar.png") {
-		defaultAvatarPath, err := filepath.Abs("static/my-avatar.png")
+	filename := "avatar4.png"
+	if !gridFsDao.ExistFile(filename) {
+		defaultAvatarPath, err := filepath.Abs("static/" + filename)
 		util.JustPanic(err)
 		defaultAvatar, err := os.OpenFile(defaultAvatarPath, os.O_RDONLY, os.ModePerm)
 		util.JustPanic(err)
@@ -72,7 +73,7 @@ func BeforeStart() {
 		metaMap["archive"] = "avatar"
 		data, err := ioutil.ReadAll(defaultAvatar)
 		util.JustPanic(err)
-		err = gridFsDao.UploadFile(data, "my-avatar.png", metaMap)
+		err = gridFsDao.UploadFile(data, filename, metaMap)
 		util.JustPanic(err)
 	}
 	// 设置文件后缀识别

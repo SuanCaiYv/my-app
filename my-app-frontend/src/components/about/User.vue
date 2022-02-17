@@ -2,7 +2,10 @@
     <div class="user">
         <PH1></PH1>
         <div class="col1">
-            <Img class="img" :url="avatar"></Img>
+            <label for="avatar">
+                <Img class="img" :url="avatar"></Img>
+            </label>
+            <input type="file" id="avatar" hidden @change="updateAvatar($event)">
             <input class="nickname" v-model="nickname" @keydown.enter.down="updateNickname"/>
         </div>
         <div class="col2">
@@ -45,7 +48,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import Img from "../Img.vue"
-import {httpClient} from "../../net";
+import {baseUrl, httpClient} from "../../net";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
@@ -86,6 +89,29 @@ if (accessToken === "") {
             weChat.value = resp.data.we_chat
             github.value = resp.data.github
             signature.value = resp.data.signature
+        }
+    })
+}
+
+const updateAvatar = function (event: Event) {
+    // @ts-ignore
+    let file = event.target.files[0]
+    let form = new FormData()
+    form.append("file", file)
+    httpClient.upload("/static/file", {}, form, function (resp: Response) {
+        if (!resp.ok) {
+            alertFunc(resp.errMsg, function () {})
+        } else {
+            let url = baseUrl + "/static/a/" + resp.data.filename
+            httpClient.put("/user/info", {}, {
+                avatar: url
+            }, true, function (resp: Response) {
+                if (!resp.ok) {
+                    alertFunc(resp.errMsg, function () {})
+                } else {
+                    router.go(0)
+                }
+            })
         }
     })
 }
@@ -233,7 +259,7 @@ const updateSignature = function () {
     border: 2px solid lightskyblue;
     box-sizing: border-box;
     border-radius: 16px;
-    margin-top: 15px;
+    margin-top: 0;
     margin-left: 25px;
     margin-right: 25px;
     overflow-x: auto;
@@ -241,6 +267,7 @@ const updateSignature = function () {
     font-weight: bolder;
     text-align: center;
     line-height: 50px;
+    outline: none;
     background-color: rgba(255,0,49,0.05);
 }
 

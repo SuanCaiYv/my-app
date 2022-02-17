@@ -59,6 +59,14 @@ const jumpHome = function () {
 }
 
 const login = function () {
+    if (username.value === "") {
+        alertFunc("用户名为空", function () {})
+        return
+    }
+    if (password.value === "") {
+        alertFunc("密码为空", function () {})
+        return
+    }
     httpClient.put("/sign", {}, {
         username: username.value,
         credential: password.value,
@@ -79,6 +87,18 @@ const login = function () {
 }
 
 const signup = function () {
+    if (username.value === "") {
+        alertFunc("用户名为空", function () {})
+        return
+    }
+    if (password.value === "") {
+        alertFunc("密码为空", function () {})
+        return
+    }
+    if (verCode.value === "") {
+        alertFunc("验证码为空", function () {})
+        return
+    }
     httpClient.post("/sign", {}, {
         username: username.value,
         credential: password.value,
@@ -164,6 +184,7 @@ const signup = function () {
     vertical-align: bottom;
     line-height: 50px;
     font-size: 1.2rem;
+    outline: none;
 }
 
 .click:hover {

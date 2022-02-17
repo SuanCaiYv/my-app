@@ -8,4 +8,6 @@ export class Constant {
     static ARTICLE_ID = "article_id"
     static ARTICLE_TITLE = "article_title"
     static ARTICLE_CONTENT = "article_content"
+    static LOCAL_COORDINATE = "local_coordinate"
+    static LOCAL_CITY = "local_city"
 }

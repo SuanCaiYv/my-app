@@ -14,9 +14,10 @@ const props = defineProps({
 <style scoped>
 .title {
     width: 100%;
-    height: 60px;
+    height: 52px;
     font-size: 1.4rem;
     border-bottom: 2px solid black;
+    margin-bottom: 8px;
     box-sizing: border-box;
     font-weight: bolder;
     text-align: left;

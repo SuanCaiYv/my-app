@@ -24,7 +24,7 @@ type ArticleDao interface {
 	// ListByAuthor0 未分页版本
 	ListByAuthor0(author string) ([]entity.Article, error)
 
-	ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, int64, error)
+	ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)
 
 	Update(article *entity.Article) error
 
@@ -99,6 +99,10 @@ func newInstanceArticleDaoService() {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)
+	collection.Indexes().CreateOne(cancel, mongo.IndexModel{
+		Keys:    "name",
+		Options: nil,
+	})
 	instanceArticleDaoService = &ArticleDaoService{
 		collection,
 		logger,
@@ -191,19 +195,31 @@ func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, erro
 	return results, nil
 }
 
-func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool) ([]entity.Article, int64, error) {
+func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error) {
 	descInt := 1
 	if desc {
 		descInt = -1
 	}
+	skip := (pgNum - 1) * pgNum
+	if len(tagIdList) == 0 {
+	} else {
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	skip := (pgNum - 1) * pgNum
-	cursor, err := a.collection.Find(ctx, primitive.M{"author": author, "visibility": entity.VisibilityPublic}, &options.FindOptions{
-		Limit: &pgSize,
-		Skip:  &skip,
-		Sort:  primitive.M{sort: descInt},
-	})
+	cursor, err := a.collection.Find(ctx,
+		primitive.M{
+			"author":     author,
+			"visibility": entity.VisibilityPublic,
+			"tag_list._id": primitive.M{
+				"$all": tagIdList,
+			},
+		},
+		&options.FindOptions{
+			Limit: &pgSize,
+			Skip:  &skip,
+			Sort:  primitive.M{sort: descInt},
+		},
+	)
 	if err != nil {
 		a.logger.Error(err)
 		return nil, 0, err

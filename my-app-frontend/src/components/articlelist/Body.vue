@@ -1,6 +1,7 @@
 <template>
     <div class="body">
         <Today></Today>
+        <PH1></PH1>
         <ArticleList></ArticleList>
     </div>
 </template>
@@ -8,7 +9,8 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import ArticleList from "./ArticleList.vue"
-import Today from "./Today.vue"
+import Today from "./Options.vue"
+import PH1 from "../placeholder/PH1.vue"
 
 const name = ref<String>("Body")
 </script>
@@ -19,10 +21,8 @@ const name = ref<String>("Body")
     height: 100%;
     grid-area: body;
     display: grid;
-    grid-template-areas: "today article-list";
+    grid-template-areas: "ph1 article-list";
     grid-template-columns: 200px 1fr;
     grid-template-rows: 1fr;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 </style>
