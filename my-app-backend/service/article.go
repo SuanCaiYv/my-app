@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
@@ -9,6 +8,7 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/yanyiwu/gojieba"
 	"strconv"
 	"strings"
 	"time"
@@ -48,6 +48,7 @@ type ArticleApiHandler struct {
 	tagDao     db.TagDao
 	gridFsDao  db.GridFSDao
 	sysUserDao db.SysUserDao
+	cutter     *gojieba.Jieba
 	logger     *logrus.Logger
 }
 
@@ -58,6 +59,7 @@ func NewArticleApiHandler() *ArticleApiHandler {
 		tagDao:     db.NewTagDaoService(),
 		gridFsDao:  db.NewGridFSDaoService(),
 		sysUserDao: db.NewSysUserDaoService(),
+		cutter:     gojieba.NewJieba(),
 		logger:     util.NewLogger(),
 	}
 }
@@ -82,7 +84,6 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("参数解析失败"))
 		return
 	}
-	fmt.Println(input.ArticleName)
 	article, err := a.articleDao.Select(input.ArticleId)
 	if err != nil {
 		a.logger.Errorf("无法读取Article数据表: %s; %v", username, err)
@@ -116,6 +117,8 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	article.Kind = *kind
 	article.TagList = tagList
 	article.Visibility = input.Visibility
+	article.FulltextTitle = strings.Join(a.cutter.CutAll(article.Name), " ")
+	article.FulltextContent = strings.Join(a.cutter.CutAll(article.Content), " ")
 	err = a.articleDao.Update(article)
 	if err != nil {
 		a.logger.Errorf("更新Article失败: %s; %v", username, err)
@@ -216,15 +219,14 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 	sort := context.DefaultQuery("sort", "created_time")
 	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
-	searchKey := context.Query("search_key")
-	tagIds := context.Query("tag_id_list")
+	searchKey := context.DefaultQuery("search_key", "")
+	tagIds := context.DefaultQuery("tag_id_list", "")
 	var tagIdList []string
 	if tagIds != "" {
-		tagIdList = strings.Split(tagIds, ";")
+		tagIdList = strings.Split(tagIds, ",")
 	} else {
 		tagIdList = make([]string, 0, 0)
 	}
-	fmt.Println(tagIdList, searchKey)
 	owner := config.ApplicationConfiguration().Owner
 	user, err := a.sysUserDao.SelectByUsername(owner)
 	if err != nil {
@@ -232,7 +234,7 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 		context.JSON(200, resp.NewInternalError("无法读取用户表"))
 		return
 	}
-	articles, total, err := a.articleDao.ListByAuthor(user.Id, int64(pageNum), int64(pageSize), sort, desc, nil, "")
+	articles, total, err := a.articleDao.ListByAuthor(user.Id, entity.VisibilityPublic, true, int64(pageNum), int64(pageSize), sort, desc, tagIdList, searchKey)
 	if err != nil {
 		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
 		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
@@ -247,28 +249,36 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 
 func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	username := context.MustGet("username").(string)
-	pgSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
-	pgNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	pageSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	pageNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
 	sort := context.DefaultQuery("sort", "created_time")
 	// 是否倒序
 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	searchKey := context.DefaultQuery("search_key", "")
+	tagIds := context.DefaultQuery("tag_id_list", "")
+	var tagIdList []string
+	if tagIds != "" {
+		tagIdList = strings.Split(tagIds, ",")
+	} else {
+		tagIdList = make([]string, 0, 0)
+	}
 	user, err := a.sysUserDao.SelectByUsername(username)
 	if err != nil {
 		a.logger.Errorf("无法读取SysUser数据表: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("无法读取用户表"))
 		return
 	}
-	articles, total, err := a.articleDao.ListByAuthor(user.Id, int64(pgNum), int64(pgSize), sort, desc, nil, "")
+	articles, total, err := a.articleDao.ListByAuthor(user.Id, entity.VisibilityDraft, false, int64(pageNum), int64(pageSize), sort, desc, tagIdList, searchKey)
 	if err != nil {
 		a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
 		context.JSON(200, resp.NewInternalError("获取文章列表失败"))
 		return
 	}
 	endPage := false
-	if len(articles) != pgSize {
+	if len(articles) != pageSize {
 		endPage = true
 	}
-	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pgNum), int64(pgSize), int64(pgNum+1), endPage, articles))
+	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))
 }
 
 func (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {

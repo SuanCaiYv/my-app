@@ -14,10 +14,10 @@ const name = ref<String>("Home")
 
 class ArticleRawClass implements ArticleLiteRaw {
     articleName: String
-    content: String
+    summary: String
     constructor(t: String, b: String) {
         this.articleName = t
-        this.content = b
+        this.summary = b
     }
 }
 

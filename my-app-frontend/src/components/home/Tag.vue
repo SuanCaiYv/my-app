@@ -37,7 +37,7 @@ const clicked = function () {
 .button {
     width: 100%;
     height: 100%;
-    border: 2px solid slateblue;
+    border: none;
     box-sizing: border-box;
     border-radius: 16px;
     padding: 0 8px;
@@ -45,10 +45,10 @@ const clicked = function () {
     font-size: 1rem;
     font-weight: bolder;
     display: inline-block;
-    background-color: #99dbff;
+    background-color: white;
 }
 
 .buttonClicked {
-    background-color: #9dbbff;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

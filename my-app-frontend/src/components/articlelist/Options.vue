@@ -1,17 +1,16 @@
 <template>
     <div class="options">
-        <div class="page">
-            <select class="select">
-                <option selected value="release_time">排序方式</option>
+        <div class="sort">
+            <select class="select" v-model="sort">
+                <option disabled value="">排序方式</option>
                 <option value="release_time">时间</option>
-                <option value="tag">标签</option>
-                <option value="kind">分类</option>
+                <option value="kind.name">分类</option>
                 <option value="name">名称</option>
             </select>
         </div>
-        <div class="sort">
-            <select class="select">
-                <option selected value="10">分页数量</option>
+        <div class="page">
+            <select class="select" v-model="page">
+                <option disabled value="">分页数量</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="15">15</option>
@@ -20,8 +19,8 @@
             </select>
         </div>
         <div class="desc">
-            <select class="select">
-                <option selected value="true">显示顺序</option>
+            <select class="select" v-model="desc">
+                <option disabled value="">显示顺序</option>
                 <option value="true">正序</option>
                 <option value="false">倒序</option>
             </select>
@@ -30,9 +29,28 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {inject, ref, watch} from "vue"
 
-const name = ref<String>("Today")
+const name = ref<string>("Today")
+const sort = ref<string>('')
+const page = ref<string>('')
+const desc = ref<string>('')
+const s = inject("sort")
+const p = inject("page")
+const d = inject("desc")
+
+watch(sort, () => {
+    // @ts-ignore
+    s.value = sort.value
+})
+watch(page, () => {
+    // @ts-ignore
+    p.value = page.value
+})
+watch(desc, () => {
+    // @ts-ignore
+    d.value = desc.value
+})
 </script>
 
 <style scoped>

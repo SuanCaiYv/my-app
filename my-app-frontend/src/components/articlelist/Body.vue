@@ -7,12 +7,15 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {provide, ref} from "vue"
 import ArticleList from "./ArticleList.vue"
 import Today from "./Options.vue"
 import PH1 from "../placeholder/PH1.vue"
 
-const name = ref<String>("Body")
+const name = ref<string>("Body")
+provide("sort", ref<string>(''))
+provide("page", ref<string>(''))
+provide("desc", ref<string>(''))
 </script>
 
 <style scoped>

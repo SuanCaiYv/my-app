@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"sync"
 	"time"
 )
@@ -24,7 +25,7 @@ type ArticleDao interface {
 	// ListByAuthor0 未分页版本
 	ListByAuthor0(author string) ([]entity.Article, error)
 
-	ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)
+	ListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)
 
 	Update(article *entity.Article) error
 
@@ -93,20 +94,31 @@ func NewArticleDaoService() *ArticleDaoService {
 func newInstanceArticleDaoService() {
 	logger := util.NewLogger()
 	config := config2.ApplicationConfiguration()
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	url := fmt.Sprintf("%s:%d", config.DatabaseConfig.Url, config.DatabaseConfig.Port)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)
-	//_, err = collection.Indexes().CreateMany(ctx, []mongo.IndexModel{
-	//	{
-	//		Keys: bsonx.Doc{
-	//			{Key: "content", Value: bsonx.String("text")},
-	//		},
-	//	},
-	//})
-	//util.JustPanic(err)
+	one := collection.FindOne(ctx, primitive.M{"_id": "000000000000000000000001"})
+	language := "none"
+	if one.Err() == mongo.ErrNoDocuments {
+		_, err = collection.Indexes().CreateOne(ctx, mongo.IndexModel{
+			Keys: bsonx.Doc{
+				{Key: "fulltext_title", Value: bsonx.String("text")},
+				{Key: "fulltext_content", Value: bsonx.String("text")},
+			},
+			Options: &options.IndexOptions{
+				DefaultLanguage: &language,
+				Weights: struct {
+					Weights int32 `bson:"weights"`
+				}{Weights: 1},
+			},
+		})
+		util.JustPanic(err)
+		_, err = collection.InsertOne(ctx, &entity.Article{Id: "000000000000000000000001"})
+		util.JustPanic(err)
+	}
 	instanceArticleDaoService = &ArticleDaoService{
 		collection,
 		logger,
@@ -199,33 +211,28 @@ func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, erro
 	return results, nil
 }
 
-func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error) {
-	descInt := 1
+func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error) {
+	descInt := -1
 	if desc {
-		descInt = -1
+		descInt = 1
 	}
 	skip := (pgNum - 1) * pgNum
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	var v interface{}
+	if equally {
+		v = visibility
+	} else {
+		v = primitive.M{"$neq": visibility}
+	}
+	timeout, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	var cursor *mongo.Cursor
 	var err error
-	if len(tagIdList) == 0 {
-		cursor, err = a.collection.Find(ctx,
+	var total int64
+	if len(tagIdList) != 0 && searchKey != "" {
+		cursor, err = a.collection.Find(timeout,
 			primitive.M{
 				"author":     author,
-				"visibility": entity.VisibilityPublic,
-			},
-			&options.FindOptions{
-				Limit: &pgSize,
-				Skip:  &skip,
-				Sort:  primitive.M{sort: descInt},
-			},
-		)
-	} else {
-		cursor, err = a.collection.Find(ctx,
-			primitive.M{
-				"author":     author,
-				"visibility": entity.VisibilityPublic,
+				"visibility": v,
 				"tag_list._id": primitive.M{
 					"$all": tagIdList,
 				},
@@ -239,6 +246,92 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 				Sort:  primitive.M{sort: descInt},
 			},
 		)
+		total, err = a.collection.CountDocuments(timeout, primitive.M{
+			"author":     author,
+			"visibility": v,
+			"tag_list._id": primitive.M{
+				"$all": tagIdList,
+			},
+			"$text": primitive.M{
+				"$search": searchKey,
+			},
+		})
+		if err != nil {
+			a.logger.Error(err)
+			return nil, 0, err
+		}
+	} else if len(tagIdList) != 0 {
+		cursor, err = a.collection.Find(timeout,
+			primitive.M{
+				"author":     author,
+				"visibility": v,
+				"tag_list._id": primitive.M{
+					"$all": tagIdList,
+				},
+			},
+			&options.FindOptions{
+				Limit: &pgSize,
+				Skip:  &skip,
+				Sort:  primitive.M{sort: descInt},
+			},
+		)
+		total, err = a.collection.CountDocuments(timeout, primitive.M{
+			"author":     author,
+			"visibility": v,
+			"tag_list._id": primitive.M{
+				"$all": tagIdList,
+			},
+		})
+		if err != nil {
+			a.logger.Error(err)
+			return nil, 0, err
+		}
+	} else if searchKey != "" {
+		cursor, err = a.collection.Find(timeout,
+			primitive.M{
+				"author":     author,
+				"visibility": v,
+				"$text": primitive.M{
+					"$search": searchKey,
+				},
+			},
+			&options.FindOptions{
+				Limit: &pgSize,
+				Skip:  &skip,
+				Sort:  primitive.M{sort: descInt},
+			},
+		)
+		total, err = a.collection.CountDocuments(timeout, primitive.M{
+			"author":     author,
+			"visibility": v,
+			"$text": primitive.M{
+				"$search": searchKey,
+			},
+		})
+		if err != nil {
+			a.logger.Error(err)
+			return nil, 0, err
+		}
+	} else {
+		cursor, err = a.collection.Find(timeout,
+			primitive.M{
+				"author":     author,
+				"visibility": v,
+			},
+			&options.FindOptions{
+				Limit: &pgSize,
+				Skip:  &skip,
+				Sort:  primitive.M{sort: descInt},
+			},
+		)
+		total, err = a.collection.CountDocuments(timeout, primitive.M{
+			"author":     author,
+			"visibility": v,
+		})
+		if err != nil {
+			a.logger.Error(err)
+			return nil, 0, err
+		}
 	}
 	if err != nil {
 		a.logger.Error(err)
@@ -249,12 +342,12 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 		if err != nil {
 			a.logger.Error(err)
 		}
-	}(cursor, ctx)
+	}(cursor, timeout)
 	if err != nil {
 		return nil, 0, err
 	}
 	results := make([]entity.Article, 0, pgSize)
-	for cursor.Next(ctx) {
+	for cursor.Next(timeout) {
 		tmp := entity.Article{}
 		err := cursor.Decode(&tmp)
 		if err != nil {
@@ -264,11 +357,6 @@ func (a *ArticleDaoService) ListByAuthor(author string, pgNum, pgSize int64, sor
 		results = append(results, tmp)
 	}
 	if err := cursor.Err(); err != nil {
-		a.logger.Error(err)
-		return nil, 0, err
-	}
-	total, err := a.collection.CountDocuments(ctx, primitive.M{"author": author})
-	if err != nil {
 		a.logger.Error(err)
 		return nil, 0, err
 	}

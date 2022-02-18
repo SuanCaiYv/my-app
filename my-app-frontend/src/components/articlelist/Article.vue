@@ -2,7 +2,7 @@
     <div class="article">
         <PH1></PH1>
         <div class="title">{{title}}</div>
-        <div class="content">{{contentRendered}}</div>
+        <div class="content">{{summary}}</div>
         <PH2></PH2>
         <div class="update">
             <button class="button">更新</button>
@@ -26,15 +26,8 @@ const name = ref<string>("Article")
 const props = defineProps({
     title: String,
     summary: String,
-    content: String,
 })
-
 let visibly = ref<string>("公开")
-const contentRendered = ref<string>('')
-
-watch(props, () => {
-    contentRendered.value = marked.parse(props.content)
-})
 
 const setVisibly = function () {
     visibly.value = "私密"
@@ -60,28 +53,30 @@ const setVisibly = function () {
     width: 40%;
     height: 100%;
     grid-area: title;
-    border: 2px solid wheat;
+    border: none;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
     padding: 0 0 0 8px;
     font-size: 1.4rem;
     font-weight: bolder;
+    line-height: 40px;
     text-align: left;
-    background-color: antiquewhite;
+    background-color: rgba(0,0,0,0.05);
 }
 
 .content {
-    width: 100%;
+    min-width: 600px;
     height: 100%;
     grid-area: content;
-    border: 2px solid wheat;
+    border: none;
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
-    font-size: 1rem;
+    font-size: 1.2rem;
     text-align: left;
-    background-color: antiquewhite;
+    word-break: break-word;
     overflow: hidden;
+    background-color: rgba(0,0,0,0.03);
 }
 
 .update {

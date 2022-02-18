@@ -63,6 +63,7 @@ import {Response} from "../../common/interface";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
+import {marked} from "marked";
 
 const name = ref<string>("Publish")
 
@@ -280,6 +281,10 @@ const publish = function () {
         errorNotification("你就发布个标题搞得我很尴尬啊！")
         return;
     }
+    let s = marked.parse(content).replaceAll(/<[^>]+>|&[^>]+;/g, "")
+    if (summary.value !== "") {
+        s = summary.value
+    }
     const afterCoverImgUploaded = function () {
         if (chosenKindList.length === 0) {
             errorNotification("分类不可为空")
@@ -296,7 +301,7 @@ const publish = function () {
         httpClient.post("/article", {}, {
             article_id: id,
             article_name: title,
-            summary: summary.value,
+            summary: s,
             cover_img: covImgUrl,
             content: content,
             kind: chosenKindList[0].id,

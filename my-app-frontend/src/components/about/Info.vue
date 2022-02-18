@@ -16,6 +16,7 @@
                 </div>
             </div>
             <div class="future-weather">
+                <div style="width: 10px; height: 50px; display: inline-block"></div>
                 <div v-for="i in hourlyWeather" style="display: inline-block">
                     <img class="icon" :src="i.icon" style="display: block">
                     <div class="time">{{i.time}}时</div>
@@ -25,19 +26,19 @@
         <div class="brief">
             <div>
                 <div class="name article-list" @click="router.push('/article_list')">文章总数</div>
-                <div class="value"></div>
+                <div class="value">{{total}}</div>
             </div>
             <div>
                 <div class="name">上次更新</div>
-                <div class="value"></div>
+                <div class="value">{{lastedUpdate}}</div>
             </div>
             <div>
                 <div class="name">最多标签</div>
-                <div class="value"></div>
+                <div class="value">{{mostTag}}</div>
             </div>
             <div>
                 <div class="name">最新文章</div>
-                <div class="value"></div>
+                <div class="value">{{lastedAdd}}</div>
             </div>
         </div>
         <PH2></PH2>
@@ -51,6 +52,10 @@ import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alertFunc from "../../util/alert";
+import {toListResult} from "../../util/base";
 
 const name = ref<string>("Info")
 const router = useRouter()
@@ -59,9 +64,9 @@ const myKey = "80dfc319835144c4a59572d5319f305b"
 const iconDir = "../../icons/"
 
 const total = ref<number>(0)
-const lastedUpdate = ref<string>('')
-const lastedAdd = ref<string>('')
-const mostTag = ref<string>('')
+const lastedUpdate = ref<string>('暂无更新')
+const lastedAdd = ref<string>('暂无文章')
+const mostTag = ref<string>('暂无标签')
 
 const region = ref<string>('')
 let coordinate = ''
@@ -141,6 +146,41 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     region.value = storage.get(Constant.LOCAL_CITY)
     getWeather()
 }
+
+const fetchLatestArticle = function () {
+    httpClient.get("/article/list/no_auth", {
+        sort: "release_time",
+        desc: false,
+    }, false, function (resp: Response) {
+        if (!resp.ok) {
+            alertFunc(resp.errMsg, function () {})
+        } else {
+            const list = toListResult(resp.data)
+            total.value = list.total
+            if (list.list.length > 0) {
+                lastedAdd.value = "《" + list.list[0].article_name + "》"
+            }
+        }
+    })
+}
+const fetchLatestUpdate = function () {
+    httpClient.get("/article/list/no_auth", {
+        sort: "updated_time",
+        desc: false,
+    }, false, function (resp: Response) {
+        if (!resp.ok) {
+            alertFunc(resp.errMsg, function () {})
+        } else {
+            const list = toListResult(resp.data)
+            if (list.list.length > 0) {
+                lastedUpdate.value = "《" + list.list[0].article_name + "》"
+            }
+        }
+    })
+}
+
+fetchLatestArticle()
+fetchLatestUpdate()
 </script>
 
 <style scoped>
@@ -157,18 +197,20 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     width: 100%;
     height: 300px;
     grid-area: statistic;
-    border: 2px solid lightsalmon;
+    border: none;
     box-sizing: border-box;
     border-radius: 20px;
+    text-align: left;
 }
 
 .brief {
     width: 100%;
     height: 300px;
     grid-area: brief;
-    border: 2px solid salmon;
+    border: none;
     box-sizing: border-box;
     border-radius: 20px;
+    text-align: left;
 }
 
 .name {
@@ -176,7 +218,7 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     height: 50px;
     margin-left: 20px;
     margin-top: 20px;
-    border: 2px solid sandybrown;
+    border: none;
     box-sizing: border-box;
     border-radius: 18px;
     display: inline-block;
@@ -184,45 +226,48 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     font-size: 1.2rem;
     font-weight: bolder;
     text-align: center;
-    line-height: 46px;
-    background-color: rgba(255, 140, 0, 0.05);
+    line-height: 50px;
+    background-color: white;
 }
 
 .value {
-    width: calc(100% - 168px);
+    max-width: calc(100% - 168px);
+    min-width: 30px;
     height: 50px;
     margin-top: 20px;
     margin-left: 20px;
     margin-right: 20px;
-    padding: 0 0 0 8px;
+    padding: 0 8px 0 8px;
     border: none;
     border-radius: 16px;
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.2rem;
+    font-weight: bolder;
     line-height: 50px;
     outline: none;
-    background-color: rgba(255, 0, 188, 0.05);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .article-list {
+    background-color: rgba(0,0,0,0.05);
 }
 
 .article-list:hover {
-    opacity: 60%;
+    background: rgba(0,0,0,0.15);
 }
 
 .article-list:active {
-    opacity: 90%;
+    background-color: rgba(0,0,0,0.25);
 }
 
 .weather {
-    width: calc(100% - 160px);
+    width: calc(100% - 176px);
     height: 50px;
     margin-top: 20px;
     margin-left: 20px;
     margin-right: 20px;
-    padding: 0;
+    padding: 0 8px 0 8px;
     border: none;
     border-radius: 16px;
     display: inline-block;
@@ -230,14 +275,15 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     font-size: 1.2rem;
     line-height: 50px;
     outline: none;
-    background-color: rgba(255, 0, 188, 0.05);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .weather-item {
-    width: 100px;
+    width: 96px;
     height: 100%;
     vertical-align: bottom;
     line-height: 50px;
+    font-weight: bolder;
     display: inline-block;
 }
 
@@ -245,22 +291,23 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
     width: 100%;
     height: 140px;
     text-align: left;
-    padding-top: 20px;
+    padding-top: 30px;
     padding-left: 18px;
 }
 
 .icon {
     width: 70px;
     height: 70px;
-    margin-left: 30px;
+    margin-right: 42px;
     outline: none;
 }
 
 .time {
     width: 70px;
     height: 70px;
-    margin-left: 30px;
+    margin-right: 42px;
     text-align: center;
+    font-weight: bolder;
     display: inline-block;
 }
 </style>

@@ -3,7 +3,7 @@
         <PH1></PH1>
         <div class="col1">
             <label for="avatar">
-                <Img class="img" :url="avatar"></Img>
+                <img class="img" :src="avatar"/>
             </label>
             <input type="file" id="avatar" hidden @change="updateAvatar($event)">
             <input class="nickname" v-model="nickname" @keydown.enter.down="updateNickname"/>
@@ -47,7 +47,6 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Img from "../Img.vue"
 import {baseUrl, httpClient} from "../../net";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
@@ -245,7 +244,8 @@ const updateSignature = function () {
     width: 150px;
     height: 150px;
     margin: 25px;
-    border: 2px solid pink;
+    border: none;
+    border-radius: 150px;
     box-sizing: border-box;
 }
 
@@ -256,7 +256,7 @@ const updateSignature = function () {
 .nickname {
     width: 150px;
     height: 50px;
-    border: 2px solid lightskyblue;
+    border: none;
     box-sizing: border-box;
     border-radius: 16px;
     margin-top: 0;
@@ -268,24 +268,23 @@ const updateSignature = function () {
     text-align: center;
     line-height: 50px;
     outline: none;
-    background-color: rgba(255,0,49,0.05);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .input {
     width: 220px;
     height: 50px;
-    border: 2px solid cornflowerblue;
+    border: none;
     box-sizing: border-box;
-    border-right: none;
     border-radius: 16px 0 0 16px;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding-left: 4px;
+    padding-left: 8px;
     font-size: 1rem;
     font-weight: bold;
     display: inline-block;
     vertical-align: top;
-    background-color: rgba(0,167,255,0.05);
+    background-color: rgba(0,0,0,0.05);
     outline: none;
 }
 
@@ -301,17 +300,18 @@ const updateSignature = function () {
     display: inline-block;
     vertical-align: top;
     line-height: 50px;
-    background-color: rgba(0,63,121,0.11);
+    background-color: rgba(0,0,0,0.1);
 }
 
 .signature {
     width: 280px;
     height: 145px;
-    border: 2px solid skyblue;
+    border: none;
     box-sizing: border-box;
     border-radius: 16px;
     margin-top: 20px;
     margin-bottom: 20px;
+    padding: 8px;
     font-size: 1.2rem;
     font-weight: bolder;
     font-style: oblique;
@@ -319,6 +319,6 @@ const updateSignature = function () {
     vertical-align: bottom;
     outline: none;
     resize: none;
-    background-color: rgba(29,0,255,0.05);
+    background-color: rgba(0,0,0,0.05);
 }
 </style>

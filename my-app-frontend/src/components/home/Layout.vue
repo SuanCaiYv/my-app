@@ -1,6 +1,6 @@
 <template>
     <div class="layout">
-        <Header></Header>
+        <HeaderWithSearch></HeaderWithSearch>
         <PH1></PH1>
         <Body></Body>
         <Footer></Footer>
@@ -8,13 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
-import Header from "../common/HeaderWithSearch.vue"
+import {inject, provide, ref} from "vue"
+import HeaderWithSearch from "../common/HeaderWithSearch.vue"
 import PH1 from "../placeholder/PH1.vue"
 import Body from "./Body.vue"
 import Footer from "./Footer.vue"
 
-const name = ref<String>("Layout")
+const name = ref<string>("Layout")
+provide("searchKey", ref<string>(''))
 </script>
 
 <style scoped>

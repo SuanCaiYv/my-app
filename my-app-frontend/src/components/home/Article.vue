@@ -2,7 +2,7 @@
     <div class="article" @click="router.push('/view/' + id)">
         <PH1></PH1>
         <div class="title">{{title}}</div>
-        <div class="content" v-html="contentRendered"></div>
+        <div class="content">{{summary}}</div>
         <PH2></PH2>
     </div>
 </template>
@@ -16,18 +16,11 @@ import {useRouter} from "vue-router";
 
 const name = ref<String>("Article")
 const router = useRouter()
-const contentRendered = ref<string>('')
 
 const props = defineProps({
     id: String,
     title: String,
-    content: String,
-})
-
-onMounted(() => {
-    // @ts-ignore
-    contentRendered.value = marked.parse(props.content)
-    contentRendered.value = contentRendered.value.replaceAll(/<[^>]+>|&[^>]+;/g, "")
+    summary: String,
 })
 </script>
 
@@ -50,7 +43,7 @@ onMounted(() => {
     width: 40%;
     height: 100%;
     grid-area: title;
-    border: 2px solid wheat;
+    border: none;
     box-sizing: border-box;
     border-radius: 16px 16px 0 0;
     padding: 0 0 0 8px;
@@ -58,20 +51,21 @@ onMounted(() => {
     font-weight: bolder;
     line-height: 40px;
     text-align: left;
-    background-color: #f5ecff;
+    background-color: rgba(0,0,0,0.05);
 }
 
 .content {
     min-width: 600px;
     height: 100%;
     grid-area: content;
-    border: 2px solid wheat;
+    border: none;
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;
     font-size: 1.2rem;
     text-align: left;
+    word-break: break-word;
     overflow: hidden;
-    background-color: #f5ecff;
+    background-color: rgba(0,0,0,0.03);
 }
 </style>

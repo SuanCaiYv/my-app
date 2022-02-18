@@ -1,7 +1,7 @@
 <template>
     <div class="userInfo">
         <div class="img" @click="router.push('/about')">
-            <Img :url="avatar" />
+            <img :src="avatar" style="border-radius: 150px; width: 100%; height: 100%; object-fit: cover"/>
         </div>
         <!--最多七个字或10个大写字母-->
         <div class="nickname">
@@ -23,7 +23,6 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import Img from "../Img.vue"
 import {useRouter} from "vue-router";
 import {httpClient} from "../../net";
 import {Response} from "../../common/interface";
@@ -57,12 +56,12 @@ const router = useRouter()
 .userInfo {
     width: 200px;
     height: 100%;
-    border: 2px solid salmon;
+    border: none;
     box-sizing: border-box;
     border-radius: 20px;
-    background-color: mistyrose;
     position: fixed;
     top: 140px;
+    background-color: rgba(0,0,0,0.05);
 }
 
 .img {
@@ -74,7 +73,6 @@ const router = useRouter()
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
-    border-radius: 6px;
 }
 
 .img:active {
@@ -118,7 +116,7 @@ const router = useRouter()
     padding: 0;
     border-radius: 6px;
     font-size: 1rem;
-    color: dodgerblue;
+    color: black;
     font-weight: bolder;
     line-height: 20px;
     word-break: break-all;

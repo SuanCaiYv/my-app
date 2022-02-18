@@ -2,14 +2,14 @@
     <div class="articleList">
         <div style="margin-bottom: -25px"></div>
         <div v-for="article in articleList">
-            <Article :id="article.articleId" :title="article.articleName" :content="article.content"></Article>
+            <Article :id="article.articleId" :title="article.articleName" :summary="article.summary"></Article>
         </div>
         <button class="button" @click="fetchArticles" :style="{ display: displayStr }">more</button>
     </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref} from "vue"
+import {inject, provide, reactive, Ref, ref, watch} from "vue"
 import Article from "./Article.vue"
 import {ArticleLiteRaw} from "../../common/interface"
 import {httpClient} from "../../net";
@@ -23,43 +23,110 @@ const name = ref<string>("ArticleList")
 // @ts-ignore
 const articleList = reactive<Array<ArticleLiteRaw>>([])
 const displayStr = ref<string>("none")
-
+const pageSize = inject("page") as Ref<string>
+const sort = inject("sort") as Ref<string>
+const desc = inject("desc") as Ref<string>
+const chosenTagList = inject("chosenTagList")
+const searchKey = inject("searchKey") as Ref<string>
 let pageNum = 1
-let pageSize = 10
+let endPage = false
 
 class ArticleRawClass implements ArticleLiteRaw {
     articleId: string
     articleName: string;
-    content: string;
+    summary: string;
 
-    constructor(articleId: string, title: string, body: string) {
+    constructor(articleId: string, title: string, summary: string) {
         this.articleId = articleId
         this.articleName = title;
-        this.content = body;
+        this.summary = summary;
     }
 }
 
+watch(searchKey, () => {
+    endPage = false
+    articleList.splice(0, articleList.length)
+    fetchArticles()
+})
+watch(sort, () => {
+    endPage = false
+    articleList.splice(0, articleList.length)
+    fetchArticles()
+})
+watch(pageSize, () => {
+    endPage = false
+    articleList.splice(0, articleList.length)
+    fetchArticles()
+})
+watch(desc, () => {
+    endPage = false
+    articleList.splice(0, articleList.length)
+    fetchArticles()
+})
+// @ts-ignore
+watch(chosenTagList, () => {
+    endPage = false
+    articleList.splice(0, articleList.length)
+    fetchArticles()
+})
+
 const fetchArticles = function () {
-    httpClient.get("/article/list/no_auth", {}, false, function (resp: Response) {
+    if (endPage) {
+        return
+    }
+    let pageSizeValue
+    let sortValue
+    let descValue
+    // @ts-ignore
+    if (pageSize.value === "") {
+        // @ts-ignore
+        pageSizeValue = "10"
+    } else {
+        pageSizeValue = pageSize.value
+    }
+    // @ts-ignore
+    if (sort.value === "") {
+        // @ts-ignore
+        sortValue = "release_time"
+    } else {
+        sortValue = sort.value
+    }
+    // @ts-ignore
+    if (desc.value === "") {
+        // @ts-ignore
+        descValue = "false"
+    } else {
+        descValue = desc.value
+    }
+    httpClient.get("/article/list/no_auth", {
+        page_num: pageNum,
+        page_size: pageSizeValue,
+        sort: sortValue,
+        desc: descValue,
+        tag_id_list: chosenTagList,
+        search_key: searchKey.value
+    }, false, function (resp: Response) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
             const list = toListResult(resp.data)
+            endPage = list.endPage
             pageNum = list.pageNum
             for (let l of list.list) {
                 // @ts-ignore
-                articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.content))
+                articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary))
                 storage.set(Constant.ARTICLE_ID + "_" + l.article_id, JSON.stringify(l))
+            }
+            if (articleList.length > 0) {
+                displayStr.value = "inline-block"
             }
         }
     })
 }
 
+articleList.splice(0, articleList.length)
+endPage = false
 fetchArticles()
-
-if (articleList.length > 0) {
-    displayStr.value = "inline-block"
-}
 </script>
 
 <style scoped>

@@ -9,7 +9,7 @@ export interface Response {
 export interface ArticleLiteRaw {
     articleId: string
     articleName: string
-    content: string
+    summary: string
 }
 
 export interface Catalog {

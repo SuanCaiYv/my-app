@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {provide, reactive, ref} from "vue"
 import SortAndPage from "./SortAndPage.vue"
 import UserInfo from "./UserInfo.vue"
 import ArticleList from "./ArticleList.vue";
@@ -21,6 +21,10 @@ import PH2 from "../placeholder/PH2.vue"
 import PH3 from "../placeholder/PH3.vue"
 
 const name = ref<string>("Body")
+provide("sort", ref<string>(''))
+provide("page", ref<string>(''))
+provide("desc", ref<string>(''))
+provide("chosenTagList", reactive<Array<string>>([]))
 </script>
 
 <style scoped>
