@@ -118,15 +118,14 @@ const signup = function () {
     width: 450px;
     height: 325px;
     grid-area: form;
-    border: 2px solid darkgray;
+    border: none;
     border-radius: 18px;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .l1 {
     width: 100%;
     height: 50px;
-    box-sizing: border-box;
     border-radius: 8px;
     margin-top: 25px;
 }
@@ -134,7 +133,6 @@ const signup = function () {
 .l2 {
     width: 100%;
     height: 50px;
-    box-sizing: border-box;
     border-radius: 8px;
     margin-top: 25px;
 }
@@ -142,7 +140,6 @@ const signup = function () {
 .l3 {
     width: 100%;
     height: 50px;
-    box-sizing: border-box;
     border-radius: 8px;
     margin-top: 25px;
 }
@@ -150,7 +147,6 @@ const signup = function () {
 .l4 {
     width: 100%;
     height: 50px;
-    box-sizing: border-box;
     border-radius: 8px;
     margin-top: 25px;
     margin-bottom: 25px;
@@ -158,33 +154,36 @@ const signup = function () {
 
 .name-show {
     width: 100px;
-    height: 50px;
+    height: 100%;
     margin-left: 10px;
     margin-right: 10px;
-    border-radius: 30px;
-    box-sizing: border-box;
+    padding: 0;
     display: inline-block;
     font-size: 1.2rem;
     vertical-align: bottom;
-    line-height: 46px;
+    line-height: 50px;
     font-weight: bolder;
-    border: 2px solid lightgray;
-    background-color: white;
 }
 
 .value-input {
-    width: calc(100% - 130px);
-    height: 50px;
-    border: 2px solid lightgray;
-    box-sizing: border-box;
+    width: calc(100% - 138px);
+    height: 100%;
+    border: none;
     border-radius: 16px;
-    margin-right: 10px;
     padding: 0 0 0 8px;
+    margin-right: 10px;
     display: inline-block;
     vertical-align: bottom;
     line-height: 50px;
     font-size: 1.2rem;
     outline: none;
+}
+
+.click {
+    line-height: 50px;
+    border: none;
+    border-radius: 30px;
+    background-color: white;
 }
 
 .click:hover {

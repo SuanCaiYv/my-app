@@ -38,7 +38,7 @@ const searchKey = function () {
     display: inline-block;
     font-size: 1rem;
     font-weight: bold;
-    background-color: whitesmoke;
+    background-color: rgba(0,0,0,0.05);
     outline: none;
 }
 </style>

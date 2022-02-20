@@ -10,6 +10,7 @@ export interface ArticleLiteRaw {
     articleId: string
     articleName: string
     summary: string
+    visibility: number
 }
 
 export interface Catalog {

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import {inject, provide, ref} from "vue"
+import {provide, ref} from "vue"
 import HeaderWithSearch from "../common/HeaderWithSearch.vue"
 import PH1 from "../placeholder/PH1.vue"
 import Body from "./Body.vue"

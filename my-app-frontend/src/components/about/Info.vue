@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, watch} from "vue"
+import {reactive, ref} from "vue"
 import {useRouter} from "vue-router";
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"

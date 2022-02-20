@@ -26,18 +26,18 @@ const router = useRouter()
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 0;
-    border: 2px solid lightgray;
+    border: none;
     border-radius: 20px;
     font-size: 1rem;
     font-weight: bolder;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .button:hover {
-    background-color: lightgray;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .button:active {
-    background-color: gainsboro;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

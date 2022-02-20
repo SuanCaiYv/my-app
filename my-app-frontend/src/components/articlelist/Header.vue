@@ -5,14 +5,14 @@
         <Publish></Publish>
         <Draft></Draft>
         <Manager></Manager>
-        <Search></Search>
+        <Search :search-func="click"></Search>
         <PH2></PH2>
         <SignButton></SignButton>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {inject, ref} from "vue"
 import HomePage from "../common/HomePage.vue"
 import PH1 from "../placeholder/PH1.vue"
 import Search from "../common/Search.vue"
@@ -23,6 +23,11 @@ import Draft from "./Draft.vue";
 import Manager from "./Manager.vue";
 
 const name = ref<String>("Header")
+const searchKey = inject("searchKey")
+const click = function (key: string) {
+    // @ts-ignore
+    searchKey.value = key
+}
 </script>
 
 <style scoped>

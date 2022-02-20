@@ -57,9 +57,8 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from "vue"
 import ChoiceItem from "./ChoiceItem.vue"
-import {IdName} from "../../common/interface";
+import {IdName, Response} from "../../common/interface";
 import {baseUrl, httpClient} from "../../net";
-import {Response} from "../../common/interface";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";

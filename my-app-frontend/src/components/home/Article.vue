@@ -8,10 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue"
+import {ref} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
-import {marked} from "marked";
 import {useRouter} from "vue-router";
 
 const name = ref<String>("Article")

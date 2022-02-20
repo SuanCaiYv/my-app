@@ -9,11 +9,10 @@
 </template>
 
 <script setup lang="ts">
-import {inject, provide, reactive, Ref, ref, watch} from "vue"
+import {inject, reactive, Ref, ref, watch} from "vue"
 import Article from "./Article.vue"
-import {ArticleLiteRaw} from "../../common/interface"
+import {ArticleLiteRaw, Response} from "../../common/interface"
 import {httpClient} from "../../net";
-import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 import {toListResult} from "../../util/base";
 import storage from "../../util/storage";
@@ -35,11 +34,13 @@ class ArticleRawClass implements ArticleLiteRaw {
     articleId: string
     articleName: string;
     summary: string;
+    visibility: number;
 
-    constructor(articleId: string, title: string, summary: string) {
+    constructor(articleId: string, title: string, summary: string, visibility: number) {
         this.articleId = articleId
         this.articleName = title;
         this.summary = summary;
+        this.visibility = visibility;
     }
 }
 
@@ -124,6 +125,14 @@ const fetchArticles = function () {
     })
 }
 
+watch(articleList, () => {
+    if (articleList.length > 0) {
+        displayStr.value = "inline-block"
+    } else {
+        displayStr.value = "none"
+    }
+})
+
 articleList.splice(0, articleList.length)
 endPage = false
 fetchArticles()
@@ -144,11 +153,11 @@ fetchArticles()
     font-size: 1.4rem;
     font-weight: bolder;
     line-height: 30px;
-    color: #b4d4ff;
+    color: darkgray;
     background-color: white;
 }
 
 .button:hover {
-    color: #9dbbff;
+    color: gray;
 }
 </style>

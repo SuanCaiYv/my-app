@@ -17,20 +17,40 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from "vue"
+import {onMounted, ref, watch} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
-import {marked} from "marked";
 
 const name = ref<string>("Article")
 const props = defineProps({
     title: String,
     summary: String,
+    visibility: Number,
 })
-let visibly = ref<string>("公开")
+const visibly = ref<string>("公开")
+const flag = ref<boolean>(false)
+
+onMounted(() => {
+    if (Number(props.visibility) === 1) {
+        flag.value = false
+    } else if (Number(props.visibility) === 2) {
+       flag.value = true
+    }
+})
 
 const setVisibly = function () {
-    visibly.value = "私密"
+    flag.value = !flag.value
+    if (flag.value) {
+        visibly.value = "公开"
+    } else {
+        visibly.value = "私密"
+    }
+}
+
+const upt = function () {
+}
+
+const del = function () {
 }
 </script>
 
@@ -106,19 +126,19 @@ const setVisibly = function () {
     margin-top: 20px;
     margin-bottom: 20px;
     margin-left: -80px;
-    border: 2px solid lightgray;
+    border: none;
     padding: 0;
     border-radius: 18px;
     font-size: 1.2rem;
     font-weight: bolder;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .button:hover {
-    background-color: lightgray;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .button:active {
-    background-color: gainsboro;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

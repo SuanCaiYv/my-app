@@ -27,19 +27,19 @@ const router = useRouter()
     margin-left: auto;
     margin-right: auto;
     padding: 0 20px;
-    border: 2px solid lightgray;
+    border: none;
     box-sizing: border-box;
     border-radius: 18px;
     font-size: 1.0rem;
     font-weight: bolder;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .home-page-button:hover {
-    background-color: lightgray;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .home-page-button:active {
-    background-color: gainsboro;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

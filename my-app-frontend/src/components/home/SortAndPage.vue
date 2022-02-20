@@ -101,7 +101,7 @@ watch(desc, () => {
 .select {
     width: auto;
     height: 100%;
-    border: 2px solid lightgray;
+    border: none;
     box-sizing: border-box;
     border-radius: 18px;
     padding: 0 8px;
@@ -113,14 +113,14 @@ watch(desc, () => {
     -webkit-appearance: none;
     -moz-appearance: none;
     outline: none;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .select:hover {
-    background-color: lightgray;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .select:active {
-    background-color: gainsboro;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

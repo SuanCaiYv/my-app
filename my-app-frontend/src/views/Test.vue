@@ -8,9 +8,6 @@
 
 <script setup lang="ts">
 import {reactive, ref, watch} from "vue"
-import {useRouter} from "vue-router";
-import {marked} from "marked";
-import Publish from "../components/editor/Publish.vue"
 
 const name = ref<String>("Test")
 

@@ -11,9 +11,8 @@
 <script setup lang="ts">
 import {inject, reactive, ref} from "vue"
 import Tag from "./Tag.vue";
-import {IdName} from "../../common/interface";
+import {IdName, Response} from "../../common/interface";
 import {httpClient} from "../../net";
-import {Response} from "../../common/interface";
 import {toListResult} from "../../util/base";
 
 const name = ref<string>("TagList")

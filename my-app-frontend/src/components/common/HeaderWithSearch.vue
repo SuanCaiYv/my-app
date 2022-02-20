@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import {inject, provide, ref} from "vue"
+import {inject, ref} from "vue"
 import HomePage from "./HomePage.vue"
 import PH1 from "../placeholder/PH1.vue"
 import Search from "./Search.vue"

@@ -2,7 +2,7 @@
     <div class="article-list">
         <div style="margin-top: 80px"></div>
         <div v-for="article in articleList">
-            <Article :id="article.articleId" :title="article.articleName" :summary="article.summary"></Article>
+            <Article :id="article.articleId" :title="article.articleName" :summary="article.summary" :visibility="article.visibility"></Article>
         </div>
         <button class="button" @click="fetchArticles" :style="{ display: displayStr }">more</button>
     </div>
@@ -33,20 +33,24 @@ class ArticleRawClass implements ArticleLiteRaw {
     articleId: string
     articleName: string;
     summary: string;
+    visibility: number;
 
-    constructor(articleId: string, title: string, body: string) {
+    constructor(articleId: string, title: string, body: string, visibility: number) {
         this.articleId = articleId
         this.articleName = title;
         this.summary = body;
+        this.visibility = visibility
     }
 }
 
 watch(searchKey, () => {
+    console.log(searchKey.value)
     endPage = false
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(sort, () => {
+    console.log(sort.value)
     endPage = false
     articleList.splice(0, articleList.length)
     fetchArticles()
@@ -105,15 +109,20 @@ const fetchArticles = function () {
             pageNum = list.pageNum
             for (let l of list.list) {
                 // @ts-ignore
-                articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary))
+                articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary, l.visibility))
                 storage.set(Constant.ARTICLE_ID + "_" + l.article_id, JSON.stringify(l))
-            }
-            if (articleList.length > 0) {
-                displayStr.value = "inline-block"
             }
         }
     })
 }
+
+watch(articleList, () => {
+    if (articleList.length > 0) {
+        displayStr.value = "inline-block"
+    } else {
+        displayStr.value = "none"
+    }
+})
 
 articleList.splice(0, articleList.length)
 endPage = false
@@ -135,11 +144,11 @@ fetchArticles()
     font-size: 1.4rem;
     font-weight: bolder;
     line-height: 30px;
-    color: #b4d4ff;
+    color: darkgray;
     background-color: white;
 }
 
 .button:hover {
-    color: #9dbbff;
+    color: gray;
 }
 </style>
