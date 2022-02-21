@@ -73,7 +73,7 @@ func Route() {
 
 		// 文章接口
 		article := versionOne.Group("/article")
-		article.GET("/list", articleApi.ListArticleNoAuth, articleApi.ListArticle)
+		article.GET("/list", articleApi.ListArticle)
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
 		article.GET("/detail/:article_id", articleApi.ArticleDetail)

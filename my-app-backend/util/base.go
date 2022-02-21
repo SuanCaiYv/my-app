@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/SuanCaiYv/my-app-backend/nosql"
 	"github.com/google/uuid"
 	"mime"
 	"path"
@@ -9,7 +10,11 @@ import (
 	"time"
 )
 
+type TaskFunc func(args ...interface{}) (interface{}, error)
+
 var logger = NewLogger()
+var funcMap = make(map[string]TaskFunc)
+var redisOps = nosql.NewRedisClient()
 
 func GenerateUUID() string {
 	newUUID, err := uuid.NewUUID()
@@ -51,7 +56,38 @@ func UpdateStructObjectWithJsonTag(old interface{}, m map[string]interface{}) {
 	t := reflect.TypeOf(old).Elem()
 	for i := 0; i < v.NumField(); i += 1 {
 		if val, ok := m[t.Field(i).Tag.Get("json")]; ok {
-			v.Field(i).Set(reflect.ValueOf(val))
+			// 处理json的number类型
+			if reflect.TypeOf(val).Name() == "float64" && v.Field(i).Type().Name() != "float64" {
+				v.Field(i).SetInt(int64(val.(float64)))
+			} else {
+				v.Field(i).Set(reflect.ValueOf(val))
+			}
+		}
+	}
+}
+
+func AddTimedTask(task TaskFunc, toExec time.Time) {
+	uid := GenerateUUID()
+	funcMap[uid] = task
+	err := redisOps.PushSortQueue("timed_task", uid, float64(toExec.UnixMilli()))
+	if err != nil {
+		logger.Error("添加定时任务失败", err)
+	}
+}
+
+func WakeupTimedTask(taskId string) {
+	z, err := redisOps.PeeksSortQueue("timed_task")
+	if err != nil {
+		logger.Error("唤醒定时任务失败", err)
+		return
+	}
+	if time.UnixMilli(int64(z.Score)).After(time.Now()) {
+		return
+	} else {
+		z, err = redisOps.PopSortQueue("timed_task")
+		if err != nil {
+			logger.Error("唤醒定时任务失败", err)
+			return
 		}
 	}
 }

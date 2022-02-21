@@ -191,7 +191,7 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 		err = a.articleDao.Update(article)
 		if err != nil {
 			a.logger.Errorf("更新Article失败: %s; %v", username, err)
-			context.JSON(200, resp.NewInternalError("更新用户文档表失败"))
+			context.JSON(200, resp.NewInternalError("更新文档表失败"))
 			return
 		}
 		input.ArticleId = article.Id
@@ -204,13 +204,40 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 }
 
 func (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.MustGet("username").(string)
+	input := make(map[string]interface{})
+	err := context.BindJSON(&input)
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	article, err := a.articleDao.Select(input["article_id"].(string))
+	if err != nil {
+		a.logger.Errorf("获取文档失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("获取用户"))
+		return
+	}
+	util.UpdateStructObjectWithJsonTag(article, input)
+	err = a.articleDao.Update(article)
+	if err != nil {
+		a.logger.Errorf("更新文档失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("更新文档失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
 }
 
 func (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	username := context.MustGet("username")
+	articleId := context.Param("article_id")
+	err := a.articleDao.Delete(articleId)
+	if err != nil {
+		a.logger.Errorf("删除Article失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("删除文档表失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
 }
 
 func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {

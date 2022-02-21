@@ -21,8 +21,23 @@ func (t *Tmp) UnmarshalBinary(data []byte) error {
 }
 
 func TestRedisClient_Set(t *testing.T) {
-	tmp := Tmp{}
 	ops := NewRedisClient()
-	ops.Get("tmp", &tmp)
-	fmt.Println(tmp)
+	fmt.Println(ops.Get("tmp"))
+}
+
+func TestRedisClient_PushSortQueue(t *testing.T) {
+	ops := NewRedisClient()
+	tmp1 := Tmp{
+		Id:   "aaa",
+		Name: "bbb",
+		Age:  1,
+	}
+	ops.PushSortQueue("test", &tmp1, 1)
+	tmp2 := Tmp{
+		Id:   "ccc",
+		Name: "ddd",
+		Age:  2,
+	}
+	ops.PushSortQueue("test", &tmp2, 2)
+	fmt.Println(ops.PeeksSortQueue("test"))
 }

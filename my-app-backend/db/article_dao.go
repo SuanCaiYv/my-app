@@ -160,7 +160,7 @@ func (a *ArticleDaoService) Select(id string) (*entity.Article, error) {
 func (a *ArticleDaoService) SelectByAuthorName(author, name string) (*entity.Article, error) {
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	one := a.collection.FindOne(timeout, primitive.M{"author": author, "name": name})
+	one := a.collection.FindOne(timeout, primitive.M{"author": author, "name": name, "available": true})
 	if err := one.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -180,7 +180,7 @@ func (a *ArticleDaoService) SelectByAuthorName(author, name string) (*entity.Art
 func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	cursor, err := a.collection.Find(ctx, primitive.M{"author": author})
+	cursor, err := a.collection.Find(ctx, primitive.M{"author": author, "available": true})
 	if err != nil {
 		a.logger.Error(err)
 		return nil, err
@@ -221,7 +221,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 	if equally {
 		v = visibility
 	} else {
-		v = primitive.M{"$neq": visibility}
+		v = primitive.M{"$ne": visibility}
 	}
 	timeout, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -232,6 +232,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		cursor, err = a.collection.Find(timeout,
 			primitive.M{
 				"author":     author,
+				"available":  true,
 				"visibility": v,
 				"tag_list._id": primitive.M{
 					"$all": tagIdList,
@@ -248,6 +249,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		)
 		total, err = a.collection.CountDocuments(timeout, primitive.M{
 			"author":     author,
+			"available":  true,
 			"visibility": v,
 			"tag_list._id": primitive.M{
 				"$all": tagIdList,
@@ -264,6 +266,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		cursor, err = a.collection.Find(timeout,
 			primitive.M{
 				"author":     author,
+				"available":  true,
 				"visibility": v,
 				"tag_list._id": primitive.M{
 					"$all": tagIdList,
@@ -277,6 +280,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		)
 		total, err = a.collection.CountDocuments(timeout, primitive.M{
 			"author":     author,
+			"available":  true,
 			"visibility": v,
 			"tag_list._id": primitive.M{
 				"$all": tagIdList,
@@ -290,6 +294,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		cursor, err = a.collection.Find(timeout,
 			primitive.M{
 				"author":     author,
+				"available":  true,
 				"visibility": v,
 				"$text": primitive.M{
 					"$search": searchKey,
@@ -303,6 +308,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		)
 		total, err = a.collection.CountDocuments(timeout, primitive.M{
 			"author":     author,
+			"available":  true,
 			"visibility": v,
 			"$text": primitive.M{
 				"$search": searchKey,
@@ -316,6 +322,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		cursor, err = a.collection.Find(timeout,
 			primitive.M{
 				"author":     author,
+				"available":  true,
 				"visibility": v,
 			},
 			&options.FindOptions{
@@ -326,6 +333,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		)
 		total, err = a.collection.CountDocuments(timeout, primitive.M{
 			"author":     author,
+			"available":  true,
 			"visibility": v,
 		})
 		if err != nil {

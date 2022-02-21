@@ -73,8 +73,12 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("用户已存在"))
 		return
 	}
-	verCodeCache := ""
-	_ = u.redisOps.Get("ver_code_"+sign.Username, &verCodeCache)
+	verCodeCache, err := u.redisOps.Get("ver_code_" + sign.Username)
+	if err != nil {
+		u.logger.Errorf("无法读取验证码缓存: %v", err)
+		context.JSON(200, resp.NewInternalError("无法读取验证码缓存"))
+		return
+	}
 	if verCodeCache != sign.VerCode {
 		u.logger.Infof("验证码错误: %s", sign.Username)
 		context.JSON(200, resp.NewBadRequest("验证码错误"))
@@ -232,7 +236,7 @@ func (u *UserApiHandler) UpdateUserInfo(context *gin.Context) {
 	}
 	user, err := u.sysUserDao.SelectByUsername(username)
 	if err != nil {
-		u.logger.Errorf("获取用户: %s; %v", username, err)
+		u.logger.Errorf("获取用户失败: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("获取用户"))
 		return
 	}

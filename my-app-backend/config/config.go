@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	absPath, err := filepath.Abs("config.json")
+	absPath, err := filepath.Abs("../config.json")
 	util.JustPanic(err)
 	confFile, err := os.OpenFile(absPath, os.O_RDONLY, os.ModePerm)
 	util.JustPanic(err)

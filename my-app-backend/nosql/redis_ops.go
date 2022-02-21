@@ -12,13 +12,21 @@ import (
 )
 
 type RedisOps interface {
+	// Set 以下都是string的操作
 	Set(key string, value interface{}) error
 
 	SetExp(key string, value interface{}, timeout time.Duration) error
 
-	Get(key string, value interface{}) error
+	Get(key string) (interface{}, error)
 
 	Del(key string) error
+
+	// PushSortQueue 以下都是list的操作
+	PushSortQueue(key string, value interface{}, score float64) error
+
+	PopSortQueue(key string) (*redis.Z, error)
+
+	PeeksSortQueue(key string) (*redis.Z, error)
 }
 
 type RedisClient struct {
@@ -63,11 +71,29 @@ func (r *RedisClient) SetExp(key string, value interface{}, timeout time.Duratio
 	return r.client.Set(r.ctx, key, value, timeout).Err()
 }
 
-func (r *RedisClient) Get(key string, value interface{}) error {
-	return r.client.Get(r.ctx, key).Scan(value)
+func (r *RedisClient) Get(key string) (interface{}, error) {
+	value := interface{}(nil)
+	err := r.client.Get(r.ctx, key).Scan(value)
+	return value, err
 }
 
 func (r *RedisClient) Del(key string) error {
-	//TODO implement me
-	panic("implement me")
+	return r.client.Del(r.ctx, key).Err()
+}
+
+func (r *RedisClient) PushSortQueue(key string, value interface{}, score float64) error {
+	return r.client.ZAdd(r.ctx, key, &redis.Z{
+		Score:  score,
+		Member: value,
+	}).Err()
+}
+
+func (r *RedisClient) PopSortQueue(key string) (*redis.Z, error) {
+	result, err := r.client.ZPopMax(r.ctx, key, 1).Result()
+	return &result[0], err
+}
+
+func (r *RedisClient) PeeksSortQueue(key string) (*redis.Z, error) {
+	result, err := r.client.ZRangeWithScores(r.ctx, key, 0, 0).Result()
+	return &result[0], err
 }

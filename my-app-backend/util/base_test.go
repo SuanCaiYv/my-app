@@ -34,7 +34,7 @@ func TestUpdateStructObject(test *testing.T) {
 
 func TestUpdateStructObjectWithJsonTag(test *testing.T) {
 	result := resp.NewOk("aaa")
-	m := map[string]interface{}{"code": 204, "msg": "bbb"}
+	m := map[string]interface{}{"code": 204.0, "msg": "bbb"}
 	UpdateStructObjectWithJsonTag(result, m)
 	fmt.Println(result)
 }
