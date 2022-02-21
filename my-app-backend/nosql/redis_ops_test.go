@@ -3,6 +3,7 @@ package nosql
 import (
 	"encoding/json"
 	"fmt"
+	redis2 "github.com/go-redis/redis/v8"
 	"testing"
 )
 
@@ -21,23 +22,18 @@ func (t *Tmp) UnmarshalBinary(data []byte) error {
 }
 
 func TestRedisClient_Set(t *testing.T) {
-	ops := NewRedisClient()
-	fmt.Println(ops.Get("tmp"))
 }
 
 func TestRedisClient_PushSortQueue(t *testing.T) {
-	ops := NewRedisClient()
-	tmp1 := Tmp{
+	redis := NewRedisClient()
+	t1 := Tmp{
 		Id:   "aaa",
-		Name: "bbb",
+		Name: "aaa",
 		Age:  1,
 	}
-	ops.PushSortQueue("test", &tmp1, 1)
-	tmp2 := Tmp{
-		Id:   "ccc",
-		Name: "ddd",
-		Age:  2,
-	}
-	ops.PushSortQueue("test", &tmp2, 2)
-	fmt.Println(ops.PeeksSortQueue("test"))
+	redis.PushSortQueue("test", &t1, 1)
+	var t2 *redis2.Z
+	var s *float64
+	redis.PopSortQueue("test", t2, s)
+	fmt.Println(t2)
 }

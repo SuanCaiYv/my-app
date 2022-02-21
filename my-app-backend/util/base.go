@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"github.com/SuanCaiYv/my-app-backend/nosql"
 	"github.com/google/uuid"
 	"mime"
 	"path"
@@ -13,8 +12,6 @@ import (
 type TaskFunc func(args ...interface{}) (interface{}, error)
 
 var logger = NewLogger()
-var funcMap = make(map[string]TaskFunc)
-var redisOps = nosql.NewRedisClient()
 
 func GenerateUUID() string {
 	newUUID, err := uuid.NewUUID()
@@ -62,32 +59,6 @@ func UpdateStructObjectWithJsonTag(old interface{}, m map[string]interface{}) {
 			} else {
 				v.Field(i).Set(reflect.ValueOf(val))
 			}
-		}
-	}
-}
-
-func AddTimedTask(task TaskFunc, toExec time.Time) {
-	uid := GenerateUUID()
-	funcMap[uid] = task
-	err := redisOps.PushSortQueue("timed_task", uid, float64(toExec.UnixMilli()))
-	if err != nil {
-		logger.Error("添加定时任务失败", err)
-	}
-}
-
-func WakeupTimedTask(taskId string) {
-	z, err := redisOps.PeeksSortQueue("timed_task")
-	if err != nil {
-		logger.Error("唤醒定时任务失败", err)
-		return
-	}
-	if time.UnixMilli(int64(z.Score)).After(time.Now()) {
-		return
-	} else {
-		z, err = redisOps.PopSortQueue("timed_task")
-		if err != nil {
-			logger.Error("唤醒定时任务失败", err)
-			return
 		}
 	}
 }

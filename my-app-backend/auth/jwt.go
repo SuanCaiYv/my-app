@@ -15,12 +15,12 @@ var logger = util.NewLogger()
 var sysUserDao = db.NewSysUserDaoService()
 
 func SignAccessToken(username, role string) (accessToken string, err error) {
-	secretKey := ""
-	err = redisOps.Get(username, &secretKey)
+	secretKey0, err := redisOps.Get(username)
 	if err != nil && err != redis.Nil {
 		logger.Errorf("获取JwtId异常: %v", err)
 		return "", err
 	}
+	secretKey := secretKey0.(string)
 	if secretKey == AccountLocked {
 		logger.Errorf("账户已锁定: %s", username)
 		return "", fmt.Errorf("账户已锁定: %s", username)
@@ -42,12 +42,12 @@ func SignAccessToken(username, role string) (accessToken string, err error) {
 }
 
 func SignRefreshToken(username string) (refreshToken string, err error) {
-	secretKey := ""
-	err = redisOps.Get(username, &secretKey)
+	secretKey0, err := redisOps.Get(username)
 	if err != nil && err != redis.Nil {
 		logger.Infof("获取JwtId异常: %v", err)
 		return "", err
 	}
+	secretKey := secretKey0.(string)
 	if secretKey == AccountLocked {
 		logger.Errorf("账户已锁定: %s", username)
 		return "", fmt.Errorf("账户已锁定: %s", username)
@@ -77,9 +77,9 @@ func SignRefreshToken(username string) (refreshToken string, err error) {
 func ValidAccessToken(token string) (username string, role string, err error) {
 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
-			secret := ""
+			secret0, err := redisOps.Get(username)
+			secret := secret0.(string)
 			username = claims.ID
-			err = redisOps.Get(username, &secret)
 			if err != nil {
 				logger.Warn(err)
 			}
@@ -107,9 +107,9 @@ func ValidRefreshToken(token string) (accessToken string, err error) {
 	username := ""
 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
-			secret := ""
+			secret0, err := redisOps.Get(username)
+			secret := secret0.(string)
 			username = claims.ID
-			err = redisOps.Get(username, &secret)
 			if err != nil {
 				logger.Warn(err)
 			}

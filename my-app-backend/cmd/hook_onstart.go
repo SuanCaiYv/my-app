@@ -7,6 +7,7 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
 	"github.com/SuanCaiYv/my-app-backend/nosql"
+	"github.com/SuanCaiYv/my-app-backend/service"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"io/ioutil"
 	"mime"
@@ -91,4 +92,6 @@ func BeforeStart() {
 			util.JustPanic(err)
 		}
 	}
+	service.AddTask(&service.EmptyTask{}, time.Now())
+	service.RunTask()
 }
