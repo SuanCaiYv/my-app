@@ -12,15 +12,15 @@
 import {inject, reactive, Ref, ref, watch} from "vue"
 import Article from "./Article.vue"
 import {httpClient} from "../../net";
-import {ArticleLiteRaw, Response} from "../../common/interface";
+import {ArticleLiteRaw, ArticleRaw, Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
-import {toListResult} from "../../util/base";
+import {toArticleRawWithObject, toListResult} from "../../util/base";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 
 const name = ref<String>("ArticleList")
 // @ts-ignore
-const articleList = reactive<Array<ArticleLiteRaw>>([])
+const articleList = reactive<Array<ArticleRaw>>([])
 const displayStr = ref<string>("none")
 const pageSize = inject("page") as Ref<string>
 const sort = inject("sort") as Ref<string>
@@ -28,20 +28,6 @@ const desc = inject("desc") as Ref<string>
 const searchKey = inject("searchKey") as Ref<string>
 let pageNum = 1
 let endPage = false
-
-class ArticleRawClass implements ArticleLiteRaw {
-    articleId: string
-    articleName: string;
-    summary: string;
-    visibility: number;
-
-    constructor(articleId: string, title: string, body: string, visibility: number) {
-        this.articleId = articleId
-        this.articleName = title;
-        this.summary = body;
-        this.visibility = visibility
-    }
-}
 
 watch(searchKey, () => {
     console.log(searchKey.value)
@@ -94,13 +80,13 @@ const fetchArticles = function () {
     } else {
         descValue = desc.value
     }
-    httpClient.get("/article/list/no_auth", {
+    httpClient.get("/article/list", {
         page_num: pageNum,
         page_size: pageSizeValue,
         sort: sortValue,
         desc: descValue,
         search_key: searchKey.value
-    }, false, function (resp: Response) {
+    }, true, function (resp: Response) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
@@ -109,8 +95,8 @@ const fetchArticles = function () {
             pageNum = list.pageNum
             for (let l of list.list) {
                 // @ts-ignore
-                articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary, l.visibility))
-                storage.set(Constant.ARTICLE_ID + "_" + l.article_id, JSON.stringify(l))
+                articleList.push(toArticleRawWithObject(l))
+                storage.set(Constant.ARTICLE_ID_PREFIX + l.article_id, JSON.stringify(l))
             }
         }
     })

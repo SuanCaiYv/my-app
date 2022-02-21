@@ -86,7 +86,10 @@ export const toListResult = function (data: object): ListResult {
 }
 
 export const toArticleRaw = function (data: string): ArticleRaw {
-    const obj = JSON.parse(data)
+    return toArticleRawWithObject(JSON.parse(data))
+}
+
+export const toArticleRawWithObject = function (obj: any): ArticleRaw {
     let tagList: Array<IdName> = []
     for (let i of obj.tag_list) {
         tagList.push(new IdNameClass(i.tag_id, i.tag_name))

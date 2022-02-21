@@ -43,7 +43,7 @@ const tagList = reactive<Array<IdName>>([])
 
 const articleId = route.params.article_id
 
-let articleCache = storage.get(Constant.ARTICLE_ID + "_" + articleId);
+let articleCache = storage.get(Constant.ARTICLE_ID_PREFIX + articleId);
 let article: ArticleRaw | null = null
 if (articleCache === "") {
     httpClient.get("/article/detail/" + articleId, {}, true, function (resp: Response) {

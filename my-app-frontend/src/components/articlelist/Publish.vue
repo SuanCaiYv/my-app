@@ -1,15 +1,41 @@
 <template>
     <div class="publish">
-        <button class="button" @click="router.push('/editor')">发布文章</button>
+        <button class="button" @click="publish">发布文章</button>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
 import {useRouter} from "vue-router";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alertFunc from "../../util/alert";
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("Publish")
 const router = useRouter()
+
+const publish = function () {
+    httpClient.post("/article/draft", {}, {
+        article_id: "",
+        article_name: new Date(),
+        article_content: ""
+    }, true, function (resp: Response) {
+        if (!resp.ok) {
+            console.log("http failed")
+            alertFunc(resp.errMsg, function () {
+            })
+        } else {
+            // @ts-ignore
+            storage.set(Constant.DRAFT_ARTICLE_ID, resp.data.article_id)
+            storage.set(Constant.ARTICLE_TITLE, "")
+            storage.set(Constant.ARTICLE_CONTENT, "")
+            storage.set(Constant.EDITOR_TYPE, "draft")
+            router.push("/editor/draft")
+        }
+    })
+}
 </script>
 
 <style scoped>

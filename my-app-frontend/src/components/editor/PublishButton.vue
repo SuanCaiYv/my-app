@@ -12,14 +12,7 @@ import {Constant} from "../../common/systemconstant";
 
 const name = ref<string>("PublishButton")
 
-const id = inject("id")
-const title = inject("title")
-const content = inject("content")
-
 const publish = function () {
-    storage.set(Constant.ARTICLE_ID, id.value)
-    storage.set(Constant.ARTICLE_TITLE, title.value)
-    storage.set(Constant.ARTICLE_CONTENT, content.value)
     let divElement = document.createElement("div");
     const instance = createApp(Publish, {
         divNode: divElement,
@@ -44,19 +37,19 @@ const publish = function () {
     margin-left: 0;
     margin-right: calc(100% - 80px);
     padding: 0 20px;
-    border: 2px solid lightgray;
+    border: none;
     box-sizing: border-box;
     border-radius: 18px;
     font-size: 1.0rem;
     font-weight: bolder;
-    background-color: white;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .button:hover {
-    background-color: lightgray;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .button:active {
-    background-color: gainsboro;
+    background-color: rgba(0,0,0,0.2);
 }
 </style>

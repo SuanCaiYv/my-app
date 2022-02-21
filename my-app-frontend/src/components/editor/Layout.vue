@@ -13,14 +13,6 @@ import PH1 from "../placeholder/PH1.vue"
 import Body from "./Body.vue"
 
 const name = ref<string>("Layout")
-
-const id = ref<string>('')
-const title = ref<string>('')
-const content = ref<string>('')
-
-provide("id", id)
-provide("title", title)
-provide("content", content)
 </script>
 
 <style scoped>

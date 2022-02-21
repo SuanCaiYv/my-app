@@ -5,13 +5,13 @@
         <div class="content">{{summary}}</div>
         <PH2></PH2>
         <div class="update">
-            <button class="button">更新</button>
+            <button class="button" @click="upt">更新</button>
         </div>
         <div class="delete">
-            <button class="button">删除</button>
+            <button class="button" @click="del">删除</button>
         </div>
         <div class="visible">
-            <button class="button" @click="setVisibly">{{visibly}}</button>
+            <button class="button" @click="setVisibility">{{visibly}}</button>
         </div>
     </div>
 </template>
@@ -20,37 +20,65 @@
 import {onMounted, ref, watch} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
+import {useRouter} from "vue-router";
+import {confirmFunc} from "../../util/confirm";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alert from "../../util/alert";
 
 const name = ref<string>("Article")
+const router = useRouter()
 const props = defineProps({
+    id: String,
     title: String,
     summary: String,
     visibility: Number,
 })
-const visibly = ref<string>("公开")
-const flag = ref<boolean>(false)
+const visibly = ref<string>()
+const flag = ref<boolean>()
 
-onMounted(() => {
-    if (Number(props.visibility) === 1) {
-        flag.value = false
-    } else if (Number(props.visibility) === 2) {
-       flag.value = true
-    }
-})
-
-const setVisibly = function () {
-    flag.value = !flag.value
+watch(flag,  () => {
     if (flag.value) {
         visibly.value = "公开"
     } else {
         visibly.value = "私密"
     }
+    httpClient.put("/article", {}, {
+        article_id: props.id + "",
+        visibility: flag.value ? 2 : 1
+    }, true, function (resp: Response) {})
+})
+
+onMounted(() => {
+    if (Number(props.visibility) === 1) {
+        flag.value = false
+    } else if (Number(props.visibility) === 2) {
+        flag.value = true
+    }
+})
+
+const setVisibility = function () {
+    flag.value = !flag.value
 }
 
 const upt = function () {
+    storage.set(Constant.UPDATE_ARTICLE_ID, props.id + "")
+    storage.set(Constant.EDITOR_TYPE, "update")
+    router.push("/editor/update")
 }
 
 const del = function () {
+    confirmFunc("确认删除吗？", function () {}, function () {
+        httpClient.delete("/article/" + props.id, {}, true, function (resp: Response) {
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                alert("已删除！", function () {})
+            }
+        })
+    })
 }
 </script>
 

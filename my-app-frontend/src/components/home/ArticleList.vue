@@ -116,7 +116,7 @@ const fetchArticles = function () {
             for (let l of list.list) {
                 // @ts-ignore
                 articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary))
-                storage.set(Constant.ARTICLE_ID + "_" + l.article_id, JSON.stringify(l))
+                storage.set(Constant.ARTICLE_ID_PREFIX + l.article_id, JSON.stringify(l))
             }
             if (articleList.length > 0) {
                 displayStr.value = "inline-block"

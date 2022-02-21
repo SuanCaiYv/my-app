@@ -13,7 +13,7 @@ import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
 import {useRouter} from "vue-router";
 
-const name = ref<String>("Article")
+const name = ref<string>("Article")
 const router = useRouter()
 
 const props = defineProps({

@@ -62,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     // 编辑器
     {
-        path: "/editor",
+        path: "/editor/:type",
         name: "editor",
         component: () => import("../views/Editor.vue")
     },

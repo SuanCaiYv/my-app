@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import {inject, ref} from "vue"
+import {provide, ref} from "vue"
 import Title from "./Title.vue"
 import Edit from "./Edit.vue"
 import Preview from "./Preview.vue"
@@ -16,15 +16,28 @@ import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
+import {useRoute} from "vue-router";
 
 const name = ref<string>("Body")
+const id = ref<string>(storage.get(Constant.DRAFT_ARTICLE_ID))
+const title = ref<string>(storage.get(Constant.ARTICLE_TITLE))
+const content = ref<string>(storage.get(Constant.ARTICLE_CONTENT))
+const route = useRoute()
+provide("id", id)
+provide("title", title)
+provide("content", content)
 
-const id = inject("id")
-const title = inject("title")
-const content = inject("content")
+const type = route.params.type
+if (type === "update") {
+    id.value = storage.get(Constant.UPDATE_ARTICLE_ID)
+} else if (type === "draft") {
+    id.value = storage.get(Constant.DRAFT_ARTICLE_ID)
+} else {
+    console.log("fuck error")
+}
 
 const saveDraft = function () {
-    storage.set(Constant.ARTICLE_ID, id.value)
+    storage.set(Constant.DRAFT_ARTICLE_ID, id.value)
     storage.set(Constant.ARTICLE_TITLE, title.value)
     storage.set(Constant.ARTICLE_CONTENT, content.value)
     httpClient.post("/article/draft", {}, {
@@ -45,7 +58,6 @@ const saveDraft = function () {
 }
 
 saveDraft()
-
 const cancel = setInterval(saveDraft, 5000)
 storage.set(Constant.DRAFT_INTERVAL_CANCEL, cancel + "")
 </script>

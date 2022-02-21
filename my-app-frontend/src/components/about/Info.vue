@@ -110,7 +110,6 @@ const getWeather = function () {
             return resp.json()
         })
         .then(function (data) {
-            console.log(data)
             if (data.code !== "200") {
                 region.value = "地址出错啦！"
                 return
@@ -148,10 +147,10 @@ if (storage.get(Constant.LOCAL_COORDINATE) === "") {
 }
 
 const fetchLatestArticle = function () {
-    httpClient.get("/article/list/no_auth", {
+    httpClient.get("/article/list", {
         sort: "release_time",
         desc: false,
-    }, false, function (resp: Response) {
+    }, true, function (resp: Response) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
@@ -164,10 +163,10 @@ const fetchLatestArticle = function () {
     })
 }
 const fetchLatestUpdate = function () {
-    httpClient.get("/article/list/no_auth", {
+    httpClient.get("/article/list", {
         sort: "updated_time",
         desc: false,
-    }, false, function (resp: Response) {
+    }, true, function (resp: Response) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {

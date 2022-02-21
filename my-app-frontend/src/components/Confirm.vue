@@ -42,8 +42,9 @@ const confirm = function () {
     transform: translate(-50%, 0);
     top: 20%;
     background: white;
-    border-radius: 4px;
+    border-radius: 24px;
     padding: 24px;
+    font-weight: bolder;
     z-index: 1001;
 }
 
@@ -57,6 +58,7 @@ const confirm = function () {
 .cancel-button {
     min-width: 80px;
     padding: 8px 24px;
+    font-weight: bolder;
     text-align: center;
     background: dodgerblue;
     border: 0;
@@ -64,13 +66,14 @@ const confirm = function () {
     float: left;
     margin-left: 50px;
     color: white;
-    border-radius: 4px;
+    border-radius: 18px;
     cursor: pointer;
 }
 
 .confirm-button {
     min-width: 80px;
     padding: 8px 24px;
+    font-weight: bolder;
     text-align: center;
     background: dodgerblue;
     border: 0;
@@ -78,7 +81,7 @@ const confirm = function () {
     float: right;
     margin-right: 50px;
     color: white;
-    border-radius: 4px;
+    border-radius: 18px;
     cursor: pointer;
 }
 

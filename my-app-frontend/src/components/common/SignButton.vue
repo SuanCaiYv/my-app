@@ -10,10 +10,18 @@ import {useRouter} from "vue-router";
 import storage from "../../util/storage"
 import {parseBoolean} from "../../util/base";
 import {Constant} from "../../common/systemconstant";
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
 
-const name = ref<String>("SignButton")
+const name = ref<string>("SignButton")
+const state = ref<string>("Sign")
 
-const state = ref<String>("Sign")
+httpClient.put("/sign", {}, {}, true, function (resp: Response) {
+    if (!resp.ok) {
+        storage.set(Constant.ACCESS_TOKEN, "")
+        storage.set(Constant.AUTHENTICATED, "false")
+    }
+})
 
 // todo
 if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {

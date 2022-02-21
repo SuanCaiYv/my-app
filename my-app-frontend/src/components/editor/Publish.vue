@@ -37,13 +37,6 @@
                             :delete-func="cancelTagList"></ChoiceItem>
             </div>
         </div>
-        <div class="rollback">
-            <select class="select" v-model="chosenRollback">
-                <option value="" selected>选择回滚</option>
-                <option v-for="item in rollbackList" :value="item.id">{{ item.name }}</option>
-            </select>
-            <div class="fill-all-show-value">{{ chosenRollback }}</div>
-        </div>
         <div class="brief">
             <textarea class="textarea" placeholder="来点文章简介吧！" v-model="summary"></textarea>
         </div>
@@ -65,35 +58,28 @@ import alertFunc from "../../util/alert";
 import {marked} from "marked";
 
 const name = ref<string>("Publish")
-
 const props = defineProps({
     divNode: Node
 })
-
 const notification = ref<string>("")
 const notificationColor = ref<string>("blue")
 let covImg: string | Blob | null = null
 let covImgPath = ref<string>("")
-
 let visibility = ref<boolean>(false)
 let visibilityFlag = ref<string>("私密文章")
 let visibilityMsg = ref<string>("此文章仅允许作者阅览")
-
 const kindList = reactive<Array<IdName>>([])
 const chosenKindList = reactive<Array<IdName>>([])
 const chosenKind = ref<string>('')
 const kindMap = new Map<string, string>()
 const newKind = ref<string>('')
-
 const tagList = reactive<Array<IdName>>([])
 const chosenTagList = reactive<Array<IdName>>([])
 const chosenTag = ref<string>('')
 const tagMap = new Map<string, string>()
 const newTag = ref<string>('')
-
 const rollbackList = reactive<Array<IdName>>([])
 const chosenRollback = ref<string>('')
-
 const summary = ref<string>('')
 
 class IdAndValue implements IdName {
@@ -107,6 +93,13 @@ class IdAndValue implements IdName {
         } else {
             this.name = value0
         }
+    }
+}
+if (storage.get(Constant.EDITOR_TYPE) === "update") {
+    const article = JSON.parse(storage.get(Constant.ARTICLE_ID_PREFIX + storage.get(Constant.UPDATE_ARTICLE_ID)))
+    chosenKindList.push(new IdAndValue(article.kind.kind_id, article.kind.kind_name))
+    for (let i of article.tag_list) {
+        chosenTagList.push(new IdAndValue(i.tag_id, i.tag_name))
     }
 }
 
@@ -264,7 +257,15 @@ const close = function () {
     document.getElementById("app").removeChild(props.divNode)
 }
 const publish = function () {
-    const id = storage.get(Constant.ARTICLE_ID)
+    let id = ""
+    const type = storage.get(Constant.EDITOR_TYPE)
+    if (type === "draft") {
+        id = storage.get(Constant.DRAFT_ARTICLE_ID)
+    } else if (type === "update") {
+        id = storage.get(Constant.UPDATE_ARTICLE_ID)
+    } else {
+        return
+    }
     const title = storage.get(Constant.ARTICLE_TITLE)
     const content = storage.get(Constant.ARTICLE_CONTENT)
     let covImgUrl = ""
@@ -348,11 +349,10 @@ const publish = function () {
         "cov-img visibility"
         "kind-list chosen-kind-list"
         "tag-list chosen-tag-list"
-        "rollback rollback"
         "brief brief"
         "done done";
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 40px 60px 60px 60px 60px 160px 60px;
+    grid-template-rows: 40px 60px 60px 60px 220px 60px;
     background-color: white;
 }
 
@@ -417,15 +417,6 @@ const publish = function () {
     width: 100%;
     height: 100%;
     grid-area: chosen-tag-list;
-    display: inline-block;
-    font-size: 1rem;
-    font-weight: bolder;
-}
-
-.rollback {
-    width: 100%;
-    height: 100%;
-    grid-area: rollback;
     display: inline-block;
     font-size: 1rem;
     font-weight: bolder;
@@ -581,16 +572,6 @@ span:after {
     background-color: rgba(0, 0, 0, 0.07);
 }
 
-.fill-all-show-value {
-    width: 700px;
-    height: 44px;
-    margin: 8px 5px 8px 10px;
-    border-radius: 30px;
-    display: inline-block;
-    vertical-align: bottom;
-    background-color: rgba(0, 0, 0, 0.07);
-}
-
 .publish-mask {
     width: 100%;
     height: 100%;
@@ -603,8 +584,8 @@ span:after {
 }
 
 .textarea {
-    width: 784px;
-    height: 144px;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
     border: 2px solid antiquewhite;
     box-sizing: border-box;
     border-radius: 8px;

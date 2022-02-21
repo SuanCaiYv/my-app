@@ -6,10 +6,18 @@
 
 <script setup lang="ts">
 import {inject, ref} from "vue"
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
+import {useRoute} from "vue-router";
 
 const name = ref<string>("Title")
-
 const title = inject("title")
+const id = inject("id")
+const route = useRoute()
+if (route.params.type === "update") {
+    const article = JSON.parse(storage.get(Constant.ARTICLE_ID_PREFIX + id.value))
+    title.value = article.article_name
+}
 </script>
 
 <style scoped>

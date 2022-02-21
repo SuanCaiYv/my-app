@@ -8,10 +8,18 @@
 import {inject, ref} from "vue"
 import {baseUrl, httpClient} from "../../net";
 import {Response} from "../../common/interface";
+import storage from "../../util/storage";
+import {Constant} from "../../common/systemconstant";
+import {useRoute} from "vue-router";
 
 const name = ref<string>("Edit")
-
 const content = inject("content")
+const id = inject("id")
+const route = useRoute()
+if (route.params.type === "update") {
+    const article = JSON.parse(storage.get(Constant.ARTICLE_ID_PREFIX + id.value))
+    content.value = article.content
+}
 
 document.addEventListener('paste', function (event: ClipboardEvent) {
     const items = event.clipboardData && event.clipboardData.items
