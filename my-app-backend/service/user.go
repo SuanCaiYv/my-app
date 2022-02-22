@@ -73,7 +73,8 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 		context.JSON(200, resp.NewBadRequest("用户已存在"))
 		return
 	}
-	verCodeCache, err := u.redisOps.Get("ver_code_" + sign.Username)
+	verCodeCache := ""
+	err = u.redisOps.Get("ver_code_"+sign.Username, &verCodeCache)
 	if err != nil {
 		u.logger.Errorf("无法读取验证码缓存: %v", err)
 		context.JSON(200, resp.NewInternalError("无法读取验证码缓存"))

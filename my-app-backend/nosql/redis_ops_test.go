@@ -3,7 +3,6 @@ package nosql
 import (
 	"encoding/json"
 	"fmt"
-	redis2 "github.com/go-redis/redis/v8"
 	"testing"
 )
 
@@ -26,14 +25,15 @@ func TestRedisClient_Set(t *testing.T) {
 
 func TestRedisClient_PushSortQueue(t *testing.T) {
 	redis := NewRedisClient()
-	t1 := Tmp{
-		Id:   "aaa",
-		Name: "aaa",
-		Age:  1,
-	}
-	redis.PushSortQueue("test", &t1, 1)
-	var t2 *redis2.Z
-	var s *float64
-	redis.PopSortQueue("test", t2, s)
-	fmt.Println(t2)
+	//t1 := Tmp{
+	//	Id:   "aaa",
+	//	Name: "aaa",
+	//	Age:  1,
+	//}
+	//redis.PushSortQueue("test", &t1, 1)
+	params := make(map[string]interface{})
+	params["aaa"] = "aaa"
+	params["bbb"] = 2
+	err := redis.PushSortQueue("test", params, 1)
+	fmt.Println(err)
 }

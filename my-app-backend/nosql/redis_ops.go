@@ -2,6 +2,7 @@ package nosql
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	config2 "github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/util"
@@ -26,7 +27,7 @@ type RedisOps interface {
 
 	PopSortQueue(key string, value interface{}, score *float64) error
 
-	PeeksSortQueue(key string, value interface{}, score *float64) error
+	PeekSortQueue(key string, value interface{}, score *float64) error
 }
 
 type RedisClient struct {
@@ -80,11 +81,15 @@ func (r *RedisClient) Del(key string) error {
 }
 
 func (r *RedisClient) PushSortQueue(key string, value interface{}, score float64) error {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
 	timeout, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	return r.client.ZAdd(timeout, key, &redis.Z{
 		Score:  score,
-		Member: value,
+		Member: bytes,
 	}).Err()
 }
 
@@ -93,11 +98,29 @@ func (r *RedisClient) PopSortQueue(key string, value interface{}, score *float64
 	if err != nil {
 		return err
 	}
-	value = &results[0]
+	if len(results) == 0 {
+		return nil
+	}
+	err = json.Unmarshal([]byte(results[0].Member.(string)), value)
+	if err != nil {
+		return err
+	}
+	*score = results[0].Score
 	return nil
 }
 
-func (r *RedisClient) PeeksSortQueue(key string) (*redis.Z, error) {
-	result, err := r.client.ZRangeWithScores(r.ctx, key, 0, 0).Result()
-	return &result[0], err
+func (r *RedisClient) PeekSortQueue(key string, value interface{}, score *float64) error {
+	results, err := r.client.ZRangeWithScores(r.ctx, key, 0, 1).Result()
+	if err != nil {
+		return err
+	}
+	if len(results) == 0 {
+		return nil
+	}
+	err = json.Unmarshal([]byte(results[0].Member.(string)), value)
+	if err != nil {
+		return err
+	}
+	*score = results[0].Score
+	return nil
 }
