@@ -93,5 +93,5 @@ func BeforeStart() {
 		}
 	}
 	service.AddTask(&service.EmptyTask{}, time.Now())
-	service.RunTask()
+	service.runTask()
 }

@@ -99,7 +99,7 @@ func (r *RedisClient) PopSortQueue(key string, value interface{}, score *float64
 		return err
 	}
 	if len(results) == 0 {
-		return nil
+		return redis.Nil
 	}
 	err = json.Unmarshal([]byte(results[0].Member.(string)), value)
 	if err != nil {
@@ -115,7 +115,7 @@ func (r *RedisClient) PeekSortQueue(key string, value interface{}, score *float6
 		return err
 	}
 	if len(results) == 0 {
-		return nil
+		return redis.Nil
 	}
 	err = json.Unmarshal([]byte(results[0].Member.(string)), value)
 	if err != nil {

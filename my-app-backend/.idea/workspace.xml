@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天" />
+    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天">
+      <change beforePath="$PROJECT_DIR$/cmd/hook_onstart.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/hook_onstart.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nosql/redis_ops.go" beforeDir="false" afterPath="$PROJECT_DIR$/nosql/redis_ops.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/scheduled.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/scheduled.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/scheduled_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/scheduled_test.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -62,7 +67,15 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql">
+  <component name="RunManager" selected="Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="my-app-backend" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build github.com/SuanCaiYv/my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="my-app-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -70,6 +83,18 @@
       <package value="github.com/SuanCaiYv/my-app-backend/cmd" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/cmd/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestAddFunc in github.com/SuanCaiYv/my-app-backend/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="my-app-backend" />
+      <working_directory value="$PROJECT_DIR$/service" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/SuanCaiYv/my-app-backend/service" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestAddFunc\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -108,8 +133,18 @@
       <pattern value="^\QTestUpdateStructObjectWithJsonTag\E$" />
       <method v="2" />
     </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="my-app-backend" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service" />
         <item itemvalue="Go Test.TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql" />
         <item itemvalue="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd" />
         <item itemvalue="Go Test.TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util" />
