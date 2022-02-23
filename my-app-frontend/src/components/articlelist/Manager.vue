@@ -1,13 +1,15 @@
 <template>
     <div class="manager">
-        <button class="button">其他管理</button>
+        <button class="button" @click="router.push('/state_manager')">其他管理</button>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import {useRouter} from "vue-router";
 
-const name = ref<String>("Manager")
+const name = ref<string>("Manager")
+const router = useRouter()
 </script>
 
 <style scoped>

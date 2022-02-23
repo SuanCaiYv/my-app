@@ -33,8 +33,8 @@
                 <div class="value">{{lastedUpdate}}</div>
             </div>
             <div>
-                <div class="name">最多标签</div>
-                <div class="value">{{mostTag}}</div>
+                <div class="name">最新标签</div>
+                <div class="value">{{ newestTag }}</div>
             </div>
             <div>
                 <div class="name">最新文章</div>
@@ -66,7 +66,7 @@ const iconDir = "../../icons/"
 const total = ref<number>(0)
 const lastedUpdate = ref<string>('暂无更新')
 const lastedAdd = ref<string>('暂无文章')
-const mostTag = ref<string>('暂无标签')
+const newestTag = ref<string>('暂无标签')
 
 const region = ref<string>('')
 let coordinate = ''
@@ -98,7 +98,6 @@ const getCoordinate = function () {
         .then(function (data) {
             coordinate = data.location[0].lon + "," + data.location[0].lat
             storage.set(Constant.LOCAL_COORDINATE, coordinate)
-            console.log(coordinate)
             getWeather()
         })
 }
@@ -177,9 +176,25 @@ const fetchLatestUpdate = function () {
         }
     })
 }
+const fetchNewestTag = function () {
+    httpClient.get("/article/tag_list", {
+        page_num: -1,
+    }, false, function (resp: Response) {
+        if (!resp.ok) {
+            alertFunc(resp.errMsg, function () {})
+        } else {
+            console.log(resp.data)
+            const list = toListResult(resp.data)
+            if (list.list.length > 0) {
+                newestTag.value = list.list[0].tag_name
+            }
+        }
+    })
+}
 
 fetchLatestArticle()
 fetchLatestUpdate()
+fetchNewestTag()
 </script>
 
 <style scoped>

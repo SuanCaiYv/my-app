@@ -1,5 +1,5 @@
 <template>
-    <div class="articleList">
+    <div class="article-list">
         <div style="margin-bottom: -25px"></div>
         <div v-for="article in articleList">
             <Article :id="article.articleId" :title="article.articleName" :summary="article.summary"></Article>
@@ -139,7 +139,7 @@ fetchArticles()
 </script>
 
 <style scoped>
-.articleList {
+.article-list {
     width: 100%;
     height: 100%;
     grid-area: articleList;

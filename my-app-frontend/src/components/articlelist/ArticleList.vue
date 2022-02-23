@@ -12,7 +12,7 @@
 import {inject, reactive, Ref, ref, watch} from "vue"
 import Article from "./Article.vue"
 import {httpClient} from "../../net";
-import {ArticleLiteRaw, ArticleRaw, Response} from "../../common/interface";
+import {ArticleRaw, Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 import {toArticleRawWithObject, toListResult} from "../../util/base";
 import storage from "../../util/storage";

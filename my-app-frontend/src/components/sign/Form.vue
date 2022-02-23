@@ -38,7 +38,8 @@ storage.setOnce(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, (new Date().getTime() 
 
 const sendVerCode = function () {
     if (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP)) < 120 * 1000) {
-        alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP))) / 1000) + "秒后重试", function () {})
+        alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP))) / 1000) + "秒后重试", function () {
+        })
         return
     }
     setTimeout(() => {
@@ -48,7 +49,8 @@ const sendVerCode = function () {
         username: username.value
     }, false, function (resp: Response) {
         if (resp.ok) {
-            alertFunc("验证码发送成功!", function () {})
+            alertFunc("验证码发送成功!", function () {
+            })
             storage.set(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, new Date().getTime() + "")
         }
     })
@@ -60,11 +62,13 @@ const jumpHome = function () {
 
 const login = function () {
     if (username.value === "") {
-        alertFunc("用户名为空", function () {})
+        alertFunc("用户名为空", function () {
+        })
         return
     }
     if (password.value === "") {
-        alertFunc("密码为空", function () {})
+        alertFunc("密码为空", function () {
+        })
         return
     }
     httpClient.put("/sign", {}, {
@@ -76,27 +80,31 @@ const login = function () {
             storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
             // @ts-ignore
             storage.set(Constant.REFRESH_TOKEN, resp.data.refresh_token)
-           storage.set(Constant.AUTHENTICATED, "true")
+            storage.set(Constant.AUTHENTICATED, "true")
             alertFunc("登录成功", function () {
                 jumpHome()
             })
         } else {
-            alertFunc(resp.errMsg, function () {})
+            alertFunc(resp.errMsg, function () {
+            })
         }
     })
 }
 
 const signup = function () {
     if (username.value === "") {
-        alertFunc("用户名为空", function () {})
+        alertFunc("用户名为空", function () {
+        })
         return
     }
     if (password.value === "") {
-        alertFunc("密码为空", function () {})
+        alertFunc("密码为空", function () {
+        })
         return
     }
     if (verCode.value === "") {
-        alertFunc("验证码为空", function () {})
+        alertFunc("验证码为空", function () {
+        })
         return
     }
     httpClient.post("/sign", {}, {
@@ -105,9 +113,11 @@ const signup = function () {
         ver_code: verCode.value
     }, false, function (resp: Response) {
         if (resp.ok) {
-            alertFunc("注册成功", function () {})
+            alertFunc("注册成功", function () {
+            })
         } else {
-            alertFunc(resp.errMsg, function () {})
+            alertFunc(resp.errMsg, function () {
+            })
         }
     })
 }
@@ -120,7 +130,7 @@ const signup = function () {
     grid-area: form;
     border: none;
     border-radius: 18px;
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .l1 {
