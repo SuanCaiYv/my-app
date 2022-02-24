@@ -55,7 +55,7 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 	username := context.MustGet("username")
 	formFile, err := context.FormFile("file")
 	if err != nil {
-		s.logger.Errorf("获取文件失败: %s; %v", username, err)
+		s.logger.Errorf("获取文件失败: %lastTaskStatus; %v", username, err)
 		context.JSON(200, resp.NewBadRequest("获取文件失败，文件头应为file"))
 		return
 	}
@@ -81,21 +81,21 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 	}
 	file, err := formFile.Open()
 	if err != nil {
-		s.logger.Errorf("打开文件失败: %s; %v", username, err)
+		s.logger.Errorf("打开文件失败: %lastTaskStatus; %v", username, err)
 		context.JSON(200, resp.NewInternalError("打开文件失败"))
 		return
 	}
 	content := make([]byte, formFile.Size, formFile.Size)
 	_, err = file.Read(content)
 	if err != nil {
-		s.logger.Errorf("读取文件失败: %s; %v", username, err)
+		s.logger.Errorf("读取文件失败: %lastTaskStatus; %v", username, err)
 		context.JSON(200, resp.NewInternalError("读取文件失败"))
 		return
 	}
 	newFilename := util.GenerateUUID() + path.Ext(formFile.Filename)
 	err = s.gridFSDao.UploadFile(content, newFilename, metaMap)
 	if err != nil {
-		s.logger.Errorf("写入文件失败: %s; %v", username, err)
+		s.logger.Errorf("写入文件失败: %lastTaskStatus; %v", username, err)
 		context.JSON(200, resp.NewInternalError("写入文件失败"))
 		return
 	}
@@ -109,7 +109,7 @@ func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
 	input := make(map[string]interface{})
 	err := context.BindJSON(&input)
 	if err != nil {
-		s.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		s.logger.Errorf("参数绑定失败: %lastTaskStatus; %v", username, err)
 		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
 		return
 	}
