@@ -446,7 +446,7 @@ func (k *KindDaoService) Insert(kind *entity.Kind) error {
 func (k *KindDaoService) Select(id string) (*entity.Kind, error) {
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	one := k.collection.FindOne(timeout, primitive.M{"_id": id})
+	one := k.collection.FindOne(timeout, primitive.M{"_id": id, "available": true})
 	if err := one.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -466,7 +466,7 @@ func (k *KindDaoService) Select(id string) (*entity.Kind, error) {
 func (k *KindDaoService) SelectByName(name string) (*entity.Kind, error) {
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	one := k.collection.FindOne(timeout, primitive.M{"name": name})
+	one := k.collection.FindOne(timeout, primitive.M{"name": name, "available": true})
 	if err := one.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -504,7 +504,7 @@ func (k *KindDaoService) Delete(id string) error {
 func (k *KindDaoService) ListAll() ([]entity.Kind, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	cursor, err := k.collection.Find(ctx, primitive.M{})
+	cursor, err := k.collection.Find(ctx, primitive.M{"available": true})
 	if err != nil {
 		k.logger.Error(err)
 		return nil, err
@@ -569,7 +569,7 @@ func (t *TagDaoService) Insert(tag *entity.Tag) error {
 func (t *TagDaoService) Select(id string) (*entity.Tag, error) {
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	one := t.collection.FindOne(timeout, primitive.M{"_id": id})
+	one := t.collection.FindOne(timeout, primitive.M{"_id": id, "available": true})
 	if err := one.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -589,7 +589,7 @@ func (t *TagDaoService) Select(id string) (*entity.Tag, error) {
 func (t *TagDaoService) SelectByName(name string) (*entity.Tag, error) {
 	timeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancelFunc()
-	one := t.collection.FindOne(timeout, primitive.M{"name": name})
+	one := t.collection.FindOne(timeout, primitive.M{"name": name, "available": true})
 	if err := one.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -627,7 +627,7 @@ func (t *TagDaoService) Delete(id string) error {
 func (t *TagDaoService) ListAll() ([]entity.Tag, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	cursor, err := t.collection.Find(ctx, primitive.M{})
+	cursor, err := t.collection.Find(ctx, primitive.M{"available": true})
 	if err != nil {
 		t.logger.Error(err)
 		return nil, err

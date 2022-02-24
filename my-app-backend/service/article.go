@@ -42,6 +42,10 @@ type ArticleApi interface {
 	KindList(context *gin.Context)
 
 	TagList(context *gin.Context)
+
+	DeleteKind(context *gin.Context)
+
+	DeleteTag(context *gin.Context)
 }
 
 type ArticleApiHandler struct {
@@ -158,11 +162,14 @@ func (a *ArticleApiHandler) UploadDraft(context *gin.Context) {
 			input.ArticleName = time.Now().String()
 		}
 		article := entity.Article{
-			Name:        input.ArticleName,
-			Author:      user.Id,
-			Summary:     "",
-			CoverImg:    "",
-			Catalog:     entity.Catalog{},
+			Name:     input.ArticleName,
+			Author:   user.Id,
+			Summary:  "",
+			CoverImg: "",
+			Catalog: entity.Catalog{
+				Name:     "",
+				Children: []entity.Catalog{},
+			},
 			Content:     input.ArticleContent,
 			Kind:        entity.Kind{},
 			TagList:     make([]entity.Tag, 0, 0),
@@ -362,6 +369,9 @@ func (a *ArticleApiHandler) ListDraft(context *gin.Context) {
 	}
 	var list []entity.Article
 	var total int64
+	var endPage bool
+	// 故意这么写的，因为我要测试这个函数的bug
+	Add("clearDraft", make(Params), time.Now())
 	if pageNum == -1 {
 		list, err = a.articleDao.ListByAuthor0(user.Id, entity.VisibilityDraft, true)
 		if err != nil {
@@ -369,10 +379,12 @@ func (a *ArticleApiHandler) ListDraft(context *gin.Context) {
 			context.JSON(200, resp.NewInternalError("获取文章列表失败"))
 			return
 		}
+		endPage = true
+		total = int64(len(list))
 	} else {
 		a.logger.Info(pageNum, pageSize)
 	}
-	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum+1), true, list))
+	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, list))
 }
 
 func (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {
@@ -490,6 +502,8 @@ func (a *ArticleApiHandler) KindList(context *gin.Context) {
 	}
 	a.logger.Info(pageNum, pageSize)
 	var list []entity.Kind
+	var total int64
+	var endPage bool
 	if pageNum == -1 {
 		list, err = a.kindDao.ListAll()
 		if err != nil {
@@ -497,10 +511,12 @@ func (a *ArticleApiHandler) KindList(context *gin.Context) {
 			context.JSON(200, resp.NewInternalError("获取分类列表失败"))
 			return
 		}
+		total = int64(len(list))
+		endPage = true
 	} else {
 		// TODO
 	}
-	context.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))
+	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), endPage, list))
 }
 
 func (a *ArticleApiHandler) TagList(context *gin.Context) {
@@ -519,6 +535,8 @@ func (a *ArticleApiHandler) TagList(context *gin.Context) {
 	}
 	a.logger.Info(pageNum, pageSize)
 	var list []entity.Tag
+	var total int64
+	var endPage bool
 	if pageNum == -1 {
 		list, err = a.tagDao.ListAll()
 		if err != nil {
@@ -526,8 +544,45 @@ func (a *ArticleApiHandler) TagList(context *gin.Context) {
 			context.JSON(200, resp.NewInternalError("获取分类列表失败"))
 			return
 		}
+		total = int64(len(list))
+		endPage = true
 	} else {
 		// TODO
 	}
-	context.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))
+	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), endPage, list))
 }
+
+func (a *ArticleApiHandler) DeleteKind(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	id := context.Param("kind_id")
+	if id == "" {
+		a.logger.Errorf("KindId为空: %s", username)
+		context.JSON(200, resp.NewBadRequest("KindId为空"))
+		return
+	}
+	err := a.kindDao.Delete(id)
+	if err != nil {
+		a.logger.Errorf("删除分类失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("删除分类失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
+}
+
+func (a *ArticleApiHandler) DeleteTag(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	id := context.Param("tag_id")
+	if id == "" {
+		a.logger.Errorf("TagId为空: %s", username)
+		context.JSON(200, resp.NewBadRequest("TagId为空"))
+		return
+	}
+	err := a.tagDao.Delete(id)
+	if err != nil {
+		a.logger.Errorf("删除标签失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("删除标签失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
+}
+

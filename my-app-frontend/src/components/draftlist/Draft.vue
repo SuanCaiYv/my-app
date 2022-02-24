@@ -2,7 +2,7 @@
     <div class="draft" @click="upt">
         <PH1></PH1>
         <div class="title">{{title}}</div>
-        <div class="content">{{summary}}</div>
+        <div class="content">{{content}}</div>
         <PH2></PH2>
     </div>
 </template>
@@ -21,7 +21,7 @@ const router = useRouter()
 const props = defineProps({
     id: String,
     title: String,
-    summary: String,
+    content: String,
 })
 
 const upt = function () {
@@ -66,6 +66,7 @@ const upt = function () {
     height: 100%;
     grid-area: content;
     border: none;
+    padding: 8px;
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;

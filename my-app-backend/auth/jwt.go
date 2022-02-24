@@ -77,12 +77,12 @@ func SignRefreshToken(username string) (refreshToken string, err error) {
 func ValidAccessToken(token string) (username string, role string, err error) {
 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
+			username = claims.ID
 			secret := ""
 			err = redisOps.Get(username, &secret)
 			if err != nil {
 				logger.Warn(err)
 			}
-			username = claims.ID
 			return []byte(secret), nil
 		}
 		return []byte("Failed!"), nil
@@ -107,12 +107,12 @@ func ValidRefreshToken(token string) (accessToken string, err error) {
 	username := ""
 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
+			username = claims.ID
 			secret := ""
 			err = redisOps.Get(username, &secret)
 			if err != nil {
 				logger.Warn(err)
 			}
-			username = claims.ID
 			return []byte(secret), nil
 		}
 		return []byte("Failed!"), nil

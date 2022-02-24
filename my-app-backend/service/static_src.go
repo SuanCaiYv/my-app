@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -17,7 +18,11 @@ type StaticSrcApi interface {
 
 	UploadFile(context *gin.Context)
 
+	DeleteFile(context *gin.Context)
+
 	ExistFile(context *gin.Context)
+
+	ListFile(context *gin.Context)
 }
 
 type StaticSrcApiHandler struct {
@@ -104,6 +109,18 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 	}{Filename: newFilename}))
 }
 
+func (s *StaticSrcApiHandler) DeleteFile(context *gin.Context) {
+	username := context.MustGet("username")
+	filename := context.Param("filename")
+	err := s.gridFSDao.DeleteFile(filename)
+	if err != nil {
+		s.logger.Errorf("删除文件失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("删除文件失败"))
+		return
+	}
+	context.JSON(200, resp.NewBoolean(true))
+}
+
 func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
 	username := context.MustGet("username")
 	input := make(map[string]interface{})
@@ -115,4 +132,41 @@ func (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {
 	}
 	existFile := s.gridFSDao.ExistFile(input["filename"].(string))
 	context.JSON(200, resp.NewBoolean(existFile))
+}
+
+func (s *StaticSrcApiHandler) ListFile(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		s.logger.Errorf("获取分页大小失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("获取分页大小失败"))
+		return
+	}
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		s.logger.Errorf("获取分页页码失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("获取分页页码失败"))
+		return
+	}
+	archive := context.DefaultQuery("archive", "other")
+	if err != nil {
+		s.logger.Errorf("获取分页页码失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("获取分页页码失败"))
+		return
+	}
+	var list []string
+	var total int64
+	var endPage bool
+	if pageNum == -1 {
+		list, err = s.gridFSDao.ListByArchive0(archive)
+		if err != nil {
+			s.logger.Errorf("获取归档列表失败: %s; %v", "no-auth", err)
+			context.JSON(200, resp.NewInternalError("获取归档列表失败"))
+			return
+		}
+		endPage = true
+	} else {
+		s.logger.Info(pageNum, pageSize)
+	}
+	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, list))
 }

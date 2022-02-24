@@ -83,7 +83,7 @@ func NewBoolean(result bool) *Result {
 }
 
 type s struct {
-	Result string `json:"result"`
+	Msg string `json:"msg"`
 }
 
 func NewString(result string) *Result {

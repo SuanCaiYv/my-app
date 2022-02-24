@@ -1,5 +1,5 @@
 <template>
-    <div class="article">
+    <div class="article" @click="router.push('/view/' + id)">
         <PH1></PH1>
         <div class="title">{{title}}</div>
         <div class="content">{{summary}}</div>
@@ -117,6 +117,7 @@ const del = function () {
     height: 100%;
     grid-area: content;
     border: none;
+    padding: 8px;
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;

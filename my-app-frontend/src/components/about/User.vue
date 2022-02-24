@@ -195,8 +195,6 @@ const updateSignature = function () {
     width: 100%;
     height: 100%;
     grid-area: user;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     display: grid;
     grid-template-areas: "ph1 col1 col2 col3 col4 ph2";
     grid-template-columns: 1fr 200px 330px 330px 330px 1fr;
@@ -206,40 +204,24 @@ const updateSignature = function () {
     width: 100%;
     height: 100%;
     grid-area: col1;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 
 .col2 {
     width: 100%;
     height: 100%;
     grid-area: col2;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 
 .col3 {
     width: 100%;
     height: 100%;
     grid-area: col3;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 
 .col4 {
     width: 100%;
     height: 100%;
     grid-area: col4;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
-}
-
-.col5 {
-    width: 100%;
-    height: 100%;
-    grid-area: col5;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 
 .img {
@@ -249,6 +231,7 @@ const updateSignature = function () {
     border: none;
     border-radius: 150px;
     box-sizing: border-box;
+    object-fit: cover;
 }
 
 .img:active {

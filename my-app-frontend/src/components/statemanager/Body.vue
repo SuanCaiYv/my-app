@@ -1,21 +1,130 @@
 <template>
     <div class="body">
+        <div style="margin-top: 80px"></div>
         <div class="block-name">分类管理</div>
         <div class="kind-list">
-            <KindOrTagItem></KindOrTagItem>
+            <div v-for="item in kindList" style="display: inline-block">
+                <KindOrTagItem :id="item.id" :name="item.name"></KindOrTagItem>
+            </div>
         </div>
         <div class="block-name">标签管理</div>
-        <div class="tag-list"></div>
+        <div class="tag-list">
+            <div v-for="item in tagList" style="display: inline-block">
+                <KindOrTagItem :id="item.id" :name="item.name"></KindOrTagItem>
+            </div>
+        </div>
         <div class="block-name">图片管理</div>
-        <div class="img-list"></div>
+        <div class="img-list">
+            <div v-for="item in imgList" style="display: inline-block">
+                <img class="img" :src="item" @click="deleteImg(item)">
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {reactive, ref} from "vue"
 import KindOrTagItem from "../common/KindOrTagItem.vue"
+import {IdName, Response} from "../../common/interface";
+import {baseUrl, httpClient} from "../../net";
+import {toListResult} from "../../util/base";
+import alertFunc from "../../util/alert";
+import {confirmFunc} from "../../util/confirm";
 
-const name = ref<String>("Body")
+const name = ref<string>("Body")
+const kindList = reactive<Array<IdName>>([])
+const tagList = reactive<Array<IdName>>([])
+const imgList = reactive<Array<string>>([])
+
+class IdNameClass implements IdName {
+    id: string;
+    name: string;
+
+    constructor(id: string, name: string) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+const fetchKindList = function () {
+    httpClient.get("/article/kind_list", {
+        page_num: -1,
+        page_size: 10
+    },false, function (resp: Response) {
+        if (!resp.ok) {
+            console.log(resp.errMsg)
+        } else {
+            const list = toListResult(resp.data)
+            for (let l of list.list) {
+                kindList.push(new IdNameClass(l.kind_id, l.kind_name))
+            }
+        }
+    })
+}
+
+const fetchTagList = function () {
+    httpClient.get("/article/tag_list", {
+        page_num: -1,
+        page_size: 10
+    },false, function (resp: Response) {
+        if (!resp.ok) {
+            console.log(resp.errMsg)
+        } else {
+            const list = toListResult(resp.data)
+            for (let l of list.list) {
+                tagList.push(new IdNameClass(l.tag_id, l.tag_name))
+            }
+        }
+    })
+}
+
+const fetchImgList = function () {
+    httpClient.get("/static/file/list", {
+        page_num: -1,
+        page_size: 10,
+        archive: "doc_img",
+    },true, function (resp: Response) {
+        if (!resp.ok) {
+            console.log(resp.errMsg)
+        } else {
+            const list = toListResult(resp.data)
+            for (let l of list.list) {
+                imgList.push(baseUrl + "/static/a/" + l)
+            }
+        }
+    })
+    httpClient.get("/static/file/list", {
+        page_num: -1,
+        page_size: 10,
+        archive: "avatar",
+    },true, function (resp: Response) {
+        if (!resp.ok) {
+            console.log(resp.errMsg)
+        } else {
+            const list = toListResult(resp.data)
+            for (let l of list.list) {
+                imgList.push(baseUrl + "/static/a/" + l)
+            }
+        }
+    })
+}
+
+const deleteImg = function (id: string) {
+    confirmFunc("确认删除？", function () {}, function () {
+        id = id.replace(baseUrl + "/static/a/", "")
+        httpClient.delete("/static/file/" + id, {},true, function (resp: Response) {
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                alertFunc("删除成功", function () {})
+            }
+        })
+    })
+}
+
+fetchKindList()
+fetchTagList()
+fetchImgList()
 </script>
 
 <style scoped>
@@ -23,49 +132,51 @@ const name = ref<String>("Body")
     width: 100%;
     height: 100%;
     grid-area: body;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
 }
 
 .block-name {
     width: 200px;
     height: 40px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     border-radius: 18px;
     margin-top: 20px;
-    text-align: center;
+    text-align: left;
     line-height: 40px;
-    font-size: 1.4rem;
-    background-color: rgba(255,0,154,0.11);
+    font-size: 1.6rem;
+    font-weight: bolder;
+    background-color: white;
 }
 
 .kind-list {
     width: 100%;
-    min-height: 200px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
+    height: auto;
     border-radius: 16px;
     text-align: left;
-    background-color: rgba(255,0,12,0.05);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .tag-list {
     width: 100%;
-    min-height: 200px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
+    height: auto;
     border-radius: 16px;
     text-align: left;
-    background-color: rgba(168,0,255,0.11);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .img-list {
     width: 100%;
-    min-height: 400px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
+    height: auto;
     border-radius: 16px;
-    background-color: rgba(121,121,121,0.11);
+    text-align: left;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.img {
+    width: auto;
+    max-height: 200px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 0;
+    object-fit: cover;
+    display: inline-block;
 }
 </style>

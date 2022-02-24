@@ -58,6 +58,7 @@ const props = defineProps({
     height: 100%;
     grid-area: content;
     border: none;
+    padding: 8px;
     box-sizing: border-box;
     border-radius: 0 16px 16px 16px;
     display: inline-block;

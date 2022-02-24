@@ -1,65 +1,77 @@
 <template>
     <div class="kind-or-tag">
-        <div class="value">{{ name }}</div>
-        <button class="delete" @click="del">✖️</button>
+        <div class="value">{{ props.name }}</div>
+        <div class="delete" @click="del">✖️</div>
     </div>
 </template>
 
 <script setup lang="ts">
 import {ref} from "vue"
+import {httpClient} from "../../net";
+import {Response} from "../../common/interface";
+import alertFunc from "../../util/alert";
+import {confirmFunc} from "../../util/confirm";
 
 const name = ref<string>("KindOrTagItem")
 
 const props = defineProps({
     id: String,
     name: String,
-    deleteFunc: Function,
 })
 
 const del = function () {
-    // @ts-ignore
-    props.deleteFunc(props.id)
+    confirmFunc("确认删除?", function () {}, function () {
+        httpClient.delete("/article/tag/" + props.id, {}, true, function (resp: Response) {
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                alertFunc("删除成功", function () {})
+            }
+        })
+    })
 }
 </script>
 
 <style scoped>
 .kind-or-tag {
-    min-width: 1px;
+    width: auto;
     height: 30px;
+    margin: 10px 5px;
     border-radius: 16px;
-    margin-left: 10px;
-    margin-top: 10px;
     display: inline-block;
-    background-color: darkgrey;
+    background-color: rgba(0,0,0,0.25);
 }
 
 .value {
-    min-width: 1px;
-    height: 30px;
+    width: auto;
+    height: 100%;
+    border-radius: 16px;
+    padding-left: 8px;
+    padding-right: 4px;
     display: inline-block;
     text-align: left;
     line-height: 30px;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+    font-weight: bolder;
     vertical-align: bottom;
 }
 
 .delete {
-    width: 30px;
-    height: 30px;
+    width: auto;
+    height: 100%;
     border: none;
     border-radius: 16px;
-    padding: 0;
     display: inline-block;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+    line-height: 30px;
     vertical-align: bottom;
-    background-color: darkgrey;
 }
 
 .delete:hover {
-    background-color: lightgrey;
+    background-color: rgba(0,0,0,0.15);
 }
 
 .delete:active {
-    background-color: snow;
+    background-color: rgba(0,0,0,0.3);
 }
 </style>

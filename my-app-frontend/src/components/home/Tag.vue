@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
 
-const name = ref<String>("Tag")
+const name = ref<string>("Tag")
 
 const props = defineProps({
     id: String,
@@ -15,7 +15,7 @@ const props = defineProps({
     clickFunc: Function
 })
 
-const isActive = ref<Boolean>(false)
+const isActive = ref<boolean>(false)
 
 const clicked = function () {
     isActive.value = !isActive.value

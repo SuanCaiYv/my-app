@@ -14,28 +14,26 @@ func TestAdd(t *testing.T) {
 	curr := time.Now()
 
 	params1 := make(Params)
-	params1["str"] = "hello"
+	params1["str"] = "02"
 	Add("print", params1, curr.Add(time.Second*2))
 
 	params2 := make(Params)
-	params2["str"] = "world"
+	params2["str"] = "05"
 	Add("print", params2, curr.Add(time.Second*5))
 
 	params3 := make(Params)
-	params3["str"] = "foo"
+	params3["str"] = "03"
 	Add("print", params3, curr.Add(time.Second*3))
 
 	params4 := make(Params)
-	params4["str"] = "bar"
+	params4["str"] = "00"
 	Add("print", params4, curr)
 
-	params5 := make(Params)
-	params5["str"] = "msl"
-	Add("print", params5, curr.Add(time.Second*6))
-
-	params6 := make(Params)
-	params6["str"] = "cwb"
-	Add("print", params6, curr.Add(time.Second))
+	for i := 0; i < 100; i += 1 {
+		params := make(Params)
+		params["str"] = fmt.Sprintf("%d", i)
+		Add("print", params, time.Now())
+	}
 
 	time.Sleep(math.MaxInt64)
 }

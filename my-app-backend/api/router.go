@@ -77,6 +77,7 @@ func Route() {
 		article.GET("/doc/:article_id", articleApi.ExportArticle)
 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
 		article.GET("/detail/:article_id", articleApi.ArticleDetail)
+		article.GET("/draft/list", articleApi.ListDraft)
 		article.GET("/img_fetch", wsApi.ImageFetch)
 		article.PUT("", articleApi.UpdateArticle)
 		article.POST("", articleApi.AddArticle)
@@ -84,10 +85,14 @@ func Route() {
 		article.POST("/tag", articleApi.AddTag)
 		article.POST("/draft", articleApi.UploadDraft)
 		article.DELETE("/:article_id", articleApi.DeleteArticle)
+		article.DELETE("/kind/:kind_id", articleApi.DeleteKind)
+		article.DELETE("tag/:tag_id", articleApi.DeleteTag)
 
 		// 静态资源接口
 		file := versionOne.Group("/static")
+		file.GET("/file/list", staticSrcApi.ListFile)
 		file.POST("/file", staticSrcApi.UploadFile)
+		file.DELETE("/file/:filename", staticSrcApi.DeleteFile)
 
 		// 其他接口
 		other := versionOne.Group("")

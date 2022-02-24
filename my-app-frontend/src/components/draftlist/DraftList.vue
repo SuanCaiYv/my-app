@@ -2,7 +2,7 @@
     <div class="draft-list">
         <div style="margin-bottom: -25px"></div>
         <div v-for="draft in draftList">
-            <Draft :id="draft.articleId" :title="draft.articleName" :summary="draft.summary"></Draft>
+            <Draft :id="draft.articleId" :title="draft.articleName" :content="draft.content"></Draft>
         </div>
     </div>
 </template>
@@ -34,6 +34,7 @@ const fetchDraftList = function () {
                 // @ts-ignore
                 draftList.push(toArticleRawWithObject(l))
                 storage.set(Constant.ARTICLE_ID_PREFIX + l.article_id, JSON.stringify(l))
+                console.log(l)
             }
         }
     })

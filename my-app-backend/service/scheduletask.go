@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/nosql"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/go-redis/redis/v8"
@@ -39,6 +40,7 @@ const (
 const (
 	FunctionName = "function_name"
 	Id           = "_id"
+	Timestamp    = "timestamp"
 	RedisKey     = "schedule_task"
 )
 
@@ -50,11 +52,13 @@ func AddFunction(name string, fn Func) {
 
 func Add(funcName string, params Params, timestamp time.Time) {
 	params[FunctionName] = funcName
-	params[Id] = util.GenerateUUID()
-	err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp.UnixMilli()))
+	params[Id] = fmt.Sprintf("%d", timestamp.UnixMicro())
+	params[Timestamp] = timestamp.UnixMicro()
+	err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp.UnixMicro()))
 	if err != nil {
 		scheduleLogger.Error(err)
 	}
+	// 实现串形化添加任务
 	wakeupSignal <- struct{}{}
 }
 
@@ -79,6 +83,8 @@ func pullTask() {
 */
 
 // 这狗屎逻辑过三天就只有上帝知道它是怎么跑的了
+// 每次重新添加任务都必须调用编排方法，防止出现多线程下添加后，定时任务无法被唤醒的bug
+// 我不知道有没有潜在的bug，先这么写，应该是没问题了，又是原子操作又是禁止重排序的
 func choreographyTask() {
 	params := make(Params)
 	timestamp0 := new(float64)
@@ -94,18 +100,18 @@ func choreographyTask() {
 	if timestamp < newestTimestamp {
 		if newestTimestamp == math.MaxInt64 {
 			newestTimestamp = timestamp
-			d := time.Duration(timestamp-time.Now().UnixMilli()) * time.Millisecond
+			d := time.Duration(timestamp-time.Now().UnixMicro()) * time.Microsecond
 			timer := time.After(d)
 			go func(params Params) {
 				select {
 				case <-timer:
 					if !atomic.CompareAndSwapInt64(&lastTaskStatus, ReadyStart, Started) {
-						scheduleLogger.Infof("schedule task: %s is started too fast! But can be canceled.", params[Id])
-						err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp))
+						scheduleLogger.Warnf("schedule task: %s is started too fast! But can be canceled.", params[Id])
+						err := redisClient.PushSortQueue(RedisKey, params, params[Timestamp].(float64))
 						if err != nil {
 							scheduleLogger.Error(err)
 						}
-						return
+						break
 					}
 					if fnName, ok := params[FunctionName]; ok {
 						if fn, ok := funcMap[fnName.(string)]; ok {
@@ -121,20 +127,19 @@ func choreographyTask() {
 						newestTimestamp = math.MaxInt64
 					}
 					scheduleLogger.Infof("schedule task: %s is finished!", params[Id])
-					// 调用编排任务方法
-					choreographyTask()
-					return
 				case <-cancelLastTaskSignal:
 					// 记得重新添加回去
-					err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp))
+					err := redisClient.PushSortQueue(RedisKey, params, params[Timestamp].(float64))
 					if err != nil {
 						scheduleLogger.Error(err)
+					} else {
+						// 允许下一次执行，使用else语句产生数据依赖，消除instruction-reorder
+						newestTimestamp = math.MaxInt64
 					}
-					// 允许下一次执行
-					newestTimestamp = math.MaxInt64
 					scheduleLogger.Infof("this task: %s is canceled!", params[Id])
-					return
 				}
+				// 调用编排任务方法
+				choreographyTask()
 			}(params)
 		} else {
 			// 已经有别的任务在等待调度
@@ -143,23 +148,26 @@ func choreographyTask() {
 				// 取消失败，自行消化取消信号
 				<-cancelLastTaskSignal
 				// 取消失败后，成功的任务会自行调用编排方法
-				scheduleLogger.Info("schedule task already started.")
+				scheduleLogger.Warnf("schedule task already started.")
 			} else {
 				atomic.CompareAndSwapInt64(&lastTaskStatus, DoNotStart, ReadyStart)
 				scheduleLogger.Infof("success to cancel schedule task: %s", params[Id])
 				// 给自己归位
-				err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp))
+				err := redisClient.PushSortQueue(RedisKey, params, params[Timestamp].(float64))
 				if err != nil {
 					scheduleLogger.Error(err)
 				}
+				// 调用编排任务方法
 				choreographyTask()
 			}
 		}
 	} else {
 		// 给人家归位
-		err := redisClient.PushSortQueue(RedisKey, params, float64(timestamp))
+		err := redisClient.PushSortQueue(RedisKey, params, params[Timestamp].(float64))
 		if err != nil {
 			scheduleLogger.Error(err)
 		}
+		// 调用编排任务方法
+		choreographyTask()
 	}
 }
