@@ -116,7 +116,10 @@ func choreographyTask() {
 						panic("something wrong with schedule task!")
 					}
 					// 允许下一次执行
-					newestTimestamp = math.MaxInt64
+					if lastTaskStatus == ReadyStart {
+						// 使用if语句产生数据依赖，消除instruction-reorder
+						newestTimestamp = math.MaxInt64
+					}
 					scheduleLogger.Infof("schedule task: %s is finished!", params[Id])
 					// 调用编排任务方法
 					choreographyTask()

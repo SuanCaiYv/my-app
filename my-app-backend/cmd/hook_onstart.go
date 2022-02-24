@@ -7,6 +7,7 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
 	"github.com/SuanCaiYv/my-app-backend/nosql"
+	"github.com/SuanCaiYv/my-app-backend/service"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"io/ioutil"
 	"mime"
@@ -79,16 +80,22 @@ func BeforeStart() {
 	// 设置文件后缀识别
 	_ = mime.AddExtensionType(".md", "text/x-markdown")
 	// 启动文章清除器
-	articleDao := db.NewArticleDaoService()
-	ownerUser, err := sysUserDao.SelectByUsername(config.Owner)
-	util.JustPanic(err)
-	articles, err := articleDao.ListByAuthor0(ownerUser.Id)
-	util.JustPanic(err)
-	threshold := time.UnixMilli(time.Now().UnixMilli() - 2*time.Hour.Milliseconds())
-	for i := range articles {
-		if articles[i].UpdatedTime.Before(threshold) && articles[i].Content == "" {
-			err := articleDao.Delete0(articles[i].Id)
-			util.JustPanic(err)
+	clearFunc := func(params service.Params) {
+		articleDao := db.NewArticleDaoService()
+		sysUserDao := db.NewSysUserDaoService()
+		user, err := sysUserDao.SelectByUsername(config2.ApplicationConfiguration().Owner)
+		util.JustPanic(err)
+		articles, err := articleDao.ListByAuthor0(user.Id, entity.VisibilityDraft, true)
+		util.JustPanic(err)
+		curr := time.Now()
+		for i := range articles {
+			if articles[i].UpdatedTime.Before(curr.Add(-2*time.Minute)) && len(articles[i].Name) == 0 && len(articles[i].Content) == 0 {
+				err = articleDao.Delete(articles[i].Id)
+				util.JustPanic(err)
+			}
 		}
+		service.Add("clearFunc", make(service.Params), time.Now().Add(2*time.Minute))
 	}
+	service.AddFunction("clearFunc", clearFunc)
+	service.Add("clearFunc", make(service.Params), time.Now())
 }

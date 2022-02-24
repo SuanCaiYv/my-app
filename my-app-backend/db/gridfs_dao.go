@@ -143,9 +143,21 @@ func (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, e
 }
 
 func (g *GridFSDaoService) ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error) {
+	skip := (pgNum - 1) * pgNum
 	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
 	defer cancel()
-	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"metadata": primitive.M{"archive": archive}})
+	cursor, err := g.bucket.GetFilesCollection().Find(ctx,
+		primitive.M{
+			"metadata": primitive.M{
+				"archive": archive,
+			},
+		},
+		&options.FindOptions{
+			Limit: &pgSize,
+			Skip:  &skip,
+			Sort:  primitive.M{"uploadDate": -1},
+		},
+	)
 	if err != nil {
 		g.logger.Errorf("按照归档列举失败，归档名: %s", archive)
 		return nil, 0, err

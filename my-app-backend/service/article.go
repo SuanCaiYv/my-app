@@ -27,6 +27,8 @@ type ArticleApi interface {
 
 	ListArticle(context *gin.Context)
 
+	ListDraft(context *gin.Context)
+
 	ArticleDetail(context *gin.Context)
 
 	ExportArticle(context *gin.Context)
@@ -241,11 +243,26 @@ func (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {
 }
 
 func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
-	pageSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
-	pageNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %v", err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %v", err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
 	sort := context.DefaultQuery("sort", "created_time")
 	// 是否倒序
-	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	desc, err := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %v", err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
 	searchKey := context.DefaultQuery("search_key", "")
 	tagIds := context.DefaultQuery("tag_id_list", "")
 	var tagIdList []string
@@ -276,11 +293,26 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 
 func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 	username := context.MustGet("username").(string)
-	pageSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
-	pageNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
 	sort := context.DefaultQuery("sort", "created_time")
 	// 是否倒序
-	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	desc, err := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
 	searchKey := context.DefaultQuery("search_key", "")
 	tagIds := context.DefaultQuery("tag_id_list", "")
 	var tagIdList []string
@@ -306,6 +338,41 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 		endPage = true
 	}
 	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))
+}
+
+func (a *ArticleApiHandler) ListDraft(context *gin.Context) {
+	username := context.MustGet("username").(string)
+	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
+	if err != nil {
+		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
+		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
+		return
+	}
+	user, err := a.sysUserDao.SelectByUsername(username)
+	if err != nil {
+		a.logger.Errorf("无法读取SysUser数据表: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("无法读取用户表"))
+		return
+	}
+	var list []entity.Article
+	var total int64
+	if pageNum == -1 {
+		list, err = a.articleDao.ListByAuthor0(user.Id, entity.VisibilityDraft, true)
+		if err != nil {
+			a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
+			context.JSON(200, resp.NewInternalError("获取文章列表失败"))
+			return
+		}
+	} else {
+		a.logger.Info(pageNum, pageSize)
+	}
+	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum+1), true, list))
 }
 
 func (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {

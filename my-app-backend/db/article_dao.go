@@ -23,7 +23,7 @@ type ArticleDao interface {
 	SelectByAuthorName(author, name string) (*entity.Article, error)
 
 	// ListByAuthor0 未分页版本
-	ListByAuthor0(author string) ([]entity.Article, error)
+	ListByAuthor0(author string, visibility int, equally bool) ([]entity.Article, error)
 
 	ListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)
 
@@ -116,7 +116,12 @@ func newInstanceArticleDaoService() {
 			},
 		})
 		util.JustPanic(err)
-		_, err = collection.InsertOne(ctx, &entity.Article{Id: "000000000000000000000001"})
+		_, err = collection.InsertOne(ctx, &entity.Article{
+			Id:      "000000000000000000000001",
+			Author:  "program",
+			Name:    "Welcome to My Blog",
+			Content: "Welcome to My Blog, this is the first article, you can edit it by yourself.",
+		})
 		util.JustPanic(err)
 	}
 	instanceArticleDaoService = &ArticleDaoService{
@@ -177,10 +182,21 @@ func (a *ArticleDaoService) SelectByAuthorName(author, name string) (*entity.Art
 	return &result, nil
 }
 
-func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, error) {
+func (a *ArticleDaoService) ListByAuthor0(author string, visibility int, equally bool) ([]entity.Article, error) {
+	var v interface{}
+	if equally {
+		v = visibility
+	} else {
+		v = primitive.M{"$ne": visibility}
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	cursor, err := a.collection.Find(ctx, primitive.M{"author": author, "available": true})
+	cursor, err := a.collection.Find(ctx,
+		primitive.M{
+			"author":     author,
+			"available":  true,
+			"visibility": v,
+		})
 	if err != nil {
 		a.logger.Error(err)
 		return nil, err

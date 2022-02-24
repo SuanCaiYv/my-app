@@ -102,7 +102,9 @@ const updateAvatar = function (event: Event) {
             alertFunc(resp.errMsg, function () {})
         } else {
             let url = baseUrl + "/static/a/" + resp.data.filename
-            httpClient.put("/user/info", {}, {
+            httpClient.put("/user/info", {
+                archive: "avatar"
+            }, {
                 avatar: url
             }, true, function (resp: Response) {
                 if (!resp.ok) {

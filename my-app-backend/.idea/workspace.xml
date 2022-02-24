@@ -4,14 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="基于Redis封装了持久化定时任务Util">
-      <change afterPath="$PROJECT_DIR$/service/sceduletask_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/scheduletask.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/hook_onstart.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/hook_onstart.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/scheduled.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/scheduled_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/static_src.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/static_src.go" afterDir="false" />
+    <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天">
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/article_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/article_dao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/gridfs_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/gridfs_dao.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/article.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/scheduletask.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/scheduletask.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +26,7 @@
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -70,7 +69,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestAdd in github.com/SuanCaiYv/my-app-backend/service">
+  <component name="RunManager" selected="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd">
     <configuration name="go build github.com/SuanCaiYv/my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="my-app-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -179,12 +178,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/static_src.go</url>
-          <line>101</line>
+          <line>98</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/service/article.go</url>
-          <line>426</line>
+          <line>390</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
