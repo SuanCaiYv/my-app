@@ -1,0 +1,574 @@
+Index: config/config.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package config\n\nimport (\n\t\"encoding/json\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"os\"\n\t\"path/filepath\"\n)\n\nfunc init() {\n\tabsPath, err := filepath.Abs(\"../config.json\")\n\tutil.JustPanic(err)\n\tconfFile, err := os.OpenFile(absPath, os.O_RDONLY, os.ModePerm)\n\tutil.JustPanic(err)\n\tfileInfo, err := confFile.Stat()\n\tutil.JustPanic(err)\n\tbytes := make([]byte, fileInfo.Size(), fileInfo.Size())\n\t_, err = confFile.Read(bytes)\n\tutil.JustPanic(err)\n\tconfigObject := make(map[string]interface{})\n\terr = json.Unmarshal(bytes, &configObject)\n\tutil.JustPanic(err)\n\n\tdatabase := configObject[\"database\"].(map[string]interface{})\n\ttmpRoles := configObject[\"roles\"].([]interface{})\n\troles := make([]Role, 0, len(tmpRoles))\n\tfor _, val := range tmpRoles {\n\t\trole := val.(map[string]interface{})\n\t\troles = append(roles, Role{\n\t\t\tName: role[\"name\"].(string),\n\t\t\tDesc: role[\"desc\"].(string),\n\t\t})\n\t}\n\tredis := configObject[\"redis\"].(map[string]interface{})\n\ttmpAccounts := configObject[\"accounts\"].([]interface{})\n\taccounts := make([]Account, 0, len(tmpAccounts))\n\taccountSet := make(Set)\n\tfor _, val := range tmpAccounts {\n\t\ttmpAccount := val.(map[string]interface{})\n\t\taccounts = append(accounts, Account{\n\t\t\tUsername:   tmpAccount[\"username\"].(string),\n\t\t\tCredential: tmpAccount[\"credential\"].(string),\n\t\t\tVerCode:    tmpAccount[\"ver_code\"].(string),\n\t\t})\n\t\taccountSet[tmpAccount[\"username\"].(string)] = struct{}{}\n\t}\n\tconfig = &Configuration{\n\t\tOwner: configObject[\"owner\"].(string),\n\t\tDatabaseConfig: &DatabaseConfig{\n\t\t\tUrl:      database[\"url\"].(string),\n\t\t\tPort:     int(database[\"port\"].(float64)),\n\t\t\tDB:       database[\"db\"].(string),\n\t\t\tGridFSDB: database[\"grid_fs_db\"].(string),\n\t\t\tUser:     database[\"user\"].(string),\n\t\t\tPassword: database[\"password\"].(string),\n\t\t},\n\t\tRedisConfig: &RedisConfig{\n\t\t\tUrl:      redis[\"url\"].(string),\n\t\t\tPort:     int(redis[\"port\"].(float64)),\n\t\t\tDB:       int(redis[\"db\"].(float64)),\n\t\t\tUser:     redis[\"user\"].(string),\n\t\t\tPassword: redis[\"password\"].(string),\n\t\t},\n\t\tRoles:      roles,\n\t\tAccounts:   accounts,\n\t\tAccountSet: accountSet,\n\t}\n}\n\ntype Set map[string]struct{}\n\ntype Configuration struct {\n\tOwner          string\n\tDatabaseConfig *DatabaseConfig\n\tRedisConfig    *RedisConfig\n\tRoles          []Role\n\tAccounts       []Account\n\tAccountSet     Set\n}\n\ntype DatabaseConfig struct {\n\tUrl      string\n\tPort     int\n\tDB       string\n\tGridFSDB string\n\tUser     string\n\tPassword string\n}\n\ntype RedisConfig struct {\n\tUrl      string\n\tPort     int\n\tDB       int\n\tUser     string\n\tPassword string\n}\n\ntype Role struct {\n\tName string\n\tDesc string\n}\n\ntype Account struct {\n\tUsername   string\n\tCredential string\n\tVerCode    string\n}\n\nvar config *Configuration\n\nfunc ApplicationConfiguration() *Configuration {\n\treturn config\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/config.go b/config/config.go
+--- a/config/config.go	
++++ b/config/config.go	
+@@ -8,7 +8,7 @@
+ )
+ 
+ func init() {
+-	absPath, err := filepath.Abs("../config.json")
++	absPath, err := filepath.Abs("config.json")
+ 	util.JustPanic(err)
+ 	confFile, err := os.OpenFile(absPath, os.O_RDONLY, os.ModePerm)
+ 	util.JustPanic(err)
+Index: db/gridfs_dao.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package db\n\nimport (\n\tcontext2 \"context\"\n\t\"fmt\"\n\tconfig2 \"github.com/SuanCaiYv/my-app-backend/config\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/sirupsen/logrus\"\n\t\"go.mongodb.org/mongo-driver/bson\"\n\t\"go.mongodb.org/mongo-driver/bson/primitive\"\n\t\"go.mongodb.org/mongo-driver/mongo\"\n\t\"go.mongodb.org/mongo-driver/mongo/gridfs\"\n\t\"go.mongodb.org/mongo-driver/mongo/options\"\n\t\"os\"\n\t\"sync\"\n\t\"time\"\n)\n\ntype GridFSDao interface {\n\tUploadFile(fileContent []byte, filename string, metaData primitive.M) error\n\n\tModifyFile(file os.File) error\n\n\tDownloadFile(filename string) ([]byte, primitive.M, error)\n\n\tListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error)\n\n\tDeleteFile(filename string) error\n\n\tExistFile(filename string) bool\n}\n\ntype GridFSDaoService struct {\n\tbucket *gridfs.Bucket\n\tlogger *logrus.Logger\n}\n\nvar (\n\tinstanceGridFSDaoService *GridFSDaoService\n\tonceGridFSDaoService     sync.Once\n)\n\nfunc NewGridFSDaoService() *GridFSDaoService {\n\tonceGridFSDaoService.Do(newInstanceGridFSDaoService)\n\treturn instanceGridFSDaoService\n}\n\nfunc newInstanceGridFSDaoService() {\n\tlogger := util.NewLogger()\n\tconfig := config2.ApplicationConfiguration()\n\tctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)\n\tdefer cancel()\n\turl := fmt.Sprintf(\"%s:%d\", config.DatabaseConfig.Url, config.DatabaseConfig.Port)\n\tclient, err := mongo.Connect(ctx, options.Client().ApplyURI(url))\n\tutil.JustPanic(err)\n\tbucket, err := gridfs.NewBucket(client.Database(config.DatabaseConfig.GridFSDB))\n\tutil.JustPanic(err)\n\tinstanceGridFSDaoService = &GridFSDaoService{\n\t\tbucket,\n\t\tlogger,\n\t}\n}\n\nfunc (g *GridFSDaoService) UploadFile(fileContent []byte, filename string, metaData primitive.M) error {\n\t// 设置自定义元数据\n\toption := options.GridFSUpload()\n\toption.SetMetadata(metaData)\n\t// 打开上传流，其实就是Insert Files，这里面的option用于设置Files的meta字段，打开流就是初始化Files一条记录的过程\n\t// Files负责管理文件分片，即chunks表\n\tuploadStream, err := g.bucket.OpenUploadStream(filename, option)\n\tdefer func(uploadStream *gridfs.UploadStream) {\n\t\t_ = uploadStream.Close()\n\t}(uploadStream)\n\tif err != nil {\n\t\tg.logger.Errorf(\"打开GridFS上传流失败: %v\", err)\n\t\treturn err\n\t}\n\t_, err = uploadStream.Write(fileContent)\n\tif err != nil {\n\t\tg.logger.Errorf(\"上传文件至GridFS失败: %v\", err)\n\t\treturn err\n\t}\n\treturn nil\n}\n\nfunc (g *GridFSDaoService) ModifyFile(file os.File) error {\n\t//TODO implement me\n\tpanic(\"implement me\")\n}\n\nfunc (g *GridFSDaoService) DownloadFile(filename string) ([]byte, primitive.M, error) {\n\tctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)\n\tdefer cancel()\n\t// 以文件名作为字段查找Files，目的是为了获取它保存的我们自定义的元数据\n\tcursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{\"filename\": filename})\n\tif err != nil {\n\t\tg.logger.Errorf(\"查找files失败，文件名: %s\", filename)\n\t\treturn nil, nil, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context2.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tg.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tvar gFile *gridfs.File = nil\n\tfor cursor.Next(ctx) {\n\t\tfile := gridfs.File{}\n\t\terr := cursor.Decode(&file)\n\t\tif err != nil {\n\t\t\treturn nil, nil, err\n\t\t}\n\t\tgFile = &file\n\t}\n\tif gFile == nil {\n\t\treturn nil, nil, nil\n\t}\n\t// 通过文件Id找到所有文件切片并下载，也可以通过传递文件名实现，传递文件名的实现类似我们上面的写法\n\tdownloadStream, err := g.bucket.OpenDownloadStream(gFile.ID)\n\tdefer func(downloadStream *gridfs.DownloadStream) {\n\t\t_ = downloadStream.Close()\n\t}(downloadStream)\n\tif err != nil {\n\t\tg.logger.Errorf(\"打开下载流失败: %v\", err)\n\t\treturn nil, nil, err\n\t}\n\tsize := downloadStream.GetFile().Length\n\tdata := make([]byte, size, size)\n\t// 反序列化元数据\n\t_, err = downloadStream.Read(data)\n\tif err != nil {\n\t\tg.logger.Errorf(\"读取文件失败: %v\", err)\n\t\treturn nil, nil, err\n\t}\n\tmeta := gFile.Metadata\n\tmeteData := make(map[string]interface{})\n\terr = bson.Unmarshal(meta, &meteData)\n\tif err != nil {\n\t\tg.logger.Error(err)\n\t\treturn nil, nil, err\n\t}\n\treturn data, meteData, nil\n}\n\nfunc (g *GridFSDaoService) ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error) {\n\tctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)\n\tdefer cancel()\n\tcursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{\"metadata\": primitive.M{\"archive\": archive}})\n\tif err != nil {\n\t\tg.logger.Errorf(\"按照归档列举失败，归档名: %s\", archive)\n\t\treturn nil, 0, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context2.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tg.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tresults := make([]string, 0, pgNum)\n\tfor cursor.Next(ctx) {\n\t\tfile := gridfs.File{}\n\t\terr := cursor.Decode(&file)\n\t\tif err != nil {\n\t\t\treturn nil, 0, err\n\t\t}\n\t\tresults = append(results, file.Name)\n\t}\n\ttotal, err := g.bucket.GetFilesCollection().CountDocuments(ctx, bson.M{\"metadata\": primitive.M{\"archive\": archive}})\n\tif err != nil {\n\t\tg.logger.Error(err)\n\t\treturn nil, 0, err\n\t}\n\treturn results, total, nil\n}\n\nfunc (g *GridFSDaoService) DeleteFile(filename string) error {\n\tctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)\n\tdefer cancel()\n\tcursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{\"filename\": filename})\n\tif err != nil {\n\t\tg.logger.Errorf(\"查找files失败，文件名: %s\", filename)\n\t\treturn err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context2.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tg.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tvar gFile *gridfs.File = nil\n\tfor cursor.Next(ctx) {\n\t\tfile := gridfs.File{}\n\t\terr := cursor.Decode(&file)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tgFile = &file\n\t}\n\tif gFile != nil {\n\t\terr = g.bucket.Delete(gFile.ID)\n\t\tif err != nil {\n\t\t\tg.logger.Errorf(\"删除chunks失败，文件名: %s\", filename)\n\t\t\treturn err\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc (g *GridFSDaoService) ExistFile(filename string) bool {\n\tctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)\n\tdefer cancel()\n\tcursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{\"filename\": filename})\n\tif err != nil {\n\t\tg.logger.Errorf(\"查找files失败，文件名: %s\", filename)\n\t\treturn false\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context2.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tg.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tvar gFile *gridfs.File = nil\n\tfor cursor.Next(ctx) {\n\t\tfile := gridfs.File{}\n\t\terr := cursor.Decode(&file)\n\t\tif err != nil {\n\t\t\treturn false\n\t\t}\n\t\tgFile = &file\n\t}\n\treturn gFile != nil\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/db/gridfs_dao.go b/db/gridfs_dao.go
+--- a/db/gridfs_dao.go	
++++ b/db/gridfs_dao.go	
+@@ -25,6 +25,8 @@
+ 
+ 	ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error)
+ 
++	ListByArchive0(archive string) ([]string, error)
++
+ 	DeleteFile(filename string) error
+ 
+ 	ExistFile(filename string) bool
+@@ -143,9 +145,18 @@
+ }
+ 
+ func (g *GridFSDaoService) ListByArchive(archive string, pgNum, pgSize int64) ([]string, int64, error) {
++	skip := (pgNum - 1) * pgNum
+ 	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
+ 	defer cancel()
+-	cursor, err := g.bucket.GetFilesCollection().Find(ctx, bson.M{"metadata": primitive.M{"archive": archive}})
++	cursor, err := g.bucket.GetFilesCollection().Find(ctx,
++		primitive.M{
++			"metadata": primitive.M{"archive": archive},
++		},
++		&options.FindOptions{
++			Limit: &pgSize,
++			Skip:  &skip,
++			Sort:  primitive.M{"uploadDate": -1},
++		})
+ 	if err != nil {
+ 		g.logger.Errorf("按照归档列举失败，归档名: %s", archive)
+ 		return nil, 0, err
+@@ -173,6 +184,35 @@
+ 	return results, total, nil
+ }
+ 
++func (g *GridFSDaoService) ListByArchive0(archive string) ([]string, error) {
++	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
++	defer cancel()
++	cursor, err := g.bucket.GetFilesCollection().Find(ctx,
++		primitive.M{
++			"metadata": primitive.M{"archive": archive},
++		})
++	if err != nil {
++		g.logger.Errorf("按照归档列举失败，归档名: %s", archive)
++		return nil, err
++	}
++	defer func(cursor *mongo.Cursor, ctx context2.Context) {
++		err := cursor.Close(ctx)
++		if err != nil {
++			g.logger.Error(err)
++		}
++	}(cursor, ctx)
++	results := make([]string, 0, 10)
++	for cursor.Next(ctx) {
++		file := gridfs.File{}
++		err := cursor.Decode(&file)
++		if err != nil {
++			return nil, err
++		}
++		results = append(results, file.Name)
++	}
++	return results, nil
++}
++
+ func (g *GridFSDaoService) DeleteFile(filename string) error {
+ 	ctx, cancel := context2.WithTimeout(context2.Background(), 5*time.Second)
+ 	defer cancel()
+Index: auth/jwt.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package auth\n\nimport (\n\t\"fmt\"\n\t\"github.com/SuanCaiYv/my-app-backend/db\"\n\t\"github.com/SuanCaiYv/my-app-backend/nosql\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/go-redis/redis/v8\"\n\t\"github.com/golang-jwt/jwt/v4\"\n\t\"time\"\n)\n\nvar redisOps = nosql.NewRedisClient()\nvar logger = util.NewLogger()\nvar sysUserDao = db.NewSysUserDaoService()\n\nfunc SignAccessToken(username, role string) (accessToken string, err error) {\n\tsecretKey := \"\"\n\terr = redisOps.Get(username, &secretKey)\n\tif err != nil && err != redis.Nil {\n\t\tlogger.Errorf(\"获取JwtId异常: %v\", err)\n\t\treturn \"\", err\n\t}\n\tif secretKey == AccountLocked {\n\t\tlogger.Errorf(\"账户已锁定: %s\", username)\n\t\treturn \"\", fmt.Errorf(\"账户已锁定: %s\", username)\n\t}\n\taccessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{\n\t\tIssuer:    \"CWB\",\n\t\tSubject:   \"AccessToken\",\n\t\tAudience:  []string{0: username, 1: role},\n\t\tExpiresAt: jwt.NewNumericDate(time.UnixMilli(time.Now().UnixMilli() + 2*time.Hour.Milliseconds())),\n\t\tNotBefore: jwt.NewNumericDate(time.Now()),\n\t\tIssuedAt:  jwt.NewNumericDate(time.Now()),\n\t\tID:        username,\n\t}).SignedString([]byte(secretKey))\n\tif err != nil {\n\t\tlogger.Error(\"签发访问令牌失败\")\n\t\treturn \"\", err\n\t}\n\treturn accessToken, nil\n}\n\nfunc SignRefreshToken(username string) (refreshToken string, err error) {\n\tsecretKey := \"\"\n\terr = redisOps.Get(username, &secretKey)\n\tif err != nil && err != redis.Nil {\n\t\tlogger.Infof(\"获取JwtId异常: %v\", err)\n\t\treturn \"\", err\n\t}\n\tif secretKey == AccountLocked {\n\t\tlogger.Errorf(\"账户已锁定: %s\", username)\n\t\treturn \"\", fmt.Errorf(\"账户已锁定: %s\", username)\n\t}\n\tsecretKey = util.GenerateUUID()\n\terr = redisOps.SetExp(username, secretKey, 7*24*time.Hour)\n\tif err != nil {\n\t\tlogger.Errorf(\"设置JwtId异常: %v\", err)\n\t\treturn \"\", err\n\t}\n\trefreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{\n\t\tIssuer:    \"CWB\",\n\t\tSubject:   \"RefreshToken\",\n\t\tAudience:  []string{0: \"RefreshToken\"},\n\t\tExpiresAt: jwt.NewNumericDate(time.UnixMilli(time.Now().UnixMilli() + 7*24*time.Hour.Milliseconds())),\n\t\tNotBefore: jwt.NewNumericDate(time.Now()),\n\t\tIssuedAt:  jwt.NewNumericDate(time.Now()),\n\t\tID:        username,\n\t}).SignedString([]byte(secretKey))\n\tif err != nil {\n\t\tlogger.Error(\"签发刷新令牌失败\")\n\t\treturn \"\", err\n\t}\n\treturn refreshToken, err\n}\n\nfunc ValidAccessToken(token string) (username string, role string, err error) {\n\tparsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {\n\t\tif claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {\n\t\t\tsecret := \"\"\n\t\t\terr = redisOps.Get(username, &secret)\n\t\t\tif err != nil {\n\t\t\t\tlogger.Warn(err)\n\t\t\t}\n\t\t\tusername = claims.ID\n\t\t\treturn []byte(secret), nil\n\t\t}\n\t\treturn []byte(\"Failed!\"), nil\n\t})\n\tif err != nil {\n\t\tlogger.Errorf(\"解析Token失败: %v\", err)\n\t\treturn \"\", \"\", err\n\t}\n\tif claims, ok := parsedToken.Claims.(*jwt.RegisteredClaims); ok {\n\t\tusername = claims.ID\n\t\trole = \"\"\n\t\tif len(claims.Audience) > 1 {\n\t\t\trole = claims.Audience[1]\n\t\t}\n\t\treturn username, role, nil\n\t} else {\n\t\treturn \"\", \"\", err\n\t}\n}\n\nfunc ValidRefreshToken(token string) (accessToken string, err error) {\n\tusername := \"\"\n\tparsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {\n\t\tif claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {\n\t\t\tsecret := \"\"\n\t\t\terr = redisOps.Get(username, &secret)\n\t\t\tif err != nil {\n\t\t\t\tlogger.Warn(err)\n\t\t\t}\n\t\t\tusername = claims.ID\n\t\t\treturn []byte(secret), nil\n\t\t}\n\t\treturn []byte(\"Failed!\"), nil\n\t})\n\tif err != nil {\n\t\tlogger.Errorf(\"解析Token失败: %v\", err)\n\t\treturn \"\", err\n\t}\n\tif claims, ok := parsedToken.Claims.(*jwt.RegisteredClaims); ok {\n\t\tusername = claims.ID\n\t\tuser, err := sysUserDao.SelectByUsername(username)\n\t\tif err != nil {\n\t\t\tlogger.Errorf(\"读取用户信息失败: %s; %v\", username, err)\n\t\t}\n\t\taccessToken, err = SignAccessToken(username, user.Role)\n\t\tif err != nil {\n\t\t\tlogger.Errorf(\"签发访问令牌失败: %s, %v\", username, err)\n\t\t\treturn \"\", err\n\t\t}\n\t\treturn accessToken, nil\n\t} else {\n\t\treturn \"\", err\n\t}\n}\n\nconst (\n\tAccountLocked = \"__CwB__LOCKED__cWb__\"\n)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/auth/jwt.go b/auth/jwt.go
+--- a/auth/jwt.go	
++++ b/auth/jwt.go	
+@@ -77,12 +77,12 @@
+ func ValidAccessToken(token string) (username string, role string, err error) {
+ 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+ 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
++			username = claims.ID
+ 			secret := ""
+ 			err = redisOps.Get(username, &secret)
+ 			if err != nil {
+ 				logger.Warn(err)
+ 			}
+-			username = claims.ID
+ 			return []byte(secret), nil
+ 		}
+ 		return []byte("Failed!"), nil
+@@ -104,15 +104,15 @@
+ }
+ 
+ func ValidRefreshToken(token string) (accessToken string, err error) {
+-	username := ""
++	var username string
+ 	parsedToken, err := jwt.ParseWithClaims(token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+ 		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
++			username = claims.ID
+ 			secret := ""
+ 			err = redisOps.Get(username, &secret)
+ 			if err != nil {
+ 				logger.Warn(err)
+ 			}
+-			username = claims.ID
+ 			return []byte(secret), nil
+ 		}
+ 		return []byte("Failed!"), nil
+Index: db/article_dao.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package db\n\nimport (\n\t\"context\"\n\t\"fmt\"\n\tconfig2 \"github.com/SuanCaiYv/my-app-backend/config\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/sirupsen/logrus\"\n\t\"go.mongodb.org/mongo-driver/bson/primitive\"\n\t\"go.mongodb.org/mongo-driver/mongo\"\n\t\"go.mongodb.org/mongo-driver/mongo/options\"\n\t\"go.mongodb.org/mongo-driver/x/bsonx\"\n\t\"sync\"\n\t\"time\"\n)\n\ntype ArticleDao interface {\n\tInsert(article *entity.Article) error\n\n\tSelect(id string) (*entity.Article, error)\n\n\tSelectByAuthorName(author, name string) (*entity.Article, error)\n\n\t// ListByAuthor0 未分页版本\n\tListByAuthor0(author string) ([]entity.Article, error)\n\n\tListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)\n\n\tUpdate(article *entity.Article) error\n\n\tDelete0(id string) error\n\n\tDelete(id string) error\n}\n\ntype KindDao interface {\n\tInsert(kind *entity.Kind) error\n\n\tSelect(id string) (*entity.Kind, error)\n\n\tSelectByName(name string) (*entity.Kind, error)\n\n\tUpdate(kind *entity.Kind) error\n\n\tDelete(id string) error\n\n\tListAll() ([]entity.Kind, error)\n}\n\ntype TagDao interface {\n\tInsert(tag *entity.Tag) error\n\n\tSelect(id string) (*entity.Tag, error)\n\n\tSelectByName(name string) (*entity.Tag, error)\n\n\tUpdate(tag *entity.Tag) error\n\n\tDelete(id string) error\n\n\tListAll() ([]entity.Tag, error)\n}\n\ntype ArticleDaoService struct {\n\tcollection *mongo.Collection\n\tlogger     *logrus.Logger\n}\n\ntype KindDaoService struct {\n\tcollection *mongo.Collection\n\tlogger     *logrus.Logger\n}\n\ntype TagDaoService struct {\n\tcollection *mongo.Collection\n\tlogger     *logrus.Logger\n}\n\nvar (\n\tinstanceArticleDaoService *ArticleDaoService\n\tonceArticleDaoService     sync.Once\n\tinstanceKindDaoService    *KindDaoService\n\tonceKindDaoService        sync.Once\n\tinstanceTagDaoService     *TagDaoService\n\tonceTagDaoService         sync.Once\n)\n\nfunc NewArticleDaoService() *ArticleDaoService {\n\tonceArticleDaoService.Do(newInstanceArticleDaoService)\n\treturn instanceArticleDaoService\n}\n\nfunc newInstanceArticleDaoService() {\n\tlogger := util.NewLogger()\n\tconfig := config2.ApplicationConfiguration()\n\tctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)\n\tdefer cancel()\n\turl := fmt.Sprintf(\"%s:%d\", config.DatabaseConfig.Url, config.DatabaseConfig.Port)\n\tclient, err := mongo.Connect(ctx, options.Client().ApplyURI(url))\n\tutil.JustPanic(err)\n\tcollection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)\n\tone := collection.FindOne(ctx, primitive.M{\"_id\": \"000000000000000000000001\"})\n\tlanguage := \"none\"\n\tif one.Err() == mongo.ErrNoDocuments {\n\t\t_, err = collection.Indexes().CreateOne(ctx, mongo.IndexModel{\n\t\t\tKeys: bsonx.Doc{\n\t\t\t\t{Key: \"fulltext_title\", Value: bsonx.String(\"text\")},\n\t\t\t\t{Key: \"fulltext_content\", Value: bsonx.String(\"text\")},\n\t\t\t},\n\t\t\tOptions: &options.IndexOptions{\n\t\t\t\tDefaultLanguage: &language,\n\t\t\t\tWeights: struct {\n\t\t\t\t\tWeights int32 `bson:\"weights\"`\n\t\t\t\t}{Weights: 1},\n\t\t\t},\n\t\t})\n\t\tutil.JustPanic(err)\n\t\t_, err = collection.InsertOne(ctx, &entity.Article{Id: \"000000000000000000000001\"})\n\t\tutil.JustPanic(err)\n\t}\n\tinstanceArticleDaoService = &ArticleDaoService{\n\t\tcollection,\n\t\tlogger,\n\t}\n}\n\nfunc (a *ArticleDaoService) Insert(article *entity.Article) error {\n\tarticle.Available = true\n\tarticle.CreatedTime = time.Now()\n\tarticle.UpdatedTime = time.Now()\n\tarticle.ReleaseTime = time.Now()\n\tarticle.Id = primitive.NewObjectID().Hex()\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\t_, err := a.collection.InsertOne(ctx, article)\n\treturn err\n}\n\nfunc (a *ArticleDaoService) Select(id string) (*entity.Article, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := a.collection.FindOne(timeout, primitive.M{\"_id\": id})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Article{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (a *ArticleDaoService) SelectByAuthorName(author, name string) (*entity.Article, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := a.collection.FindOne(timeout, primitive.M{\"author\": author, \"name\": name, \"available\": true})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Article{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, error) {\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\tcursor, err := a.collection.Find(ctx, primitive.M{\"author\": author, \"available\": true})\n\tif err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tresults := make([]entity.Article, 0, 10)\n\tfor cursor.Next(ctx) {\n\t\ttmp := entity.Article{}\n\t\terr := cursor.Decode(&tmp)\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, err\n\t\t}\n\t\tresults = append(results, tmp)\n\t}\n\tif err := cursor.Err(); err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn results, nil\n}\n\nfunc (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error) {\n\tdescInt := -1\n\tif desc {\n\t\tdescInt = 1\n\t}\n\tskip := (pgNum - 1) * pgNum\n\tvar v interface{}\n\tif equally {\n\t\tv = visibility\n\t} else {\n\t\tv = primitive.M{\"$ne\": visibility}\n\t}\n\ttimeout, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\tvar cursor *mongo.Cursor\n\tvar err error\n\tvar total int64\n\tif len(tagIdList) != 0 && searchKey != \"\" {\n\t\tcursor, err = a.collection.Find(timeout,\n\t\t\tprimitive.M{\n\t\t\t\t\"author\":     author,\n\t\t\t\t\"available\":  true,\n\t\t\t\t\"visibility\": v,\n\t\t\t\t\"tag_list._id\": primitive.M{\n\t\t\t\t\t\"$all\": tagIdList,\n\t\t\t\t},\n\t\t\t\t\"$text\": primitive.M{\n\t\t\t\t\t\"$search\": searchKey,\n\t\t\t\t},\n\t\t\t},\n\t\t\t&options.FindOptions{\n\t\t\t\tLimit: &pgSize,\n\t\t\t\tSkip:  &skip,\n\t\t\t\tSort:  primitive.M{sort: descInt},\n\t\t\t},\n\t\t)\n\t\ttotal, err = a.collection.CountDocuments(timeout, primitive.M{\n\t\t\t\"author\":     author,\n\t\t\t\"available\":  true,\n\t\t\t\"visibility\": v,\n\t\t\t\"tag_list._id\": primitive.M{\n\t\t\t\t\"$all\": tagIdList,\n\t\t\t},\n\t\t\t\"$text\": primitive.M{\n\t\t\t\t\"$search\": searchKey,\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, 0, err\n\t\t}\n\t} else if len(tagIdList) != 0 {\n\t\tcursor, err = a.collection.Find(timeout,\n\t\t\tprimitive.M{\n\t\t\t\t\"author\":     author,\n\t\t\t\t\"available\":  true,\n\t\t\t\t\"visibility\": v,\n\t\t\t\t\"tag_list._id\": primitive.M{\n\t\t\t\t\t\"$all\": tagIdList,\n\t\t\t\t},\n\t\t\t},\n\t\t\t&options.FindOptions{\n\t\t\t\tLimit: &pgSize,\n\t\t\t\tSkip:  &skip,\n\t\t\t\tSort:  primitive.M{sort: descInt},\n\t\t\t},\n\t\t)\n\t\ttotal, err = a.collection.CountDocuments(timeout, primitive.M{\n\t\t\t\"author\":     author,\n\t\t\t\"available\":  true,\n\t\t\t\"visibility\": v,\n\t\t\t\"tag_list._id\": primitive.M{\n\t\t\t\t\"$all\": tagIdList,\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, 0, err\n\t\t}\n\t} else if searchKey != \"\" {\n\t\tcursor, err = a.collection.Find(timeout,\n\t\t\tprimitive.M{\n\t\t\t\t\"author\":     author,\n\t\t\t\t\"available\":  true,\n\t\t\t\t\"visibility\": v,\n\t\t\t\t\"$text\": primitive.M{\n\t\t\t\t\t\"$search\": searchKey,\n\t\t\t\t},\n\t\t\t},\n\t\t\t&options.FindOptions{\n\t\t\t\tLimit: &pgSize,\n\t\t\t\tSkip:  &skip,\n\t\t\t\tSort:  primitive.M{sort: descInt},\n\t\t\t},\n\t\t)\n\t\ttotal, err = a.collection.CountDocuments(timeout, primitive.M{\n\t\t\t\"author\":     author,\n\t\t\t\"available\":  true,\n\t\t\t\"visibility\": v,\n\t\t\t\"$text\": primitive.M{\n\t\t\t\t\"$search\": searchKey,\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, 0, err\n\t\t}\n\t} else {\n\t\tcursor, err = a.collection.Find(timeout,\n\t\t\tprimitive.M{\n\t\t\t\t\"author\":     author,\n\t\t\t\t\"available\":  true,\n\t\t\t\t\"visibility\": v,\n\t\t\t},\n\t\t\t&options.FindOptions{\n\t\t\t\tLimit: &pgSize,\n\t\t\t\tSkip:  &skip,\n\t\t\t\tSort:  primitive.M{sort: descInt},\n\t\t\t},\n\t\t)\n\t\ttotal, err = a.collection.CountDocuments(timeout, primitive.M{\n\t\t\t\"author\":     author,\n\t\t\t\"available\":  true,\n\t\t\t\"visibility\": v,\n\t\t})\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, 0, err\n\t\t}\n\t}\n\tif err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, 0, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t}\n\t}(cursor, timeout)\n\tif err != nil {\n\t\treturn nil, 0, err\n\t}\n\tresults := make([]entity.Article, 0, pgSize)\n\tfor cursor.Next(timeout) {\n\t\ttmp := entity.Article{}\n\t\terr := cursor.Decode(&tmp)\n\t\tif err != nil {\n\t\t\ta.logger.Error(err)\n\t\t\treturn nil, 0, err\n\t\t}\n\t\tresults = append(results, tmp)\n\t}\n\tif err := cursor.Err(); err != nil {\n\t\ta.logger.Error(err)\n\t\treturn nil, 0, err\n\t}\n\treturn results, total, nil\n}\n\nfunc (a *ArticleDaoService) Update(article *entity.Article) error {\n\tarticle.UpdatedTime = time.Now()\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\t_, err := a.collection.UpdateByID(timeout, article.Id, primitive.M{\"$set\": article})\n\treturn err\n}\n\nfunc (a *ArticleDaoService) Delete0(id string) error {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\t_, err := a.collection.DeleteOne(timeout, primitive.M{\"_id\": id})\n\treturn err\n}\n\nfunc (a *ArticleDaoService) Delete(id string) error {\n\tarticle, err := a.Select(id)\n\tif err != nil {\n\t\treturn err\n\t}\n\tarticle.UpdatedTime = time.Now()\n\tarticle.Available = false\n\treturn a.Update(article)\n}\n\nfunc NewKindDaoService() *KindDaoService {\n\tonceKindDaoService.Do(newInstanceKindDaoService)\n\treturn instanceKindDaoService\n}\n\nfunc newInstanceKindDaoService() {\n\tlogger := util.NewLogger()\n\tconfig := config2.ApplicationConfiguration()\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\turl := fmt.Sprintf(\"%s:%d\", config.DatabaseConfig.Url, config.DatabaseConfig.Port)\n\tclient, err := mongo.Connect(ctx, options.Client().ApplyURI(url))\n\tutil.JustPanic(err)\n\tcollection := client.Database(config.DatabaseConfig.DB).Collection(CollectionKind)\n\tinstanceKindDaoService = &KindDaoService{\n\t\tcollection,\n\t\tlogger,\n\t}\n}\n\nfunc (k *KindDaoService) Insert(kind *entity.Kind) error {\n\tkind.Available = true\n\tkind.CreatedTime = time.Now()\n\tkind.UpdatedTime = time.Now()\n\tkind.Id = primitive.NewObjectID().Hex()\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\t_, err := k.collection.InsertOne(ctx, kind)\n\treturn err\n}\n\nfunc (k *KindDaoService) Select(id string) (*entity.Kind, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := k.collection.FindOne(timeout, primitive.M{\"_id\": id})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Kind{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (k *KindDaoService) SelectByName(name string) (*entity.Kind, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := k.collection.FindOne(timeout, primitive.M{\"name\": name})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Kind{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (k *KindDaoService) Update(kind *entity.Kind) error {\n\tkind.UpdatedTime = time.Now()\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\t_, err := k.collection.UpdateByID(timeout, kind.Id, primitive.M{\"$set\": kind})\n\treturn err\n}\n\nfunc (k *KindDaoService) Delete(id string) error {\n\tkind, err := k.Select(id)\n\tif err != nil {\n\t\treturn err\n\t}\n\tkind.UpdatedTime = time.Now()\n\tkind.Available = false\n\treturn k.Update(kind)\n}\n\nfunc (k *KindDaoService) ListAll() ([]entity.Kind, error) {\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\tcursor, err := k.collection.Find(ctx, primitive.M{})\n\tif err != nil {\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tk.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tresults := make([]entity.Kind, 0, 10)\n\tfor cursor.Next(ctx) {\n\t\ttmp := entity.Kind{}\n\t\terr := cursor.Decode(&tmp)\n\t\tif err != nil {\n\t\t\tk.logger.Error(err)\n\t\t\treturn nil, err\n\t\t}\n\t\tresults = append(results, tmp)\n\t}\n\tif err := cursor.Err(); err != nil {\n\t\tk.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn results, nil\n}\n\nfunc NewTagDaoService() *TagDaoService {\n\tonceTagDaoService.Do(newInstanceTagDaoService)\n\treturn instanceTagDaoService\n}\n\nfunc newInstanceTagDaoService() {\n\tlogger := util.NewLogger()\n\tconfig := config2.ApplicationConfiguration()\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\turl := fmt.Sprintf(\"%s:%d\", config.DatabaseConfig.Url, config.DatabaseConfig.Port)\n\tclient, err := mongo.Connect(ctx, options.Client().ApplyURI(url))\n\tutil.JustPanic(err)\n\tcollection := client.Database(config.DatabaseConfig.DB).Collection(CollectionTag)\n\tinstanceTagDaoService = &TagDaoService{\n\t\tcollection,\n\t\tlogger,\n\t}\n}\n\nfunc (t *TagDaoService) Insert(tag *entity.Tag) error {\n\ttag.Available = true\n\ttag.CreatedTime = time.Now()\n\ttag.UpdatedTime = time.Now()\n\ttag.Id = primitive.NewObjectID().Hex()\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\t_, err := t.collection.InsertOne(ctx, tag)\n\treturn err\n}\n\nfunc (t *TagDaoService) Select(id string) (*entity.Tag, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := t.collection.FindOne(timeout, primitive.M{\"_id\": id})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Tag{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (t *TagDaoService) SelectByName(name string) (*entity.Tag, error) {\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\tone := t.collection.FindOne(timeout, primitive.M{\"name\": name})\n\tif err := one.Err(); err != nil {\n\t\tif err == mongo.ErrNoDocuments {\n\t\t\treturn nil, nil\n\t\t}\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tresult := entity.Tag{}\n\terr := one.Decode(&result)\n\tif err != nil {\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\nfunc (t *TagDaoService) Update(tag *entity.Tag) error {\n\ttag.UpdatedTime = time.Now()\n\ttimeout, cancelFunc := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancelFunc()\n\t_, err := t.collection.UpdateByID(timeout, tag.Id, primitive.M{\"$set\": tag})\n\treturn err\n}\n\nfunc (t *TagDaoService) Delete(id string) error {\n\ttag, err := t.Select(id)\n\tif err != nil {\n\t\treturn err\n\t}\n\ttag.UpdatedTime = time.Now()\n\ttag.Available = false\n\treturn t.Update(tag)\n}\n\nfunc (t *TagDaoService) ListAll() ([]entity.Tag, error) {\n\tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\n\tdefer cancel()\n\tcursor, err := t.collection.Find(ctx, primitive.M{})\n\tif err != nil {\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\tdefer func(cursor *mongo.Cursor, ctx context.Context) {\n\t\terr := cursor.Close(ctx)\n\t\tif err != nil {\n\t\t\tt.logger.Error(err)\n\t\t}\n\t}(cursor, ctx)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tresults := make([]entity.Tag, 0, 10)\n\tfor cursor.Next(ctx) {\n\t\ttmp := entity.Tag{}\n\t\terr := cursor.Decode(&tmp)\n\t\tif err != nil {\n\t\t\tt.logger.Error(err)\n\t\t\treturn nil, err\n\t\t}\n\t\tresults = append(results, tmp)\n\t}\n\tif err := cursor.Err(); err != nil {\n\t\tt.logger.Error(err)\n\t\treturn nil, err\n\t}\n\treturn results, nil\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/db/article_dao.go b/db/article_dao.go
+--- a/db/article_dao.go	
++++ b/db/article_dao.go	
+@@ -23,7 +23,7 @@
+ 	SelectByAuthorName(author, name string) (*entity.Article, error)
+ 
+ 	// ListByAuthor0 未分页版本
+-	ListByAuthor0(author string) ([]entity.Article, error)
++	ListByAuthor0(author string, visibility int, equally bool) ([]entity.Article, error)
+ 
+ 	ListByAuthor(author string, visibility int, equally bool, pgNum, pgSize int64, sort string, desc bool, tagIdList []string, searchKey string) ([]entity.Article, int64, error)
+ 
+@@ -116,7 +116,11 @@
+ 			},
+ 		})
+ 		util.JustPanic(err)
+-		_, err = collection.InsertOne(ctx, &entity.Article{Id: "000000000000000000000001"})
++		_, err = collection.InsertOne(ctx, &entity.Article{
++			Id:      "000000000000000000000001",
++			Name:    "placeholder",
++			Content: "placeholder",
++		})
+ 		util.JustPanic(err)
+ 	}
+ 	instanceArticleDaoService = &ArticleDaoService{
+@@ -177,10 +181,21 @@
+ 	return &result, nil
+ }
+ 
+-func (a *ArticleDaoService) ListByAuthor0(author string) ([]entity.Article, error) {
++func (a *ArticleDaoService) ListByAuthor0(author string, visibility int, equally bool) ([]entity.Article, error) {
++	var v interface{}
++	if equally {
++		v = visibility
++	} else {
++		v = primitive.M{"$ne": visibility}
++	}
+ 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+ 	defer cancel()
+-	cursor, err := a.collection.Find(ctx, primitive.M{"author": author, "available": true})
++	cursor, err := a.collection.Find(ctx,
++		primitive.M{
++			"author":     author,
++			"available":  true,
++			"visibility": v,
++		})
+ 	if err != nil {
+ 		a.logger.Error(err)
+ 		return nil, err
+Index: service/static_src.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package service\n\nimport (\n\t\"bytes\"\n\t\"github.com/SuanCaiYv/my-app-backend/db\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity/resp\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/gin-gonic/gin\"\n\t\"github.com/sirupsen/logrus\"\n\t\"net/http\"\n\t\"path\"\n\t\"strings\"\n)\n\ntype StaticSrcApi interface {\n\tADownloadFile(context *gin.Context)\n\n\tUploadFile(context *gin.Context)\n\n\tExistFile(context *gin.Context)\n}\n\ntype StaticSrcApiHandler struct {\n\tgridFSDao db.GridFSDao\n\tlogger    *logrus.Logger\n}\n\nfunc NewStaticSrcApiHandler() *StaticSrcApiHandler {\n\treturn &StaticSrcApiHandler{\n\t\tgridFSDao: db.NewGridFSDaoService(),\n\t\tlogger:    util.NewLogger(),\n\t}\n}\n\nfunc (s *StaticSrcApiHandler) ADownloadFile(context *gin.Context) {\n\tfilename := context.Param(\"filename\")\n\tdata, _, err := s.gridFSDao.DownloadFile(filename)\n\tif err != nil {\n\t\ts.logger.Errorf(\"下载文件: %s 失败\", filename)\n\t\tcontext.AbortWithStatus(500)\n\t\treturn\n\t}\n\treader := bytes.NewReader(data)\n\tcontentLength := len(data)\n\tcontentType := util.MIMEType(filename)\n\n\textraHeaders := map[string]string{\n\t\t\"Content-Disposition\": \"attachment; filename=\" + `\"` + filename + `\"`,\n\t}\n\n\tcontext.DataFromReader(http.StatusOK, int64(contentLength), contentType, reader, extraHeaders)\n}\n\nfunc (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {\n\tusername := context.MustGet(\"username\")\n\tformFile, err := context.FormFile(\"file\")\n\tif err != nil {\n\t\ts.logger.Errorf(\"获取文件失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"获取文件失败，文件头应为file\"))\n\t\treturn\n\t}\n\tmetaMap := make(map[string]interface{})\n\turi := context.Request.RequestURI\n\tqueryStr := uri[strings.LastIndex(uri, \"?\")+1:]\n\tif queryStr != \"\" {\n\t\tqueries := strings.Split(queryStr, \"&\")\n\t\tfor _, str := range queries {\n\t\t\tss := strings.Split(str, \"=\")\n\t\t\tmetaMap[ss[0]] = ss[1]\n\t\t}\n\t}\n\tmetaMap[\"upload_user\"] = username\n\tmetaMap[\"origin_name\"] = formFile.Filename\n\tif t, ok := metaMap[\"archive\"]; ok {\n\t\tif t == \"avatar\" || t == \"doc_img\" {\n\t\t} else {\n\t\t\tmetaMap[\"archive\"] = \"other\"\n\t\t}\n\t} else {\n\t\tmetaMap[\"archive\"] = \"other\"\n\t}\n\tfile, err := formFile.Open()\n\tif err != nil {\n\t\ts.logger.Errorf(\"打开文件失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"打开文件失败\"))\n\t\treturn\n\t}\n\tcontent := make([]byte, formFile.Size, formFile.Size)\n\t_, err = file.Read(content)\n\tif err != nil {\n\t\ts.logger.Errorf(\"读取文件失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"读取文件失败\"))\n\t\treturn\n\t}\n\tnewFilename := util.GenerateUUID() + path.Ext(formFile.Filename)\n\terr = s.gridFSDao.UploadFile(content, newFilename, metaMap)\n\tif err != nil {\n\t\ts.logger.Errorf(\"写入文件失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"写入文件失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewOk(struct {\n\t\tFilename string `json:\"filename\"`\n\t}{Filename: newFilename}))\n}\n\nfunc (s *StaticSrcApiHandler) ExistFile(context *gin.Context) {\n\tusername := context.MustGet(\"username\")\n\tinput := make(map[string]interface{})\n\terr := context.BindJSON(&input)\n\tif err != nil {\n\t\ts.logger.Errorf(\"参数绑定失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数绑定失败\"))\n\t\treturn\n\t}\n\texistFile := s.gridFSDao.ExistFile(input[\"filename\"].(string))\n\tcontext.JSON(200, resp.NewBoolean(existFile))\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/service/static_src.go b/service/static_src.go
+--- a/service/static_src.go	
++++ b/service/static_src.go	
+@@ -9,6 +9,7 @@
+ 	"github.com/sirupsen/logrus"
+ 	"net/http"
+ 	"path"
++	"strconv"
+ 	"strings"
+ )
+ 
+@@ -18,6 +19,8 @@
+ 	UploadFile(context *gin.Context)
+ 
+ 	ExistFile(context *gin.Context)
++
++	ListFile(context *gin.Context)
+ }
+ 
+ type StaticSrcApiHandler struct {
+@@ -116,3 +119,39 @@
+ 	existFile := s.gridFSDao.ExistFile(input["filename"].(string))
+ 	context.JSON(200, resp.NewBoolean(existFile))
+ }
++
++func (s *StaticSrcApiHandler) ListFile(context *gin.Context) {
++	username := context.MustGet("username").(string)
++	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
++	if err != nil {
++		s.logger.Errorf("获取分页大小失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("获取分页大小失败"))
++		return
++	}
++	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
++	if err != nil {
++		s.logger.Errorf("获取分页页码失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("获取分页页码失败"))
++		return
++	}
++	archive := context.DefaultQuery("archive", "other")
++	var list []string
++	var total int64
++	if pageNum == -1 {
++		list, err = s.gridFSDao.ListByArchive0(archive)
++		if err != nil {
++			s.logger.Errorf("获取文件列表失败: %s; %v", username, err)
++			context.JSON(200, resp.NewInternalError("获取文件列表失败"))
++			return
++		}
++		total = int64(len(list))
++	} else {
++		list, total, err = s.gridFSDao.ListByArchive(archive, int64(pageNum), int64(pageSize))
++		if err != nil {
++			s.logger.Errorf("获取文件列表失败: %s; %v", username, err)
++			context.JSON(200, resp.NewInternalError("获取文件列表失败"))
++			return
++		}
++	}
++	context.JSON(200, resp.NewList(total, int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum+1), true, list))
++}
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"ALL\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"4e6e14c2-b2bd-4da7-aa85-0d7519881e9a\" name=\"Changes\" comment=\"第九天\">\n      <change beforePath=\"$PROJECT_DIR$/cmd/hook_onstart.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/cmd/hook_onstart.go\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/nosql/redis_ops.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/nosql/redis_ops.go\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/service/scheduled.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/service/scheduled.go\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/service/scheduled_test.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/service/scheduled_test.go\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Go File\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"GOROOT\" url=\"file:///usr/local/go\" />\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$/..\" />\n  </component>\n  <component name=\"GitSEFilterConfiguration\">\n    <file-type-list>\n      <filtered-out-file-type name=\"LOCAL_BRANCH\" />\n      <filtered-out-file-type name=\"REMOTE_BRANCH\" />\n      <filtered-out-file-type name=\"TAG\" />\n      <filtered-out-file-type name=\"COMMIT_BY_MESSAGE\" />\n    </file-type-list>\n  </component>\n  <component name=\"GoLibraries\">\n    <option name=\"indexEntireGoPath\" value=\"false\" />\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectId\" id=\"228XpcPDHZTVj48DujhWHbY8HEL\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">\n    <property name=\"ASKED_ADD_EXTERNAL_FILES\" value=\"true\" />\n    <property name=\"DefaultGoTemplateProperty\" value=\"Go File\" />\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\n    <property name=\"RunOnceActivity.ShowReadmeOnStart\" value=\"true\" />\n    <property name=\"WebServerToolWindowFactoryState\" value=\"false\" />\n    <property name=\"go.format.on.save.advertiser.fired\" value=\"true\" />\n    <property name=\"go.formatter.settings.were.checked\" value=\"true\" />\n    <property name=\"go.import.settings.migrated\" value=\"true\" />\n    <property name=\"go.modules.go.list.on.any.changes.was.set\" value=\"true\" />\n    <property name=\"go.watchers.conflict.with.on.save.actions.check.performed\" value=\"true\" />\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$\" />\n    <property name=\"settings.editor.selected.configurable\" value=\"preferences.pluginManager\" />\n  </component>\n  <component name=\"RecentsManager\">\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$\" />\n    </key>\n  </component>\n  <component name=\"RunManager\" selected=\"Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service\">\n    <configuration default=\"true\" type=\"GoApplicationRunConfiguration\" factoryName=\"Go Application\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"FILE\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"go build github.com/SuanCaiYv/my-app-backend/cmd\" type=\"GoApplicationRunConfiguration\" factoryName=\"Go Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"PACKAGE\" />\n      <package value=\"github.com/SuanCaiYv/my-app-backend/cmd\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$/cmd/main.go\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"TestAddFunc in github.com/SuanCaiYv/my-app-backend/service\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$/service\" />\n      <root_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"PACKAGE\" />\n      <package value=\"github.com/SuanCaiYv/my-app-backend/service\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <framework value=\"gotest\" />\n      <pattern value=\"^\\QTestAddFunc\\E$\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$/nosql\" />\n      <root_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"PACKAGE\" />\n      <package value=\"github.com/SuanCaiYv/my-app-backend/nosql\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <framework value=\"gotest\" />\n      <pattern value=\"^\\QTestRedisClient_PushSortQueue\\E$\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"TestUpdateStructObject in github.com/SuanCaiYv/my-app-backend/util\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$/util\" />\n      <root_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"PACKAGE\" />\n      <package value=\"github.com/SuanCaiYv/my-app-backend/util\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <framework value=\"gotest\" />\n      <pattern value=\"^\\QTestUpdateStructObject\\E$\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$/util\" />\n      <root_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"PACKAGE\" />\n      <package value=\"github.com/SuanCaiYv/my-app-backend/util\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <framework value=\"gotest\" />\n      <pattern value=\"^\\QTestUpdateStructObjectWithJsonTag\\E$\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration default=\"true\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\">\n      <module name=\"my-app-backend\" />\n      <working_directory value=\"$PROJECT_DIR$\" />\n      <kind value=\"DIRECTORY\" />\n      <directory value=\"$PROJECT_DIR$\" />\n      <filePath value=\"$PROJECT_DIR$\" />\n      <framework value=\"gotest\" />\n      <method v=\"2\" />\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service\" />\n        <item itemvalue=\"Go Test.TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql\" />\n        <item itemvalue=\"Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd\" />\n        <item itemvalue=\"Go Test.TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util\" />\n        <item itemvalue=\"Go Test.TestUpdateStructObject in github.com/SuanCaiYv/my-app-backend/util\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\n    <ignored-roots>\n      <path value=\"$PROJECT_DIR$/../..\" />\n    </ignored-roots>\n    <MESSAGE value=\"backend\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"backend\" />\n  </component>\n  <component name=\"VgoProject\">\n    <integration-enabled>true</integration-enabled>\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" type=\"DlvLineBreakpoint\">\n          <url>file://$USER_HOME$/go/pkg/mod/github.com/golang-jwt/jwt/v4@v4.2.0/parser.go</url>\n          <line>99</line>\n          <option name=\"timeStamp\" value=\"12\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" type=\"DlvLineBreakpoint\">\n          <url>file://$PROJECT_DIR$/api/router.go</url>\n          <line>18</line>\n          <option name=\"timeStamp\" value=\"16\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" type=\"DlvLineBreakpoint\">\n          <url>file://$PROJECT_DIR$/service/static_src.go</url>\n          <line>101</line>\n          <option name=\"timeStamp\" value=\"18\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" type=\"DlvLineBreakpoint\">\n          <url>file://$PROJECT_DIR$/service/article.go</url>\n          <line>426</line>\n          <option name=\"timeStamp\" value=\"19\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" type=\"DlvLineBreakpoint\">\n          <url>file://$USER_HOME$/go/pkg/mod/go.mongodb.org/mongo-driver@v1.8.1/mongo/mongo.go</url>\n          <line>158</line>\n          <option name=\"timeStamp\" value=\"37\" />\n        </line-breakpoint>\n      </breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -5,10 +5,18 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第九天">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/api/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/router.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/auth/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth/jwt.go" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/cmd/hook_onstart.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/hook_onstart.go" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/nosql/redis_ops.go" beforeDir="false" afterPath="$PROJECT_DIR$/nosql/redis_ops.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/db/article_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/article_dao.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/db/gridfs_dao.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/gridfs_dao.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/service/article.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/article.go" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/service/scheduled.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/scheduled.go" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/service/scheduled_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/scheduled_test.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/service/static_src.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/static_src.go" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -67,15 +75,7 @@
+       <recent name="$PROJECT_DIR$" />
+     </key>
+   </component>
+-  <component name="RunManager" selected="Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service">
+-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+-      <module name="my-app-backend" />
+-      <working_directory value="$PROJECT_DIR$" />
+-      <kind value="FILE" />
+-      <directory value="$PROJECT_DIR$" />
+-      <filePath value="$PROJECT_DIR$" />
+-      <method v="2" />
+-    </configuration>
++  <component name="RunManager" selected="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd">
+     <configuration name="go build github.com/SuanCaiYv/my-app-backend/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+       <module name="my-app-backend" />
+       <working_directory value="$PROJECT_DIR$" />
+@@ -133,20 +133,11 @@
+       <pattern value="^\QTestUpdateStructObjectWithJsonTag\E$" />
+       <method v="2" />
+     </configuration>
+-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+-      <module name="my-app-backend" />
+-      <working_directory value="$PROJECT_DIR$" />
+-      <kind value="DIRECTORY" />
+-      <directory value="$PROJECT_DIR$" />
+-      <filePath value="$PROJECT_DIR$" />
+-      <framework value="gotest" />
+-      <method v="2" />
+-    </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd" />
+         <item itemvalue="Go Test.TestAddFunc in github.com/SuanCaiYv/my-app-backend/service" />
+         <item itemvalue="Go Test.TestRedisClient_PushSortQueue in github.com/SuanCaiYv/my-app-backend/nosql" />
+-        <item itemvalue="Go Build.go build github.com/SuanCaiYv/my-app-backend/cmd" />
+         <item itemvalue="Go Test.TestUpdateStructObjectWithJsonTag in github.com/SuanCaiYv/my-app-backend/util" />
+         <item itemvalue="Go Test.TestUpdateStructObject in github.com/SuanCaiYv/my-app-backend/util" />
+       </list>
+@@ -193,18 +184,28 @@
+         </line-breakpoint>
+         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+           <url>file://$PROJECT_DIR$/service/static_src.go</url>
+-          <line>101</line>
++          <line>104</line>
+           <option name="timeStamp" value="18" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+           <url>file://$PROJECT_DIR$/service/article.go</url>
+-          <line>426</line>
++          <line>475</line>
+           <option name="timeStamp" value="19" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+           <url>file://$USER_HOME$/go/pkg/mod/go.mongodb.org/mongo-driver@v1.8.1/mongo/mongo.go</url>
+           <line>158</line>
+           <option name="timeStamp" value="37" />
++        </line-breakpoint>
++        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
++          <url>file://$PROJECT_DIR$/service/article.go</url>
++          <line>504</line>
++          <option name="timeStamp" value="42" />
++        </line-breakpoint>
++        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
++          <url>file://$PROJECT_DIR$/service/article.go</url>
++          <line>346</line>
++          <option name="timeStamp" value="46" />
+         </line-breakpoint>
+       </breakpoints>
+     </breakpoint-manager>
+Index: api/router.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package api\n\nimport (\n\t\"fmt\"\n\t\"github.com/SuanCaiYv/my-app-backend/auth\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity/resp\"\n\t\"github.com/SuanCaiYv/my-app-backend/service\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/gin-gonic/gin\"\n\t\"strings\"\n)\n\nvar logger = util.NewLogger()\n\nfunc Route() {\n\trouter := gin.New()\n\trouter.Use(corsMiddleware())\n\trouter.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {\n\t\tif err, ok := recovered.(string); ok {\n\t\t\tcontext.AbortWithStatusJSON(200, resp.NewInternalError(err))\n\t\t} else {\n\t\t\tcontext.AbortWithStatusJSON(200, resp.NewInternalError(\"unknown error occurred.\"))\n\t\t}\n\t}))\n\t// ApiHandler实例化\n\tuserApiHandler := service.NewUserApiHandler()\n\tstaticSrcApi := service.NewStaticSrcApiHandler()\n\tarticleApi := service.NewArticleApiHandler()\n\tsiteApi := service.NewSiteApiHandler()\n\twsApi := service.NewWSApiHandler()\n\t// 版本分组\n\tversionOne := router.Group(\"/v1\")\n\t// 测试用\n\tversionOne.GET(\"/t\", func(context *gin.Context) {\n\t\tfmt.Println(context.Query(\"name\"))\n\t\tcontext.JSON(200, resp.NewBoolean(true))\n\t})\n\tversionOne.POST(\"/t\", func(context *gin.Context) {\n\t\tm := make(map[string]interface{})\n\t\t_ = context.BindJSON(&m)\n\t\tfor k, v := range m {\n\t\t\tfmt.Println(k, v)\n\t\t}\n\t\tcontext.JSON(200, resp.NewBoolean(true))\n\t})\n\tversionOne.POST(\"/t/upload\", func(context *gin.Context) {\n\t\tfile, _ := context.FormFile(\"file\")\n\t\tfmt.Println(file.Filename)\n\t\tcontext.JSON(200, resp.NewBoolean(true))\n\t})\n\t{\n\t\t// 免登陆部分\n\t\tversionOne.GET(\"/ws\", wsApi.Generic)\n\t\tversionOne.GET(\"/article/list/no_auth\", articleApi.ListArticleNoAuth)\n\t\tversionOne.GET(\"/user/info/no_auth\", userApiHandler.GetUserInfoNoAuth)\n\t\tversionOne.GET(\"/article/kind_list\", articleApi.KindList)\n\t\tversionOne.GET(\"/article/tag_list\", articleApi.TagList)\n\t\tversionOne.PUT(\"/sign\", userApiHandler.Login)\n\t\tversionOne.POST(\"/sign\", userApiHandler.SignUp)\n\t\tversionOne.POST(\"/sign/ver_code\", userApiHandler.SendVerCode)\n\n\t\t// 静态资源接口\n\t\tversionOne.GET(\"/static/a/:filename\", staticSrcApi.ADownloadFile)\n\n\t\t// 以下需要登录\n\t\tversionOne.Use(authFunc)\n\n\t\t// 用户接口\n\t\tuserApi := versionOne.Group(\"/user\")\n\t\tuserApi.GET(\"/info\", userApiHandler.GetUserInfo)\n\t\tuserApi.PUT(\"/info\", userApiHandler.UpdateUserInfo)\n\t\tuserApi.DELETE(\"\", userApiHandler.Logout)\n\n\t\t// 文章接口\n\t\tarticle := versionOne.Group(\"/article\")\n\t\tarticle.GET(\"/list\", articleApi.ListArticle)\n\t\tarticle.GET(\"/doc/:article_id\", articleApi.ExportArticle)\n\t\tarticle.GET(\"/tag_or_kind/list\", articleApi.KindAndTagList)\n\t\tarticle.GET(\"/detail/:article_id\", articleApi.ArticleDetail)\n\t\tarticle.GET(\"/img_fetch\", wsApi.ImageFetch)\n\t\tarticle.PUT(\"\", articleApi.UpdateArticle)\n\t\tarticle.POST(\"\", articleApi.AddArticle)\n\t\tarticle.POST(\"/kind\", articleApi.AddKind)\n\t\tarticle.POST(\"/tag\", articleApi.AddTag)\n\t\tarticle.POST(\"/draft\", articleApi.UploadDraft)\n\t\tarticle.DELETE(\"/:article_id\", articleApi.DeleteArticle)\n\n\t\t// 静态资源接口\n\t\tfile := versionOne.Group(\"/static\")\n\t\tfile.POST(\"/file\", staticSrcApi.UploadFile)\n\n\t\t// 其他接口\n\t\tother := versionOne.Group(\"\")\n\t\tother.GET(\"/backup\", siteApi.BackupSite)\n\t}\n\terr := router.Run(\":8190\")\n\tutil.JustPanic(err)\n}\n\nfunc corsMiddleware() gin.HandlerFunc {\n\treturn func(c *gin.Context) {\n\t\tc.Writer.Header().Set(\"Access-Control-Allow-Origin\", \"*\")\n\t\tc.Writer.Header().Set(\"Access-Control-Allow-Credentials\", \"true\")\n\t\tc.Writer.Header().Set(\"Access-Control-Allow-Headers\", \"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With\")\n\t\tc.Writer.Header().Set(\"Access-Control-Allow-Methods\", \"POST, OPTIONS, GET, PUT, DELETE, HEAD\")\n\t\tif c.Request.Method == \"OPTIONS\" {\n\t\t\tc.AbortWithStatus(204)\n\t\t\treturn\n\t\t}\n\t\tc.Next()\n\t}\n}\n\nfunc authFunc(context *gin.Context) {\n\ttoken := context.GetHeader(\"Authorization\")\n\tif !strings.HasPrefix(token, \"Bearer \") {\n\t\tcontext.AbortWithStatusJSON(200, resp.NewMissToken())\n\t\treturn\n\t}\n\ttoken = token[7:]\n\tusername, role, err := auth.ValidAccessToken(token)\n\tif err != nil {\n\t\tcontext.AbortWithStatusJSON(200, resp.NewAuthFailed())\n\t\treturn\n\t}\n\tlogger.Debugf(\"用户: %s 开始操作\", username)\n\tcontext.Set(\"username\", username)\n\tcontext.Set(\"role\", role)\n}\n\nfunc todoImplement(context *gin.Context) {\n\tcontext.JSON(200, resp.NewString(\"此接口暂未实现\"))\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/api/router.go b/api/router.go
+--- a/api/router.go	
++++ b/api/router.go	
+@@ -77,6 +77,7 @@
+ 		article.GET("/doc/:article_id", articleApi.ExportArticle)
+ 		article.GET("/tag_or_kind/list", articleApi.KindAndTagList)
+ 		article.GET("/detail/:article_id", articleApi.ArticleDetail)
++		article.GET("/draft/list", articleApi.ListDraft)
+ 		article.GET("/img_fetch", wsApi.ImageFetch)
+ 		article.PUT("", articleApi.UpdateArticle)
+ 		article.POST("", articleApi.AddArticle)
+@@ -88,6 +89,7 @@
+ 		// 静态资源接口
+ 		file := versionOne.Group("/static")
+ 		file.POST("/file", staticSrcApi.UploadFile)
++		file.GET("/file/list", staticSrcApi.ListFile)
+ 
+ 		// 其他接口
+ 		other := versionOne.Group("")
+Index: service/article.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package service\n\nimport (\n\t\"github.com/SuanCaiYv/my-app-backend/config\"\n\t\"github.com/SuanCaiYv/my-app-backend/db\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity/resp\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"github.com/gin-gonic/gin\"\n\t\"github.com/sirupsen/logrus\"\n\t\"github.com/yanyiwu/gojieba\"\n\t\"strconv\"\n\t\"strings\"\n\t\"time\"\n)\n\ntype ArticleApi interface {\n\tAddArticle(context *gin.Context)\n\n\tUploadDraft(context *gin.Context)\n\n\tUpdateArticle(context *gin.Context)\n\n\tDeleteArticle(context *gin.Context)\n\n\tListArticleNoAuth(context *gin.Context)\n\n\tListArticle(context *gin.Context)\n\n\tArticleDetail(context *gin.Context)\n\n\tExportArticle(context *gin.Context)\n\n\tKindAndTagList(context *gin.Context)\n\n\tAddKind(context *gin.Context)\n\n\tAddTag(context *gin.Context)\n\n\tKindList(context *gin.Context)\n\n\tTagList(context *gin.Context)\n}\n\ntype ArticleApiHandler struct {\n\tarticleDao db.ArticleDao\n\tkindDao    db.KindDao\n\ttagDao     db.TagDao\n\tgridFsDao  db.GridFSDao\n\tsysUserDao db.SysUserDao\n\tcutter     *gojieba.Jieba\n\tlogger     *logrus.Logger\n}\n\nfunc NewArticleApiHandler() *ArticleApiHandler {\n\treturn &ArticleApiHandler{\n\t\tarticleDao: db.NewArticleDaoService(),\n\t\tkindDao:    db.NewKindDaoService(),\n\t\ttagDao:     db.NewTagDaoService(),\n\t\tgridFsDao:  db.NewGridFSDaoService(),\n\t\tsysUserDao: db.NewSysUserDaoService(),\n\t\tcutter:     gojieba.NewJieba(),\n\t\tlogger:     util.NewLogger(),\n\t}\n}\n\ntype newArticle struct {\n\tArticleId   string   `json:\"article_id\"`\n\tArticleName string   `json:\"article_name\"`\n\tSummary     string   `json:\"summary\"`\n\tCoverImg    string   `json:\"cover_img\"`\n\tContent     string   `json:\"content\"`\n\tKind        string   `json:\"kind\"`\n\tTagList     []string `json:\"tag_list\"`\n\tVisibility  int      `bson:\"visibility\" json:\"visibility\"`\n}\n\nfunc (a *ArticleApiHandler) AddArticle(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tinput := &newArticle{}\n\terr := context.Bind(input)\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\tarticle, err := a.articleDao.Select(input.ArticleId)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取Article数据表: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取文档表\"))\n\t\treturn\n\t}\n\tkind, err := a.kindDao.Select(input.Kind)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取ArticleKind数据表: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取分类表\"))\n\t\treturn\n\t}\n\ttagList := make([]entity.Tag, 0, len(input.TagList))\n\tfor i := range input.TagList {\n\t\ttag, err := a.tagDao.Select(input.TagList[i])\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"无法读取ArticleTag数据表: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取标签表\"))\n\t\t\treturn\n\t\t}\n\t\ttagList = append(tagList, *tag)\n\t}\n\tarticle.Name = input.ArticleName\n\tarticle.Summary = input.Summary\n\tarticle.CoverImg = input.CoverImg\n\tarticle.Content = input.Content\n\tarticle.Catalog = entity.Catalog{\n\t\tName:     \"\",\n\t\tChildren: []entity.Catalog{},\n\t}\n\tarticle.Kind = *kind\n\tarticle.TagList = tagList\n\tarticle.Visibility = input.Visibility\n\tarticle.FulltextTitle = strings.Join(a.cutter.CutAll(article.Name), \" \")\n\tarticle.FulltextContent = strings.Join(a.cutter.CutAll(article.Content), \" \")\n\terr = a.articleDao.Update(article)\n\tif err != nil {\n\t\ta.logger.Errorf(\"更新Article失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"上传文档失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewOk(struct {\n\t\tArticleId string `json:\"article_id\"`\n\t}{ArticleId: article.Id}))\n}\n\ntype articleDraft struct {\n\tArticleId      string `json:\"article_id\"`\n\tArticleName    string `json:\"article_name\"`\n\tArticleContent string `json:\"article_content\"`\n}\n\nfunc (a *ArticleApiHandler) UploadDraft(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tinput := &articleDraft{}\n\terr := context.Bind(input)\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\tuser, err := a.sysUserDao.SelectByUsername(username)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取SysUser数据表: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取用户表\"))\n\t\treturn\n\t}\n\tif input.ArticleId == \"\" {\n\t\tif input.ArticleName == \"\" {\n\t\t\tinput.ArticleName = time.Now().String()\n\t\t}\n\t\tarticle := entity.Article{\n\t\t\tName:        input.ArticleName,\n\t\t\tAuthor:      user.Id,\n\t\t\tSummary:     \"\",\n\t\t\tCoverImg:    \"\",\n\t\t\tCatalog:     entity.Catalog{},\n\t\t\tContent:     input.ArticleContent,\n\t\t\tKind:        entity.Kind{},\n\t\t\tTagList:     make([]entity.Tag, 0, 0),\n\t\t\tReleaseTime: time.Now(),\n\t\t\tVisibility:  entity.VisibilityDraft,\n\t\t\tAvailable:   false,\n\t\t\tCreatedTime: time.Now(),\n\t\t\tUpdatedTime: time.Now(),\n\t\t}\n\t\terr := a.articleDao.Insert(&article)\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"插入Article失败: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"插入文档表失败\"))\n\t\t\treturn\n\t\t}\n\t\tinput.ArticleId = article.Id\n\t} else {\n\t\tarticle, err := a.articleDao.Select(input.ArticleId)\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"无法读取Article数据表: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取文档表\"))\n\t\t\treturn\n\t\t}\n\t\tif input.ArticleName != \"\" {\n\t\t\tarticle.Name = input.ArticleName\n\t\t}\n\t\tarticle.Content = input.ArticleContent\n\t\terr = a.articleDao.Update(article)\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"更新Article失败: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"更新文档表失败\"))\n\t\t\treturn\n\t\t}\n\t\tinput.ArticleId = article.Id\n\t}\n\tcontext.JSON(200, resp.NewOk(struct {\n\t\tArticleId string `json:\"article_id\"`\n\t}{\n\t\tArticleId: input.ArticleId,\n\t}))\n}\n\nfunc (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tinput := make(map[string]interface{})\n\terr := context.BindJSON(&input)\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数绑定失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数绑定失败\"))\n\t\treturn\n\t}\n\tarticle, err := a.articleDao.Select(input[\"article_id\"].(string))\n\tif err != nil {\n\t\ta.logger.Errorf(\"获取文档失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"获取用户\"))\n\t\treturn\n\t}\n\tutil.UpdateStructObjectWithJsonTag(article, input)\n\terr = a.articleDao.Update(article)\n\tif err != nil {\n\t\ta.logger.Errorf(\"更新文档失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"更新文档失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewBoolean(true))\n}\n\nfunc (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {\n\tusername := context.MustGet(\"username\")\n\tarticleId := context.Param(\"article_id\")\n\terr := a.articleDao.Delete(articleId)\n\tif err != nil {\n\t\ta.logger.Errorf(\"删除Article失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"删除文档表失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewBoolean(true))\n}\n\nfunc (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {\n\tpageSize, _ := strconv.Atoi(context.DefaultQuery(\"page_size\", \"10\"))\n\tpageNum, _ := strconv.Atoi(context.DefaultQuery(\"page_num\", \"1\"))\n\tsort := context.DefaultQuery(\"sort\", \"created_time\")\n\t// 是否倒序\n\tdesc, _ := strconv.ParseBool(context.DefaultQuery(\"desc\", \"true\"))\n\tsearchKey := context.DefaultQuery(\"search_key\", \"\")\n\ttagIds := context.DefaultQuery(\"tag_id_list\", \"\")\n\tvar tagIdList []string\n\tif tagIds != \"\" {\n\t\ttagIdList = strings.Split(tagIds, \",\")\n\t} else {\n\t\ttagIdList = make([]string, 0, 0)\n\t}\n\towner := config.ApplicationConfiguration().Owner\n\tuser, err := a.sysUserDao.SelectByUsername(owner)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取SysUser数据表: %s; %v\", owner, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取用户表\"))\n\t\treturn\n\t}\n\tarticles, total, err := a.articleDao.ListByAuthor(user.Id, entity.VisibilityPublic, true, int64(pageNum), int64(pageSize), sort, desc, tagIdList, searchKey)\n\tif err != nil {\n\t\ta.logger.Errorf(\"获取文章列表失败: %s; %v\", \"no-auth\", err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"获取文章列表失败\"))\n\t\treturn\n\t}\n\tendPage := false\n\tif len(articles) != pageSize {\n\t\tendPage = true\n\t}\n\tcontext.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))\n}\n\nfunc (a *ArticleApiHandler) ListArticle(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tpageSize, _ := strconv.Atoi(context.DefaultQuery(\"page_size\", \"10\"))\n\tpageNum, _ := strconv.Atoi(context.DefaultQuery(\"page_num\", \"1\"))\n\tsort := context.DefaultQuery(\"sort\", \"created_time\")\n\t// 是否倒序\n\tdesc, _ := strconv.ParseBool(context.DefaultQuery(\"desc\", \"true\"))\n\tsearchKey := context.DefaultQuery(\"search_key\", \"\")\n\ttagIds := context.DefaultQuery(\"tag_id_list\", \"\")\n\tvar tagIdList []string\n\tif tagIds != \"\" {\n\t\ttagIdList = strings.Split(tagIds, \",\")\n\t} else {\n\t\ttagIdList = make([]string, 0, 0)\n\t}\n\tuser, err := a.sysUserDao.SelectByUsername(username)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取SysUser数据表: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取用户表\"))\n\t\treturn\n\t}\n\tarticles, total, err := a.articleDao.ListByAuthor(user.Id, entity.VisibilityDraft, false, int64(pageNum), int64(pageSize), sort, desc, tagIdList, searchKey)\n\tif err != nil {\n\t\ta.logger.Errorf(\"获取文章列表失败: %s; %v\", \"no-auth\", err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"获取文章列表失败\"))\n\t\treturn\n\t}\n\tendPage := false\n\tif len(articles) != pageSize {\n\t\tendPage = true\n\t}\n\tcontext.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))\n}\n\nfunc (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tarticleId := context.Param(\"article_id\")\n\tif articleId == \"\" {\n\t\ta.logger.Errorf(\"文章ID为空: %s\", username)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"文章ID为空\"))\n\t\treturn\n\t}\n\tarticle, err := a.articleDao.Select(articleId)\n\tif err != nil {\n\t\ta.logger.Errorf(\"无法读取Article数据表: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"无法读取文档表\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewOk(article))\n}\n\nfunc (a *ArticleApiHandler) ExportArticle(context *gin.Context) {\n\t//TODO implement me\n\tpanic(\"implement me\")\n}\n\ntype addKind struct {\n\tKindName string `json:\"kind_name\"`\n}\n\nfunc (a *ArticleApiHandler) AddKind(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tinput := &addKind{}\n\terr := context.BindJSON(input)\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\ttemp, err := a.kindDao.SelectByName(input.KindName)\n\tif err != nil {\n\t\ta.logger.Errorf(\"查询ArticleKind失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"查询分类表失败\"))\n\t\treturn\n\t}\n\tif temp != nil {\n\t\ta.logger.Infof(\"分类已存在，重复创建: %s, %s\", username, input.KindName)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"请勿重复创建分类\"))\n\t\treturn\n\t}\n\tkind := entity.Kind{\n\t\tName: input.KindName,\n\t}\n\terr = a.kindDao.Insert(&kind)\n\tif err != nil {\n\t\ta.logger.Errorf(\"插入ArticleKind失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"插入分类表失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewBoolean(true))\n}\n\ntype addTag struct {\n\tTagName string `json:\"tag_name\"`\n}\n\nfunc (a *ArticleApiHandler) AddTag(context *gin.Context) {\n\tusername := context.MustGet(\"username\").(string)\n\tinput := &addTag{}\n\terr := context.BindJSON(input)\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\ttemp, err := a.tagDao.SelectByName(input.TagName)\n\tif err != nil {\n\t\ta.logger.Errorf(\"查询Articletag失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"查询标签表失败\"))\n\t\treturn\n\t}\n\tif temp != nil {\n\t\ta.logger.Infof(\"标签已存在，重复创建: %s, %s\", username, input.TagName)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"请勿重复创建标签\"))\n\t\treturn\n\t}\n\ttag := entity.Tag{\n\t\tName: input.TagName,\n\t}\n\terr = a.tagDao.Insert(&tag)\n\tif err != nil {\n\t\ta.logger.Errorf(\"插入ArticleTag失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewInternalError(\"插入标签表失败\"))\n\t\treturn\n\t}\n\tcontext.JSON(200, resp.NewBoolean(true))\n}\n\nfunc (a *ArticleApiHandler) KindAndTagList(context *gin.Context) {\n\t// TODO implement me\n\tpanic(\"implement me\")\n}\n\nfunc (a *ArticleApiHandler) KindList(context *gin.Context) {\n\tusername := \"no-auth\"\n\tpageNum, err := strconv.Atoi(context.DefaultQuery(\"page_num\", \"1\"))\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\tpageSize, err := strconv.Atoi(context.DefaultQuery(\"page_size\", \"10\"))\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\ta.logger.Info(pageNum, pageSize)\n\tvar list []entity.Kind\n\tif pageNum == -1 {\n\t\tlist, err = a.kindDao.ListAll()\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"获取分类列表失败: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"获取分类列表失败\"))\n\t\t\treturn\n\t\t}\n\t} else {\n\t\t// TODO\n\t}\n\tcontext.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))\n}\n\nfunc (a *ArticleApiHandler) TagList(context *gin.Context) {\n\tusername := \"no-auth\"\n\tpageNum, err := strconv.Atoi(context.DefaultQuery(\"page_num\", \"1\"))\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\tpageSize, err := strconv.Atoi(context.DefaultQuery(\"page_size\", \"10\"))\n\tif err != nil {\n\t\ta.logger.Errorf(\"参数解析失败: %s; %v\", username, err)\n\t\tcontext.JSON(200, resp.NewBadRequest(\"参数解析失败\"))\n\t\treturn\n\t}\n\ta.logger.Info(pageNum, pageSize)\n\tvar list []entity.Tag\n\tif pageNum == -1 {\n\t\tlist, err = a.tagDao.ListAll()\n\t\tif err != nil {\n\t\t\ta.logger.Errorf(\"获取分类列表失败: %s; %v\", username, err)\n\t\t\tcontext.JSON(200, resp.NewInternalError(\"获取分类列表失败\"))\n\t\t\treturn\n\t\t}\n\t} else {\n\t\t// TODO\n\t}\n\tcontext.JSON(200, resp.NewList(int64(len(list)), int64(len(list)), int64(pageNum), int64(pageSize), int64(pageNum), true, list))\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/service/article.go b/service/article.go
+--- a/service/article.go	
++++ b/service/article.go	
+@@ -1,6 +1,7 @@
+ package service
+ 
+ import (
++	"fmt"
+ 	"github.com/SuanCaiYv/my-app-backend/config"
+ 	"github.com/SuanCaiYv/my-app-backend/db"
+ 	"github.com/SuanCaiYv/my-app-backend/entity"
+@@ -27,6 +28,8 @@
+ 
+ 	ListArticle(context *gin.Context)
+ 
++	ListDraft(context *gin.Context)
++
+ 	ArticleDetail(context *gin.Context)
+ 
+ 	ExportArticle(context *gin.Context)
+@@ -152,18 +155,18 @@
+ 		return
+ 	}
+ 	if input.ArticleId == "" {
+-		if input.ArticleName == "" {
+-			input.ArticleName = time.Now().String()
+-		}
+ 		article := entity.Article{
+-			Name:        input.ArticleName,
+-			Author:      user.Id,
+-			Summary:     "",
+-			CoverImg:    "",
+-			Catalog:     entity.Catalog{},
++			Name:     "",
++			Author:   user.Id,
++			Summary:  "",
++			CoverImg: "",
++			Catalog: entity.Catalog{
++				Name:     "",
++				Children: []entity.Catalog{},
++			},
+ 			Content:     input.ArticleContent,
+ 			Kind:        entity.Kind{},
+-			TagList:     make([]entity.Tag, 0, 0),
++			TagList:     []entity.Tag{},
+ 			ReleaseTime: time.Now(),
+ 			Visibility:  entity.VisibilityDraft,
+ 			Available:   false,
+@@ -276,8 +279,18 @@
+ 
+ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
+ 	username := context.MustGet("username").(string)
+-	pageSize, _ := strconv.Atoi(context.DefaultQuery("page_size", "10"))
+-	pageNum, _ := strconv.Atoi(context.DefaultQuery("page_num", "1"))
++	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
++	if err != nil {
++		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
++		return
++	}
++	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
++	if err != nil {
++		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
++		return
++	}
+ 	sort := context.DefaultQuery("sort", "created_time")
+ 	// 是否倒序
+ 	desc, _ := strconv.ParseBool(context.DefaultQuery("desc", "true"))
+@@ -308,6 +321,42 @@
+ 	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))
+ }
+ 
++func (a *ArticleApiHandler) ListDraft(context *gin.Context) {
++	username := context.MustGet("username").(string)
++	pageSize, err := strconv.Atoi(context.DefaultQuery("page_size", "10"))
++	if err != nil {
++		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
++		return
++	}
++	pageNum, err := strconv.Atoi(context.DefaultQuery("page_num", "1"))
++	if err != nil {
++		a.logger.Errorf("参数绑定失败: %s; %v", username, err)
++		context.JSON(200, resp.NewBadRequest("参数绑定失败"))
++		return
++	}
++	if pageNum == -1 {
++		user, err := a.sysUserDao.SelectByUsername(username)
++		if err != nil {
++			a.logger.Errorf("无法读取SysUser数据表: %s; %v", username, err)
++			context.JSON(200, resp.NewInternalError("无法读取用户表"))
++			return
++		}
++		now := time.Now()
++		fmt.Println(now)
++		AddTask("clearDraft", make(map[string]interface{}), now)
++		articles, err := a.articleDao.ListByAuthor0(user.Id, entity.VisibilityDraft, true)
++		if err != nil {
++			a.logger.Errorf("获取文章列表失败: %s; %v", "no-auth", err)
++			context.JSON(200, resp.NewInternalError("获取文章列表失败"))
++			return
++		}
++		context.JSON(200, resp.NewList(int64(len(articles)), int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), true, articles))
++	} else {
++		a.logger.Info(pageNum, pageSize)
++	}
++}
++
+ func (a *ArticleApiHandler) ArticleDetail(context *gin.Context) {
+ 	username := context.MustGet("username").(string)
+ 	articleId := context.Param("article_id")
+Index: cmd/main.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package main\n\nfunc main() {\n\t//BeforeStart()\n\t//api.Route()\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmd/main.go b/cmd/main.go
+--- a/cmd/main.go	
++++ b/cmd/main.go	
+@@ -1,6 +1,8 @@
+ package main
+ 
++import "github.com/SuanCaiYv/my-app-backend/api"
++
+ func main() {
+-	//BeforeStart()
+-	//api.Route()
++	BeforeStart()
++	api.Route()
+ }
+Index: cmd/hook_onstart.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package main\n\nimport (\n\t\"crypto/md5\"\n\t\"fmt\"\n\tconfig2 \"github.com/SuanCaiYv/my-app-backend/config\"\n\t\"github.com/SuanCaiYv/my-app-backend/db\"\n\t\"github.com/SuanCaiYv/my-app-backend/entity\"\n\t\"github.com/SuanCaiYv/my-app-backend/nosql\"\n\t\"github.com/SuanCaiYv/my-app-backend/service\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"io/ioutil\"\n\t\"mime\"\n\t\"os\"\n\t\"path/filepath\"\n\t\"strings\"\n\t\"time\"\n)\n\nfunc BeforeStart() {\n\tconfig := config2.ApplicationConfiguration()\n\t// 添加角色\n\tsysRoleDao := db.NewSysRoleDaoService()\n\tfor _, val := range config.Roles {\n\t\tresult, err := sysRoleDao.SelectByName(val.Name)\n\t\tutil.JustPanic(err)\n\t\tif result == nil {\n\t\t\trole := &entity.SysRole{\n\t\t\t\tName: val.Name,\n\t\t\t\tDesc: val.Desc,\n\t\t\t}\n\t\t\terr := sysRoleDao.Insert(role)\n\t\t\tutil.JustPanic(err)\n\t\t}\n\t}\n\t// 设置验证码，添加用户\n\tsysUserDao := db.NewSysUserDaoService()\n\tredisOps := nosql.NewRedisClient()\n\tfor _, val := range config.Accounts {\n\t\terr := redisOps.SetExp(\"ver_code_\"+val.Username, val.VerCode, 7*24*time.Hour)\n\t\tutil.JustPanic(err)\n\t\ttmpSysUser, err := sysUserDao.SelectByUsername(val.Username)\n\t\tutil.JustPanic(err)\n\t\tif tmpSysUser != nil {\n\t\t\tcontinue\n\t\t}\n\t\tsysUser := entity.DefaultSysUser()\n\t\tsysUser.Username = val.Username\n\t\tsysUser.Salt = strings.ReplaceAll(util.GenerateUUID(), \"-\", \"\")[:6]\n\t\tsysUser.Credential = fmt.Sprintf(\"%x\", md5.Sum([]byte(val.Credential+\"_\"+sysUser.Salt)))\n\t\tif config.Owner == val.Username {\n\t\t\tsysUser.Role = entity.RoleOwner\n\t\t} else {\n\t\t\tsysUser.Role = entity.RoleReader\n\t\t}\n\t\tsysUser.Info.Email = val.Username\n\t\tsysUser.Info.Nickname = val.Username\n\t\terr = sysUserDao.Insert(sysUser)\n\t\tutil.JustPanic(err)\n\t}\n\t// 设置默认头像\n\tgridFsDao := db.NewGridFSDaoService()\n\tfilename := \"avatar4.png\"\n\tif !gridFsDao.ExistFile(filename) {\n\t\tdefaultAvatarPath, err := filepath.Abs(\"static/\" + filename)\n\t\tutil.JustPanic(err)\n\t\tdefaultAvatar, err := os.OpenFile(defaultAvatarPath, os.O_RDONLY, os.ModePerm)\n\t\tutil.JustPanic(err)\n\t\tfileInfo, err := defaultAvatar.Stat()\n\t\tutil.JustPanic(err)\n\t\tmetaMap := make(map[string]interface{})\n\t\tmetaMap[\"upload_user\"] = config2.ApplicationConfiguration().Owner\n\t\tmetaMap[\"origin_name\"] = fileInfo.Name()\n\t\tmetaMap[\"archive\"] = \"avatar\"\n\t\tdata, err := ioutil.ReadAll(defaultAvatar)\n\t\tutil.JustPanic(err)\n\t\terr = gridFsDao.UploadFile(data, filename, metaMap)\n\t\tutil.JustPanic(err)\n\t}\n\t// 设置文件后缀识别\n\t_ = mime.AddExtensionType(\".md\", \"text/x-markdown\")\n\t// 启动文章清除器\n\tarticleDao := db.NewArticleDaoService()\n\townerUser, err := sysUserDao.SelectByUsername(config.Owner)\n\tutil.JustPanic(err)\n\tarticles, err := articleDao.ListByAuthor0(ownerUser.Id)\n\tutil.JustPanic(err)\n\tthreshold := time.UnixMilli(time.Now().UnixMilli() - 2*time.Hour.Milliseconds())\n\tfor i := range articles {\n\t\tif articles[i].UpdatedTime.Before(threshold) && articles[i].Content == \"\" {\n\t\t\terr := articleDao.Delete0(articles[i].Id)\n\t\t\tutil.JustPanic(err)\n\t\t}\n\t}\n\tservice.AddTask(&service.EmptyTask{}, time.Now())\n\tservice.runTask()\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmd/hook_onstart.go b/cmd/hook_onstart.go
+--- a/cmd/hook_onstart.go	
++++ b/cmd/hook_onstart.go	
+@@ -83,15 +83,28 @@
+ 	articleDao := db.NewArticleDaoService()
+ 	ownerUser, err := sysUserDao.SelectByUsername(config.Owner)
+ 	util.JustPanic(err)
+-	articles, err := articleDao.ListByAuthor0(ownerUser.Id)
++	articles, err := articleDao.ListByAuthor0(ownerUser.Id, entity.VisibilityDraft, true)
+ 	util.JustPanic(err)
+-	threshold := time.UnixMilli(time.Now().UnixMilli() - 2*time.Hour.Milliseconds())
+-	for i := range articles {
+-		if articles[i].UpdatedTime.Before(threshold) && articles[i].Content == "" {
+-			err := articleDao.Delete0(articles[i].Id)
+-			util.JustPanic(err)
+-		}
+-	}
+-	service.AddTask(&service.EmptyTask{}, time.Now())
+-	service.runTask()
++	for i := range articles {
++		if articles[i].UpdatedTime.Before(time.Now().Add(-5*time.Second)) && len(articles[i].Content) == 0 && len(articles[i].Name) == 0 {
++			err = articleDao.Delete0(articles[i].Id)
++			util.JustPanic(err)
++		}
++	}
++	service.AddFunc("clearDraft", func() {
++		sysUserDao := db.NewSysUserDaoService()
++		articleDao := db.NewArticleDaoService()
++		ownerUser, err := sysUserDao.SelectByUsername(config.Owner)
++		util.JustPanic(err)
++		articles, err := articleDao.ListByAuthor0(ownerUser.Id, entity.VisibilityDraft, true)
++		util.JustPanic(err)
++		for i := range articles {
++			if articles[i].UpdatedTime.Before(time.Now().Add(-5*time.Second)) && len(articles[i].Content) == 0 && len(articles[i].Name) == 0 {
++				err = articleDao.Delete0(articles[i].Id)
++				util.JustPanic(err)
++			}
++		}
++		service.AddTask("clearDraft", make(map[string]interface{}), time.Now().Add(10*time.Second))
++	})
++	service.AddTask("clearDraft", make(map[string]interface{}), time.Now().Add(10*time.Second))
+ }

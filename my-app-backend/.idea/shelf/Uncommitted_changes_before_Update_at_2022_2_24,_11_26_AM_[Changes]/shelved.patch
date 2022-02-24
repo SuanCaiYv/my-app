@@ -1,0 +1,153 @@
+Index: service/scheduled.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package service\n\nimport (\n\t\"github.com/SuanCaiYv/my-app-backend/nosql\"\n\t\"github.com/SuanCaiYv/my-app-backend/util\"\n\t\"math\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc init() {\n\tnewestTimestamp = math.MaxInt64\n\tgo loopQueue()\n}\n\nvar scheduledLogger = util.NewLogger()\nvar redisOps = nosql.NewRedisClient()\nvar funcMap = make(map[string]func())\nvar lock = sync.Mutex{}\n\n// 确保完全取消\nvar cancel = make(chan struct{}, 0)\n\n// 确保顺序执行\nvar wakeup = make(chan struct{}, 0)\nvar done = make(chan struct{}, 1)\nvar newestTimestamp int64\n\nfunc AddFunc(funcName string, fn func()) {\n\tdefer lock.Unlock()\n\tlock.Lock()\n\tfuncMap[funcName] = fn\n}\n\nfunc AddTask(funcName string, params map[string]interface{}, timestamp time.Time) {\n\tparams[\"funcName\"] = funcName\n\tparams[\"_id\"] = util.GenerateUUID()\n\terr := redisOps.PushSortQueue(\"scheduled_task\", &params, float64(timestamp.UnixMilli()))\n\tif err != nil {\n\t\tscheduledLogger.Error(\"AddTask error:\", err)\n\t}\n\twakeup <- struct{}{}\n\tscheduledLogger.Info(\"scheduled task added:\")\n}\n\n// 获取最近的任务并运行\nfunc runTask() {\n\tparams := make(map[string]interface{})\n\ttimestamp0 := new(float64)\n\terr := redisOps.PopSortQueue(\"scheduled_task\", &params, timestamp0)\n\tif err != nil {\n\t\tscheduledLogger.Error(\"runTask error:\", err)\n\t\treturn\n\t}\n\tif fnName, ok := params[\"funcName\"]; ok {\n\t\tfn := funcMap[fnName.(string)]\n\t\tgo fn()\n\t}\n}\n\nfunc loopQueue() {\n\tfor {\n\t\tselect {\n\t\tcase <-wakeup:\n\t\t\tgetNewestTask()\n\t\tcase <-done:\n\t\t\tgetNewestTask()\n\t\t}\n\t}\n}\n\n// 之所以设计这么复杂是为了实现任意时刻，系统最多只有一个任务在执行\nfunc getNewestTask() {\n\tparams := make(map[string]interface{})\n\ttimestamp0 := new(float64)\n\terr := redisOps.PeekSortQueue(\"scheduled_task\", &params, timestamp0)\n\tif err != nil {\n\t\tscheduledLogger.Error(\"runTask error:\", err)\n\t\treturn\n\t}\n\ttimestamp := int64(*timestamp0)\n\t// 更新最新任务\n\tif timestamp < newestTimestamp {\n\t\tif newestTimestamp != math.MaxInt64 {\n\t\t\tscheduledLogger.Info(\"newest task is canceled\")\n\t\t\t// 取消上一个最新任务\n\t\t\tcancel <- struct{}{}\n\t\t}\n\t\tnewestTimestamp = timestamp\n\t\tif time.UnixMilli(timestamp).After(time.Now()) {\n\t\t\tscheduledLogger.Info(\"newest task is scheduled\")\n\t\t\tafter := time.After(time.Duration(timestamp-time.Now().UnixMilli()) * time.Millisecond)\n\t\t\tgo func() {\n\t\t\t\tselect {\n\t\t\t\tcase <-after:\n\t\t\t\t\trunTask()\n\t\t\t\t\t// 允许执行下一个任务\n\t\t\t\t\tnewestTimestamp = math.MaxInt64\n\t\t\t\tcase <-cancel:\n\t\t\t\t\tscheduledLogger.Info(\"cancel newest task\")\n\t\t\t\t}\n\t\t\t\tdone <- struct{}{}\n\t\t\t}()\n\t\t} else {\n\t\t\tscheduledLogger.Info(\"newest task is running\")\n\t\t\trunTask()\n\t\t\t// 允许执行下一个任务\n\t\t\tnewestTimestamp = math.MaxInt64\n\t\t\tdone <- struct{}{}\n\t\t}\n\t} else {\n\t\treturn\n\t}\n}\n
+===================================================================
+diff --git a/service/scheduled.go b/service/scheduled.go
+--- a/service/scheduled.go	
++++ b/service/scheduled.go	
+@@ -1,6 +1,7 @@
+ package service
+ 
+ import (
++	"fmt"
+ 	"github.com/SuanCaiYv/my-app-backend/nosql"
+ 	"github.com/SuanCaiYv/my-app-backend/util"
+ 	"math"
+@@ -15,7 +16,7 @@
+ 
+ var scheduledLogger = util.NewLogger()
+ var redisOps = nosql.NewRedisClient()
+-var funcMap = make(map[string]func())
++var funcMap = make(map[string]func(params map[string]interface{}))
+ var lock = sync.Mutex{}
+ 
+ // 确保完全取消
+@@ -26,7 +27,7 @@
+ var done = make(chan struct{}, 1)
+ var newestTimestamp int64
+ 
+-func AddFunc(funcName string, fn func()) {
++func AddFunc(funcName string, fn func(params map[string]interface{})) {
+ 	defer lock.Unlock()
+ 	lock.Lock()
+ 	funcMap[funcName] = fn
+@@ -37,10 +38,10 @@
+ 	params["_id"] = util.GenerateUUID()
+ 	err := redisOps.PushSortQueue("scheduled_task", &params, float64(timestamp.UnixMilli()))
+ 	if err != nil {
+-		scheduledLogger.Error("AddTask error:", err)
++		scheduledLogger.Errorf("AddTask error: %s", err)
+ 	}
+ 	wakeup <- struct{}{}
+-	scheduledLogger.Info("scheduled task added:")
++	scheduledLogger.Info("scheduled task added.")
+ }
+ 
+ // 获取最近的任务并运行
+@@ -49,12 +50,16 @@
+ 	timestamp0 := new(float64)
+ 	err := redisOps.PopSortQueue("scheduled_task", &params, timestamp0)
+ 	if err != nil {
+-		scheduledLogger.Error("runTask error:", err)
++		scheduledLogger.Errorf("runTask error: %s", err)
+ 		return
+ 	}
+ 	if fnName, ok := params["funcName"]; ok {
+-		fn := funcMap[fnName.(string)]
+-		go fn()
++		fn, ok := funcMap[fnName.(string)]
++		if !ok {
++			scheduledLogger.Info("runTask error: func not found.")
++		} else {
++			fn(params)
++		}
+ 	}
+ }
+ 
+@@ -75,20 +80,21 @@
+ 	timestamp0 := new(float64)
+ 	err := redisOps.PeekSortQueue("scheduled_task", &params, timestamp0)
+ 	if err != nil {
+-		scheduledLogger.Error("runTask error:", err)
++		scheduledLogger.Errorf("runTask error: %s", err)
+ 		return
+ 	}
+ 	timestamp := int64(*timestamp0)
++	fmt.Println("run: " + params["msg"].(string))
+ 	// 更新最新任务
+ 	if timestamp < newestTimestamp {
+ 		if newestTimestamp != math.MaxInt64 {
+-			scheduledLogger.Info("newest task is canceled")
++			scheduledLogger.Info("last newest task is canceled.")
+ 			// 取消上一个最新任务
+ 			cancel <- struct{}{}
+ 		}
+ 		newestTimestamp = timestamp
+ 		if time.UnixMilli(timestamp).After(time.Now()) {
+-			scheduledLogger.Info("newest task is scheduled")
++			scheduledLogger.Info("newest task is scheduled.")
+ 			after := time.After(time.Duration(timestamp-time.Now().UnixMilli()) * time.Millisecond)
+ 			go func() {
+ 				select {
+@@ -97,13 +103,13 @@
+ 					// 允许执行下一个任务
+ 					newestTimestamp = math.MaxInt64
+ 				case <-cancel:
+-					scheduledLogger.Info("cancel newest task")
++					scheduledLogger.Info("cancel newest task.")
+ 				}
+ 				done <- struct{}{}
+ 			}()
+ 		} else {
+-			scheduledLogger.Info("newest task is running")
+-			runTask()
++			scheduledLogger.Info("newest task is indirectly run.")
++			go runTask()
+ 			// 允许执行下一个任务
+ 			newestTimestamp = math.MaxInt64
+ 			done <- struct{}{}
+Index: service/scheduled_test.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package service\n\nimport (\n\t\"fmt\"\n\t\"math\"\n\t\"testing\"\n\t\"time\"\n)\n\nfunc TestAddFunc(t *testing.T) {\n\tfn1 := func() {\n\t\tfmt.Println(time.Now().String())\n\t}\n\n\tAddFunc(\"print1\", fn1)\n\tcurr := time.Now().UnixMilli()\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+5000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+5000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+5000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+6000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+7000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+8000))\n\tAddTask(\"print1\", make(map[string]interface{}), time.UnixMilli(curr+8000))\n\ttime.Sleep(math.MaxInt64)\n}\n
+===================================================================
+diff --git a/service/scheduled_test.go b/service/scheduled_test.go
+--- a/service/scheduled_test.go	
++++ b/service/scheduled_test.go	
+@@ -8,18 +8,24 @@
+ )
+ 
+ func TestAddFunc(t *testing.T) {
+-	fn1 := func() {
+-		fmt.Println(time.Now().String())
++	fn := func(params map[string]interface{}) {
++		fmt.Println(params["msg"])
+ 	}
+-
+-	AddFunc("print1", fn1)
++	AddFunc("printMsg", fn)
+ 	curr := time.Now().UnixMilli()
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+5000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+5000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+5000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+6000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+7000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+8000))
+-	AddTask("print1", make(map[string]interface{}), time.UnixMilli(curr+8000))
++
++	params1 := make(map[string]interface{})
++	params1["msg"] = "aaa"
++	AddTask("printMsg", params1, time.UnixMilli(curr+4000))
++
++	//params2 := make(map[string]interface{})
++	//params2["msg"] = "bbb"
++	//AddTask("printMsg", params2, time.UnixMilli(curr+6000))
++
++	params3 := make(map[string]interface{})
++	params3["msg"] = "ccc"
++	AddTask("printMsg", params3, time.UnixMilli(curr))
++
++	fmt.Println("started")
+ 	time.Sleep(math.MaxInt64)
+ }
