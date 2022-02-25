@@ -55,7 +55,7 @@ import {Constant} from "../../common/systemconstant";
 import {httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
-import {toListResult} from "../../util/base";
+import {parseBoolean, toListResult} from "../../util/base";
 
 const name = ref<string>("Info")
 const router = useRouter()
@@ -183,7 +183,6 @@ const fetchNewestTag = function () {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
-            console.log(resp.data)
             const list = toListResult(resp.data)
             if (list.list.length > 0) {
                 newestTag.value = list.list[0].tag_name
@@ -192,9 +191,11 @@ const fetchNewestTag = function () {
     })
 }
 
-fetchLatestArticle()
-fetchLatestUpdate()
-fetchNewestTag()
+if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
+    fetchLatestArticle()
+    fetchLatestUpdate()
+    fetchNewestTag()
+}
 </script>
 
 <style scoped>

@@ -55,11 +55,12 @@ import {useRouter} from "vue-router";
 import {Response} from "../../common/interface";
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
+import {parseBoolean} from "../../util/base";
 
 const name = ref<string>("User")
 const router = useRouter()
 
-const avatar = ref<string>('http://127.0.0.1:8190/v1/static/a/my-avatar.png')
+const avatar = ref<string>('http://127.0.0.1:8190/v1/static/a/default-avatar.png')
 const nickname = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')
@@ -69,8 +70,7 @@ const weChat = ref<string>('')
 const github = ref<string>('')
 const signature = ref<string>('')
 
-const accessToken = storage.get(Constant.ACCESS_TOKEN)
-if (accessToken === "") {
+if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
     alertFunc("请登录", function () {
         router.push("/sign")
     })

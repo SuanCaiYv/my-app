@@ -12,7 +12,7 @@ import HomePage from "./HomePage.vue"
 import PH1 from "../placeholder/PH1.vue"
 import SignButton from "./SignButton.vue"
 
-const name = ref<String>("HeaderWithoutSearch")
+const name = ref<string>("HeaderWithoutSearch")
 </script>
 
 <style scoped>
