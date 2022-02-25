@@ -15,6 +15,7 @@ var logger = util.NewLogger()
 func Route() {
 	router := gin.New()
 	router.Use(corsMiddleware())
+	router.Use(trackPath())
 	router.Use(gin.CustomRecovery(func(context *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
 			context.AbortWithStatusJSON(200, resp.NewInternalError(err))
@@ -69,6 +70,9 @@ func Route() {
 		userApi := versionOne.Group("/user")
 		userApi.GET("/info", userApiHandler.GetUserInfo)
 		userApi.PUT("/info", userApiHandler.UpdateUserInfo)
+		userApi.PUT("", func(context *gin.Context) {
+			context.JSON(200, resp.NewBoolean(true))
+		})
 		userApi.DELETE("", userApiHandler.Logout)
 
 		// 文章接口
@@ -113,6 +117,13 @@ func corsMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Next()
+	}
+}
+
+func trackPath() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		logger.Info(context.Request.URL.Path)
+		context.Next()
 	}
 }
 

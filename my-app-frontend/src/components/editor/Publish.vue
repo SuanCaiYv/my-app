@@ -11,10 +11,12 @@
             <div class="show-value">{{ visibilityMsg }}</div>
         </div>
         <div class="kind-list">
-            <select class="select" v-model="chosenKind" @change="commitKindList">
-                <option value="" selected>选择分类</option>
-                <option v-for="item in kindList" :value="item.id">{{ item.name }}</option>
-            </select>
+            <div style="display: inline-block; width: 80px">
+                <select class="select" v-model="chosenKind" @change="commitKindList">
+                    <option disabled value="">选择分类</option>
+                    <option v-for="item in kindList" :value="item.id">{{ item.name }}</option>
+                </select>
+            </div>
             <input class="input" type="text" placeholder="键入并回车以新建分类" v-model="newKind"
                    @keydown.enter.down="createKind"/>
         </div>
@@ -25,10 +27,12 @@
             </div>
         </div>
         <div class="tag-list">
-            <select class="select" v-model="chosenTag" @change="commitTagList">
-                <option value="" selected>选择标签</option>
-                <option v-for="item in tagList" :value="item.id">{{ item.name }}</option>
-            </select>
+            <div style="display: inline-block; width: 80px">
+                <select class="select" v-model="chosenTag" @change="commitTagList">
+                    <option disabled value="">选择标签</option>
+                    <option v-for="item in tagList" :value="item.id">{{ item.name }}</option>
+                </select>
+            </div>
             <input class="input" type="text" placeholder="键入并回车以新建标签" v-model="newTag" @keydown.enter.down="createTag"/>
         </div>
         <div class="chosen-tag-list">
@@ -78,8 +82,6 @@ const chosenTagList = reactive<Array<IdName>>([])
 const chosenTag = ref<string>('')
 const tagMap = new Map<string, string>()
 const newTag = ref<string>('')
-const rollbackList = reactive<Array<IdName>>([])
-const chosenRollback = ref<string>('')
 const summary = ref<string>('')
 
 class IdAndValue implements IdName {
@@ -319,7 +321,9 @@ const publish = function () {
     if (covImg !== null) {
         let formData = new FormData()
         formData.append("file", covImg)
-        httpClient.upload("/static/file", {}, formData, function (resp: Response) {
+        httpClient.upload("/static/file", {
+            archive: "doc_img"
+        }, formData, function (resp: Response) {
             if (!resp.ok) {
                 console.log(resp.errMsg)
             } else {
@@ -524,12 +528,13 @@ span:after {
 }
 
 .select {
-    width: 80px;
+    min-width: auto;
     height: 44px;
     margin-left: 5px;
     margin-top: 8px;
     margin-bottom: 8px;
-    padding: 0;
+    padding-left: 4px;
+    padding-right: 4px;
     display: inline-block;
     border: 2px solid lightgray;
     box-sizing: border-box;
@@ -555,6 +560,7 @@ span:after {
     display: inline-block;
     vertical-align: bottom;
     text-align-last: left;
+    text-align: left;
     line-height: 44px;
     background-color: rgba(0, 0, 0, 0.07);
 }

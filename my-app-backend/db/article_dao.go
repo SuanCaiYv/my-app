@@ -15,6 +15,10 @@ import (
 	"time"
 )
 
+const (
+	PlaceHolderId = "000000000000000000000001"
+)
+
 type ArticleDao interface {
 	Insert(article *entity.Article) error
 
@@ -100,7 +104,7 @@ func newInstanceArticleDaoService() {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	util.JustPanic(err)
 	collection := client.Database(config.DatabaseConfig.DB).Collection(CollectionArticle)
-	one := collection.FindOne(ctx, primitive.M{"_id": "000000000000000000000001"})
+	one := collection.FindOne(ctx, primitive.M{"_id": PlaceHolderId})
 	language := "none"
 	if one.Err() == mongo.ErrNoDocuments {
 		_, err = collection.Indexes().CreateOne(ctx, mongo.IndexModel{
@@ -117,10 +121,25 @@ func newInstanceArticleDaoService() {
 		})
 		util.JustPanic(err)
 		_, err = collection.InsertOne(ctx, &entity.Article{
-			Id:      "000000000000000000000001",
-			Author:  "program",
-			Name:    "Welcome to My Blog",
-			Content: "Welcome to My Blog, this is the first article, you can edit it by yourself.",
+			Id:       PlaceHolderId,
+			Name:     "Welcome to My Blog",
+			Author:   "program",
+			Summary:  "",
+			CoverImg: "",
+			Catalog: entity.Catalog{
+				Name:     "",
+				Children: []entity.Catalog{},
+			},
+			Content:         "Welcome to My Blog, this is the first article, you can edit it by yourself.",
+			Kind:            entity.Kind{},
+			TagList:         []entity.Tag{},
+			ReleaseTime:     time.Now(),
+			Visibility:      0,
+			FulltextTitle:   "",
+			FulltextContent: "",
+			Available:       true,
+			CreatedTime:     time.Now(),
+			UpdatedTime:     time.Now(),
 		})
 		util.JustPanic(err)
 	}

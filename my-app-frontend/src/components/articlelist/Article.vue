@@ -1,8 +1,8 @@
 <template>
-    <div class="article" @click="router.push('/view/' + id)">
+    <div class="article">
         <PH1></PH1>
-        <div class="title">{{title}}</div>
-        <div class="content">{{summary}}</div>
+        <div class="title" @click="router.push('/view/' + id)">{{title}}</div>
+        <div class="content" @click="router.push('/view/' + id)">{{summary}}</div>
         <PH2></PH2>
         <div class="update">
             <button class="button" @click="upt">更新</button>

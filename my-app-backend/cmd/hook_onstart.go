@@ -60,7 +60,7 @@ func BeforeStart() {
 	}
 	// 设置默认头像
 	gridFsDao := db.NewGridFSDaoService()
-	filename := "avatar4.png"
+	filename := "default-avatar.png"
 	if !gridFsDao.ExistFile(filename) {
 		defaultAvatarPath, err := filepath.Abs("static/" + filename)
 		util.JustPanic(err)

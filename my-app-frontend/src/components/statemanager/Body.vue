@@ -4,13 +4,13 @@
         <div class="block-name">分类管理</div>
         <div class="kind-list">
             <div v-for="item in kindList" style="display: inline-block">
-                <KindOrTagItem :id="item.id" :name="item.name"></KindOrTagItem>
+                <KindOrTagItem :id="item.id" :name="item.name" :kind="'kind'" :onDeleted="deleteKind"></KindOrTagItem>
             </div>
         </div>
         <div class="block-name">标签管理</div>
         <div class="tag-list">
             <div v-for="item in tagList" style="display: inline-block">
-                <KindOrTagItem :id="item.id" :name="item.name"></KindOrTagItem>
+                <KindOrTagItem :id="item.id" :name="item.name" :kind="'tag'" :onDeleted="deleteTag"></KindOrTagItem>
             </div>
         </div>
         <div class="block-name">图片管理</div>
@@ -60,6 +60,14 @@ const fetchKindList = function () {
             }
         }
     })
+}
+
+const deleteKind = function (id: string) {
+    kindList.splice(kindList.findIndex(item => item.id === id), 1)
+}
+
+const deleteTag = function (id: string) {
+    tagList.splice(tagList.findIndex(item => item.id === id), 1)
 }
 
 const fetchTagList = function () {
@@ -119,6 +127,7 @@ const deleteImg = function (id: string) {
                 alertFunc("删除成功", function () {})
             }
         })
+        imgList.splice(imgList.findIndex(item => item === id), 1)
     })
 }
 

@@ -30,7 +30,10 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
+        let url = baseUrl + uri
+        if (str.length > 0) {
+            url += "?" + str.substring(0, str.length-1)
+        }
         if (auth) {
             axios.get(url, {
                 headers: {
@@ -55,7 +58,10 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
+        let url = baseUrl + uri
+        if (str.length > 0) {
+            url += "?" + str.substring(0, str.length-1)
+        }
         if (auth) {
             axios.post(url, params, {
                 headers: {
@@ -84,7 +90,10 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
+        let url = baseUrl + uri
+        if (str.length > 0) {
+            url += "?" + str.substring(0, str.length-1)
+        }
         if (auth) {
             axios.put(url, params, {
                 headers: {
@@ -108,12 +117,28 @@ const httpClient = {
             })
         }
     },
+    sign: function <T extends object>(uri: string, callback: Function) {
+        let url = baseUrl + uri
+        axios.put(url, {}, {
+            headers: {
+                "Authorization": "Bearer " + storage.get(Constant.REFRESH_TOKEN),
+                "Content-Type": "application/json"
+            }
+        }).then(function (resp) {
+            callback(dealResp(resp))
+        }).catch(err => {
+            console.log(err)
+        })
+    },
     delete: function <T extends object>(uri: string, query: T, auth: boolean, callback: Function) {
         let str = ""
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
+        let url = baseUrl + uri
+        if (str.length > 0) {
+            url += "?" + str.substring(0, str.length-1)
+        }
         if (auth) {
             axios.delete(url, {
                 headers: {
@@ -139,7 +164,10 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri + "?" + str.substring(0, str.length-1)
+        let url = baseUrl + uri
+        if (str.length > 0) {
+            url += "?" + str.substring(0, str.length-1)
+        }
         axios.post(url, formData, {
             headers: {
                 "Authorization": "Bearer " + storage.get(Constant.ACCESS_TOKEN),

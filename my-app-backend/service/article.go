@@ -125,6 +125,9 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	article.Visibility = input.Visibility
 	article.FulltextTitle = strings.Join(a.cutter.CutAll(article.Name), " ")
 	article.FulltextContent = strings.Join(a.cutter.CutAll(article.Content), " ")
+	if article.ReleaseTime.IsZero() {
+		article.ReleaseTime = time.Now()
+	}
 	err = a.articleDao.Update(article)
 	if err != nil {
 		a.logger.Errorf("更新Article失败: %s; %v", username, err)
@@ -585,4 +588,3 @@ func (a *ArticleApiHandler) DeleteTag(context *gin.Context) {
 	}
 	context.JSON(200, resp.NewBoolean(true))
 }
-

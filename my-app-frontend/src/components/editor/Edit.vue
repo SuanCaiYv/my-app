@@ -5,16 +5,17 @@
 </template>
 
 <script setup lang="ts">
-import {inject, ref} from "vue"
+import {inject, Ref, ref} from "vue"
 import {baseUrl, httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import {useRoute} from "vue-router";
+import alert from "../../util/alert";
 
 const name = ref<string>("Edit")
-const content = inject("content")
-const id = inject("id")
+const content = inject("content") as Ref<string>
+const id = inject("id") as Ref<string>
 const route = useRoute()
 if (route.params.type === "update") {
     const article = JSON.parse(storage.get(Constant.ARTICLE_ID_PREFIX + id.value))
@@ -41,12 +42,16 @@ document.addEventListener('paste', function (event: ClipboardEvent) {
         httpClient.upload("/static/file", {
             archive: "doc_img"
         }, formData, function (resp: Response) {
-            // @ts-ignore
-            let filename = resp.data.result
-            let str = "![" + filename + "]"
-            let url = baseUrl + "/static/a/" + filename
-            str += "(" + url + ")"
-            navigator.clipboard.writeText(str)
+            if (!resp.ok) {
+                console.log(resp.errMsg)
+            } else {
+                // @ts-ignore
+                let filename = resp.data.filename
+                let str = "![" + filename + "]"
+                let url = baseUrl + "/static/a/" + filename
+                str += "(" + url + ")"
+                content.value += str
+            }
         })
     }
 });

@@ -66,12 +66,15 @@ func (s *StaticSrcApiHandler) UploadFile(context *gin.Context) {
 	}
 	metaMap := make(map[string]interface{})
 	uri := context.Request.RequestURI
-	queryStr := uri[strings.LastIndex(uri, "?")+1:]
-	if queryStr != "" {
-		queries := strings.Split(queryStr, "&")
-		for _, str := range queries {
-			ss := strings.Split(str, "=")
-			metaMap[ss[0]] = ss[1]
+	idx := strings.LastIndex(uri, "?") + 1
+	if idx != 0 {
+		queryStr := uri[idx:]
+		if queryStr != "" {
+			queries := strings.Split(queryStr, "&")
+			for _, str := range queries {
+				ss := strings.Split(str, "=")
+				metaMap[ss[0]] = ss[1]
+			}
 		}
 	}
 	metaMap["upload_user"] = username
@@ -165,6 +168,7 @@ func (s *StaticSrcApiHandler) ListFile(context *gin.Context) {
 			return
 		}
 		endPage = true
+		total = int64(len(list))
 	} else {
 		s.logger.Info(pageNum, pageSize)
 	}

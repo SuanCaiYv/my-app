@@ -16,10 +16,21 @@ import {Response} from "../../common/interface";
 const name = ref<string>("SignButton")
 const state = ref<string>("Sign")
 
-httpClient.put("/sign", {}, {}, true, function (resp: Response) {
+httpClient.put("/user", {}, {}, true, function (resp: Response) {
     if (!resp.ok) {
-        storage.set(Constant.ACCESS_TOKEN, "")
-        storage.set(Constant.AUTHENTICATED, "false")
+        httpClient.sign("/sign", function (resp: Response) {
+            if (!resp.ok) {
+                storage.set(Constant.REFRESH_TOKEN, "")
+                storage.set(Constant.ACCESS_TOKEN, "")
+                storage.set(Constant.AUTHENTICATED, "false")
+            } else {
+                storage.set(Constant.REFRESH_TOKEN, resp.data.refresh_token)
+                storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
+                storage.set(Constant.AUTHENTICATED, "true")
+            }
+        })
+    } else {
+        storage.set(Constant.AUTHENTICATED, "true")
     }
 })
 

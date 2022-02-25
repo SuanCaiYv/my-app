@@ -3,14 +3,18 @@
 </template>
 
 <script setup lang="ts">
-import {inject, ref, watch} from "vue"
+import {inject, onMounted, Ref, ref, watch} from "vue"
 import {marked} from "marked";
 
 const name = ref<string>("Preview")
 
-const contentRaw = inject("content")
+const contentRaw = inject("content") as Ref<string>
 const content = ref<string>('')
 const title = inject("title")
+
+onMounted(() => {
+    content.value = marked.parse(contentRaw.value)
+})
 
 // @ts-ignore
 watch(contentRaw, (n, o) => {

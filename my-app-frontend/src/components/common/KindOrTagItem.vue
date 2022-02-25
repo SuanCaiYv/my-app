@@ -17,15 +17,18 @@ const name = ref<string>("KindOrTagItem")
 const props = defineProps({
     id: String,
     name: String,
+    kind: String,
+    onDeleted: Function,
 })
 
 const del = function () {
     confirmFunc("确认删除?", function () {}, function () {
-        httpClient.delete("/article/tag/" + props.id, {}, true, function (resp: Response) {
+        httpClient.delete("/article/" + props.kind + "/" + props.id, {}, true, function (resp: Response) {
             if (!resp.ok) {
                 console.log(resp.errMsg)
             } else {
                 alertFunc("删除成功", function () {})
+                props.onDeleted(props.id)
             }
         })
     })
@@ -57,12 +60,13 @@ const del = function () {
 }
 
 .delete {
-    width: auto;
+    width: 30px;
     height: 100%;
     border: none;
     border-radius: 16px;
     display: inline-block;
     font-size: 1.2rem;
+    text-align: center;
     line-height: 30px;
     vertical-align: bottom;
 }

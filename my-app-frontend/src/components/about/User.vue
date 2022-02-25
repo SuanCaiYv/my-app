@@ -97,7 +97,9 @@ const updateAvatar = function (event: Event) {
     let file = event.target.files[0]
     let form = new FormData()
     form.append("file", file)
-    httpClient.upload("/static/file", {}, form, function (resp: Response) {
+    httpClient.upload("/static/file", {
+        archive: "avatar",
+    }, form, function (resp: Response) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
