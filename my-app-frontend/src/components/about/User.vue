@@ -70,7 +70,7 @@ const weChat = ref<string>('')
 const github = ref<string>('')
 const signature = ref<string>('')
 
-if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
+if (!parseBoolean(storage.get(Constant.AUTHENTICATED))) {
     alertFunc("请登录", function () {
         router.push("/sign")
     })
