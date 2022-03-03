@@ -53,7 +53,16 @@ func newInstanceGridFSDaoService() {
 	ctx, cancel := context2.WithTimeout(context2.Background(), 2*time.Second)
 	defer cancel()
 	url := fmt.Sprintf("%s:%d", config.DatabaseConfig.Url, config.DatabaseConfig.Port)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
+	clientOptions := options.Client()
+	clientOptions.ApplyURI(url)
+	if len(config.DatabaseConfig.User) != 0 {
+		clientOptions.Auth = &options.Credential{
+			AuthSource: config.DatabaseConfig.GridFSDB,
+			Username:   config.DatabaseConfig.User,
+			Password:   config.DatabaseConfig.Password,
+		}
+	}
+	client, err := mongo.Connect(ctx, clientOptions)
 	util.JustPanic(err)
 	bucket, err := gridfs.NewBucket(client.Database(config.DatabaseConfig.GridFSDB))
 	util.JustPanic(err)
