@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue"
-import {baseUrl, httpClient} from "../../net";
+import {BASE_URL, httpClient} from "../../net";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
@@ -113,7 +113,7 @@ const updateAvatar = function (event: Event) {
             alertFunc(resp.errMsg, function () {})
         } else {
             // @ts-ignore
-            let url = baseUrl + "/static/a/" + resp.data.filename
+            let url = BASE_URL + "/static/a/" + resp.data.filename
             httpClient.put("/user/info", {
                 archive: "avatar"
             }, {

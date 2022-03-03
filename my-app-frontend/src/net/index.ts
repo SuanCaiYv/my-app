@@ -3,7 +3,7 @@ import storage from "../util/storage";
 import {Constant} from "../common/systemconstant";
 import {Response} from "../common/interface";
 
-export const baseUrl = "http://127.0.0.1:8190/v1"
+export const BASE_URL = "http://1.117.182.211:8190/v1"
 
 axios.defaults.timeout = 2000
 
@@ -30,7 +30,7 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         if (str.length > 0) {
             url += "?" + str.substring(0, str.length-1)
         }
@@ -58,7 +58,7 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         if (str.length > 0) {
             url += "?" + str.substring(0, str.length-1)
         }
@@ -90,7 +90,7 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         if (str.length > 0) {
             url += "?" + str.substring(0, str.length-1)
         }
@@ -118,7 +118,7 @@ const httpClient = {
         }
     },
     sign: function <T extends object>(uri: string, callback: Function) {
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         axios.put(url, {}, {
             headers: {
                 "Authorization": "Bearer " + storage.get(Constant.REFRESH_TOKEN),
@@ -135,7 +135,7 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         if (str.length > 0) {
             url += "?" + str.substring(0, str.length-1)
         }
@@ -164,7 +164,7 @@ const httpClient = {
         for (let field in query) {
             str += (field + "=" + query[field] + "&")
         }
-        let url = baseUrl + uri
+        let url = BASE_URL + uri
         if (str.length > 0) {
             url += "?" + str.substring(0, str.length-1)
         }

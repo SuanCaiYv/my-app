@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"mime"
+	"os"
+	"os/exec"
 	"path"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -61,4 +65,13 @@ func UpdateStructObjectWithJsonTag(old interface{}, m map[string]interface{}) {
 			}
 		}
 	}
+}
+
+func GetAppPath() string {
+	file, err := exec.LookPath(os.Args[0])
+	JustPanic(err)
+	abs, err := filepath.Abs(file)
+	JustPanic(err)
+	index := strings.LastIndex(abs, string(os.PathSeparator))
+	return abs[:index]
 }

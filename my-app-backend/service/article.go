@@ -7,8 +7,9 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/entity/resp"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/gin-gonic/gin"
+	"github.com/huichen/sego"
 	"github.com/sirupsen/logrus"
-	"github.com/yanyiwu/gojieba"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -54,18 +55,21 @@ type ArticleApiHandler struct {
 	tagDao     db.TagDao
 	gridFsDao  db.GridFSDao
 	sysUserDao db.SysUserDao
-	cutter     *gojieba.Jieba
+	segmenter  *sego.Segmenter
 	logger     *logrus.Logger
 }
 
 func NewArticleApiHandler() *ArticleApiHandler {
+	file := os.OpenFile("/Users/joker/Downloads/dictionary.txt")
+	segmenter := &sego.Segmenter{}
+	segmenter.LoadDictionary("")
 	return &ArticleApiHandler{
 		articleDao: db.NewArticleDaoService(),
 		kindDao:    db.NewKindDaoService(),
 		tagDao:     db.NewTagDaoService(),
 		gridFsDao:  db.NewGridFSDaoService(),
 		sysUserDao: db.NewSysUserDaoService(),
-		cutter:     gojieba.NewJieba(),
+		segmenter:  segmenter,
 		logger:     util.NewLogger(),
 	}
 }
@@ -123,8 +127,17 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	article.Kind = *kind
 	article.TagList = tagList
 	article.Visibility = input.Visibility
-	article.FulltextTitle = strings.Join(a.cutter.CutAll(article.Name), " ")
-	article.FulltextContent = strings.Join(a.cutter.CutAll(article.Content), " ")
+	fulltext1 := ""
+	for _, val := range a.segmenter.Segment([]byte(article.Name)) {
+		fulltext1 += val.Token().Text() + " "
+	}
+	article.FulltextTitle = fulltext1
+	fulltext2 := ""
+	for _, val := range a.segmenter.Segment([]byte(article.Content)) {
+		fulltext2 += val.Token().Text() + " "
+	}
+	article.FulltextTitle = fulltext1
+	article.FulltextContent = fulltext2
 	if article.ReleaseTime.IsZero() {
 		article.ReleaseTime = time.Now()
 	}

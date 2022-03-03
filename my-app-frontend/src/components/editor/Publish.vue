@@ -55,7 +55,7 @@
 import {reactive, ref, watch} from "vue"
 import ChoiceItem from "./ChoiceItem.vue"
 import {IdName, Response} from "../../common/interface";
-import {baseUrl, httpClient} from "../../net";
+import {BASE_URL, httpClient} from "../../net";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import alertFunc from "../../util/alert";
@@ -328,7 +328,7 @@ const publish = function () {
                 console.log(resp.errMsg)
             } else {
                 // @ts-ignore
-                covImgUrl = baseUrl + "/static/a/" + resp.data.filename
+                covImgUrl = BASE_URL + "/static/a/" + resp.data.filename
                 afterCoverImgUploaded()
             }
         })

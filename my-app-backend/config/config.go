@@ -5,10 +5,15 @@ import (
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 func init() {
-	absPath, err := filepath.Abs("config.json")
+	path := "config.json"
+	if runtime.GOOS == "linux" {
+		path = "/home/my_app/backend/config.json"
+	}
+	absPath, err := filepath.Abs(path)
 	util.JustPanic(err)
 	confFile, err := os.OpenFile(absPath, os.O_RDONLY, os.ModePerm)
 	util.JustPanic(err)

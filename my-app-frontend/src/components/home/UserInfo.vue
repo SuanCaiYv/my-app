@@ -24,13 +24,13 @@
 <script setup lang="ts">
 import {ref} from "vue"
 import {useRouter} from "vue-router";
-import {httpClient} from "../../net";
+import {BASE_URL, httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import alertFunc from "../../util/alert";
 
 const name = ref<string>("UserInfo")
 
-const avatar = ref<string>('http://127.0.0.1:8190/v1/static/a/my-avatar.png')
+const avatar = ref<string>(BASE_URL + '/static/a/my-avatar.png')
 const nickname = ref<string>('小白白白')
 const email = ref<string>('codewithbuff@163.com')
 const github = ref<string>('https://github.com/SuanCaiYv')

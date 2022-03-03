@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import {inject, Ref, ref} from "vue"
-import {baseUrl, httpClient} from "../../net";
+import {BASE_URL, httpClient} from "../../net";
 import {Response} from "../../common/interface";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
@@ -48,7 +48,7 @@ document.addEventListener('paste', function (event: ClipboardEvent) {
                 // @ts-ignore
                 let filename = resp.data.filename
                 let str = "![" + filename + "]"
-                let url = baseUrl + "/static/a/" + filename
+                let url = BASE_URL + "/static/a/" + filename
                 str += "(" + url + ")"
                 content.value += str
             }

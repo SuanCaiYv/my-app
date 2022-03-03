@@ -26,7 +26,7 @@
 import {reactive, ref} from "vue"
 import KindOrTagItem from "../common/KindOrTagItem.vue"
 import {IdName, Response} from "../../common/interface";
-import {baseUrl, httpClient} from "../../net";
+import {BASE_URL, httpClient} from "../../net";
 import {toListResult} from "../../util/base";
 import alertFunc from "../../util/alert";
 import {confirmFunc} from "../../util/confirm";
@@ -97,7 +97,7 @@ const fetchImgList = function () {
         } else {
             const list = toListResult(resp.data)
             for (let l of list.list) {
-                imgList.push(baseUrl + "/static/a/" + l)
+                imgList.push(BASE_URL + "/static/a/" + l)
             }
         }
     })
@@ -111,7 +111,7 @@ const fetchImgList = function () {
         } else {
             const list = toListResult(resp.data)
             for (let l of list.list) {
-                imgList.push(baseUrl + "/static/a/" + l)
+                imgList.push(BASE_URL + "/static/a/" + l)
             }
         }
     })
@@ -119,7 +119,7 @@ const fetchImgList = function () {
 
 const deleteImg = function (id: string) {
     confirmFunc("确认删除？", function () {}, function () {
-        id = id.replace(baseUrl + "/static/a/", "")
+        id = id.replace(BASE_URL + "/static/a/", "")
         httpClient.delete("/static/file/" + id, {},true, function (resp: Response) {
             if (!resp.ok) {
                 console.log(resp.errMsg)
