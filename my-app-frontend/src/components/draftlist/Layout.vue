@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="layout">
         <HeaderWithoutSearch></HeaderWithoutSearch>
         <PH1></PH1>
         <Body></Body>

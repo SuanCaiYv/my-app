@@ -1,7 +1,7 @@
 <template>
     <div class="choice-item">
         <div class="value">{{props.value}}</div>
-        <button class="delete" @click="props.deleteFunc(id)">✖️</button>
+        <button class="delete" @click="del">✖️</button>
     </div>
 </template>
 
@@ -15,14 +15,17 @@ const props = defineProps({
     id: String,
     deleteFunc: Function,
 })
+
+const del = function () {
+    // @ts-ignore
+    props.deleteFuncs(props.id)
+}
 </script>
 
 <style scoped>
 .choice-item {
     min-width: 1px;
     height: 30px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     border-radius: 16px;
     margin-left: 10px;
     margin-top: 7px;
@@ -34,8 +37,6 @@ const props = defineProps({
 .value {
     min-width: 1px;
     height: 30px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     padding: 0 0 0 8px;
     display: inline-block;
     text-align: left;
@@ -47,8 +48,6 @@ const props = defineProps({
 .delete {
     width: 30px;
     height: 30px;
-    /*border: 1px solid silver;*/
-    /*box-sizing: border-box;*/
     border: none;
     border-radius: 16px;
     padding: 0;

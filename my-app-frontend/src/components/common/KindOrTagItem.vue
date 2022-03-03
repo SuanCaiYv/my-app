@@ -28,6 +28,7 @@ const del = function () {
                 console.log(resp.errMsg)
             } else {
                 alertFunc("删除成功", function () {})
+                // @ts-ignore
                 props.onDeleted(props.id)
             }
         })

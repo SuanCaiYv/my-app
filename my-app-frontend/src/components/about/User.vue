@@ -79,14 +79,23 @@ if (!parseBoolean(storage.get(Constant.AUTHENTICATED))) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
+            // @ts-ignore
             avatar.value = resp.data.avatar
+            // @ts-ignore
             nickname.value = resp.data.nickname
+            // @ts-ignore
             email.value = resp.data.email
+            // @ts-ignore
             phone.value = resp.data.phone
+            // @ts-ignore
             location.value = resp.data.location
+            // @ts-ignore
             qq.value = resp.data.qq
+            // @ts-ignore
             weChat.value = resp.data.we_chat
+            // @ts-ignore
             github.value = resp.data.github
+            // @ts-ignore
             signature.value = resp.data.signature
         }
     })
@@ -103,6 +112,7 @@ const updateAvatar = function (event: Event) {
         if (!resp.ok) {
             alertFunc(resp.errMsg, function () {})
         } else {
+            // @ts-ignore
             let url = baseUrl + "/static/a/" + resp.data.filename
             httpClient.put("/user/info", {
                 archive: "avatar"

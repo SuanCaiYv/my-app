@@ -35,16 +35,21 @@ const nickname = ref<string>('小白白白')
 const email = ref<string>('codewithbuff@163.com')
 const github = ref<string>('https://github.com/SuanCaiYv')
 const signature = ref<string>('Gin+Vue3')
-const mailto = ref<String>("mailto:" + email.value)
+const mailto = ref<string>("mailto:" + email.value)
 
 httpClient.get("/user/info/no_auth", {}, false, function (resp: Response) {
     if (!resp.ok) {
         alertFunc(resp.errMsg, function () {})
     } else {
+        // @ts-ignore
         avatar.value = resp.data.avatar
+        // @ts-ignore
         nickname.value = resp.data.nickname
+        // @ts-ignore
         email.value = resp.data.email
+        // @ts-ignore
         github.value = resp.data.github
+        // @ts-ignore
         signature.value = resp.data.signature
     }
 })

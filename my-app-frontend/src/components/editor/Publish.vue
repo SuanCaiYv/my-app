@@ -327,6 +327,7 @@ const publish = function () {
             if (!resp.ok) {
                 console.log(resp.errMsg)
             } else {
+                // @ts-ignore
                 covImgUrl = baseUrl + "/static/a/" + resp.data.filename
                 afterCoverImgUploaded()
             }

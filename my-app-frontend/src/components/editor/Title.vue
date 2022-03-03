@@ -15,7 +15,9 @@ const title = inject("title")
 const id = inject("id")
 const route = useRoute()
 if (route.params.type === "update") {
+    // @ts-ignore
     const article = JSON.parse(storage.get(Constant.ARTICLE_ID_PREFIX + id.value))
+    // @ts-ignore
     title.value = article.article_name
 }
 </script>

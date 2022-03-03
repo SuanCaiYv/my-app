@@ -24,7 +24,9 @@ httpClient.put("/user", {}, {}, true, function (resp: Response) {
                 storage.set(Constant.ACCESS_TOKEN, "")
                 storage.set(Constant.AUTHENTICATED, "false")
             } else {
+                // @ts-ignore
                 storage.set(Constant.REFRESH_TOKEN, resp.data.refresh_token)
+                // @ts-ignore
                 storage.set(Constant.ACCESS_TOKEN, resp.data.access_token)
                 storage.set(Constant.AUTHENTICATED, "true")
             }
