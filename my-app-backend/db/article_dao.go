@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
+	"strings"
 	"sync"
 	"time"
 )
@@ -261,6 +262,7 @@ func (a *ArticleDaoService) ListByAuthor(author string, visibility int, equally 
 		descInt = 1
 	}
 	skip := (pgNum - 1) * pgNum
+	searchKey = strings.ToLower(searchKey)
 	var v interface{}
 	if equally {
 		v = visibility

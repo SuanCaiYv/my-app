@@ -534,14 +534,13 @@ span:after {
     margin-left: 5px;
     margin-top: 8px;
     margin-bottom: 8px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 0 4px;
     display: inline-block;
     border: 2px solid lightgray;
     box-sizing: border-box;
     border-radius: 30px;
     vertical-align: bottom;
-    line-height: 44px;
+    line-height: 40px;
     font-size: 1rem;
     font-weight: bolder;
     outline: none;

@@ -60,7 +60,7 @@ import {parseBoolean} from "../../util/base";
 const name = ref<string>("User")
 const router = useRouter()
 
-const avatar = ref<string>('http://127.0.0.1:8190/v1/static/a/default-avatar.png')
+const avatar = ref<string>(BASE_URL + '/static/a/default-avatar.png')
 const nickname = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')

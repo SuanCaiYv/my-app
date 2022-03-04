@@ -1,12 +1,12 @@
 {
   "owner": "2508826394@qq.com",
   "database": {
-    "url": "mongodb://127.0.0.1",
+    "url": "mongodb://1.117.182.211",
     "port": 27017,
-    "db": "my_app_dev",
-    "grid_fs_db": "my_app_dev_grid_fs",
-    "user": "",
-    "password": ""
+    "db": "my_app",
+    "grid_fs_db": "my_app_grid_fs",
+    "user": "my_app_user",
+    "password": "cwb.123456"
   },
   "redis": {
     "url": "localhost",

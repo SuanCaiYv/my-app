@@ -30,7 +30,7 @@ import alertFunc from "../../util/alert";
 
 const name = ref<string>("UserInfo")
 
-const avatar = ref<string>(BASE_URL + '/static/a/my-avatar.png')
+const avatar = ref<string>(BASE_URL + '/static/a/default-avatar.png')
 const nickname = ref<string>('小白白白')
 const email = ref<string>('codewithbuff@163.com')
 const github = ref<string>('https://github.com/SuanCaiYv')

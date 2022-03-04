@@ -1,15 +1,15 @@
 package service
 
 import (
+	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
 	"github.com/SuanCaiYv/my-app-backend/entity/resp"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"github.com/gin-gonic/gin"
-	"github.com/huichen/sego"
+	"github.com/go-ego/gse"
 	"github.com/sirupsen/logrus"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -55,21 +55,23 @@ type ArticleApiHandler struct {
 	tagDao     db.TagDao
 	gridFsDao  db.GridFSDao
 	sysUserDao db.SysUserDao
-	segmenter  *sego.Segmenter
+	cutter     *gse.Segmenter
 	logger     *logrus.Logger
 }
 
 func NewArticleApiHandler() *ArticleApiHandler {
-	file := os.OpenFile("/Users/joker/Downloads/dictionary.txt")
-	segmenter := &sego.Segmenter{}
-	segmenter.LoadDictionary("")
+	cutter := &gse.Segmenter{}
+	err := cutter.LoadDictEmbed("zh")
+	util.JustPanic(err)
+	err = cutter.LoadDictEmbed("zh")
+	util.JustPanic(err)
 	return &ArticleApiHandler{
 		articleDao: db.NewArticleDaoService(),
 		kindDao:    db.NewKindDaoService(),
 		tagDao:     db.NewTagDaoService(),
 		gridFsDao:  db.NewGridFSDaoService(),
 		sysUserDao: db.NewSysUserDaoService(),
-		segmenter:  segmenter,
+		cutter:     cutter,
 		logger:     util.NewLogger(),
 	}
 }
@@ -127,17 +129,25 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 	article.Kind = *kind
 	article.TagList = tagList
 	article.Visibility = input.Visibility
-	fulltext1 := ""
-	for _, val := range a.segmenter.Segment([]byte(article.Name)) {
-		fulltext1 += val.Token().Text() + " "
+	arr1 := a.cutter.CutSearch(article.Name)
+	arr2 := a.cutter.CutSearch(article.Content)
+	ss1 := make([]string, 0, len(arr1))
+	ss2 := make([]string, 0, len(arr2))
+	for i := range arr1 {
+		if arr1[i] == " " {
+			continue
+		}
+		ss1 = append(ss1, arr1[i])
 	}
-	article.FulltextTitle = fulltext1
-	fulltext2 := ""
-	for _, val := range a.segmenter.Segment([]byte(article.Content)) {
-		fulltext2 += val.Token().Text() + " "
+	for i := range arr2 {
+		if arr2[i] == " " {
+			continue
+		}
+		ss2 = append(ss2, arr2[i])
 	}
-	article.FulltextTitle = fulltext1
-	article.FulltextContent = fulltext2
+	fmt.Println(article.FulltextTitle)
+	article.FulltextTitle = strings.Join(ss1, " ")
+	article.FulltextContent = strings.Join(ss2, " ")
 	if article.ReleaseTime.IsZero() {
 		article.ReleaseTime = time.Now()
 	}
@@ -244,6 +254,25 @@ func (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {
 		return
 	}
 	util.UpdateStructObjectWithJsonTag(article, input)
+	arr1 := a.cutter.CutAll(article.Name)
+	arr2 := a.cutter.CutAll(article.Content)
+	ss1 := make([]string, 0, len(arr1))
+	ss2 := make([]string, 0, len(arr2))
+	for i := range arr1 {
+		if arr1[i] == " " {
+			continue
+		}
+		ss1 = append(ss1, arr1[i])
+	}
+	for i := range arr2 {
+		if arr2[i] == " " {
+			continue
+		}
+		ss2 = append(ss2, arr2[i])
+	}
+	fmt.Println(article.FulltextTitle)
+	article.FulltextTitle = strings.Join(ss1, " ")
+	article.FulltextContent = strings.Join(ss2, " ")
 	err = a.articleDao.Update(article)
 	if err != nil {
 		a.logger.Errorf("更新文档失败: %s; %v", username, err)
