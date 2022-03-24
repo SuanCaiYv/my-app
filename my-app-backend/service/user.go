@@ -43,6 +43,7 @@ type sign struct {
 	Username   string `json:"username"`
 	Credential string `json:"credential"`
 	VerCode    string `json:"ver_code"`
+	Operation  string `json:"operation"`
 }
 
 func NewUserApiHandler() *UserApiHandler {
@@ -68,7 +69,7 @@ func (u *UserApiHandler) SignUp(context *gin.Context) {
 		context.JSON(200, resp.NewInternalError("无法读取用户表"))
 		return
 	}
-	if sysUser != nil {
+	if sysUser != nil && sign.Operation == "sign_up" {
 		u.logger.Infof("用户已存在: %s", sign.Username)
 		context.JSON(200, resp.NewBadRequest("用户已存在"))
 		return
@@ -185,15 +186,34 @@ func (u *UserApiHandler) Login(context *gin.Context) {
 }
 
 func (u *UserApiHandler) SendVerCode(context *gin.Context) {
-	username := context.Param("username")
+	sign := &sign{}
+	err := context.BindJSON(sign)
+	if err != nil {
+		u.logger.Errorf("参数解析失败: %v", err)
+		context.JSON(200, resp.NewBadRequest("参数解析失败"))
+		return
+	}
+	username := sign.Username
 	if _, ok := config.ApplicationConfiguration().AccountSet[username]; ok {
 		context.JSON(200, resp.NewBoolean(true))
 		return
 	}
-	err := u.redisOps.SetExp("ver_code_"+username, util.VerCode(), 120*time.Second)
+	if username == "" {
+		u.logger.Error("用户名不可为空")
+		context.JSON(200, resp.NewBadRequest("用户名不可为空"))
+		return
+	}
+	verCode := util.VerCode()
+	err = u.redisOps.SetExp("ver_code_"+username, verCode, 120*time.Second)
 	if err != nil {
 		u.logger.Errorf("设置验证码失败: %s; %v", username, err)
 		context.JSON(200, resp.NewInternalError("设置验证码失败"))
+		return
+	}
+	err = NewEmailService().SendVerCode(username, verCode)
+	if err != nil {
+		u.logger.Errorf("发送验证码失败: %s; %v", username, err)
+		context.JSON(200, resp.NewInternalError("发送验证码失败"))
 		return
 	}
 	context.JSON(200, resp.NewBoolean(true))

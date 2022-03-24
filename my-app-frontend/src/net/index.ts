@@ -3,7 +3,7 @@ import storage from "../util/storage";
 import {Constant} from "../common/systemconstant";
 import {Response} from "../common/interface";
 
-export const BASE_URL = "http://1.117.182.211:8190/v1"
+export const BASE_URL = "http://127.0.0.1:8190/v1"
 
 axios.defaults.timeout = 2000
 

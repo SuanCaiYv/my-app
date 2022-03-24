@@ -6,39 +6,43 @@
                 <img class="img" :src="avatar"/>
             </label>
             <input type="file" id="avatar" hidden @change="updateAvatar($event)">
-            <input class="nickname" v-model="nickname" @keydown.enter.down="updateNickname"/>
+            <input class="nickname" v-model="nickname" @change="updateNickname"/>
         </div>
         <div class="col2">
             <div>
-                <input class="input" type="email" v-model="email" @keydown.enter.down="updateEmail">
+                <input class="input" type="email" v-model="email" @change="updateEmail">
                 <div class="name">邮箱</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="phone" @keydown.enter.down="updatePhone">
+                <input class="input" type="text" v-model="phone" @change="updatePhone">
                 <div class="name">手机</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="location" @keydown.enter.down="updateLocation">
+                <input class="input" type="text" v-model="location" @change="updateLocation">
                 <div class="name">地址</div>
             </div>
         </div>
         <div class="col3">
             <div>
-                <input class="input" type="text" v-model="qq" @keydown.enter.down="updateQQ">
+                <input class="input" type="text" v-model="qq" @change="updateQQ">
                 <div class="name">Q&nbsp;Q</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="weChat" @keydown.enter.down="updateWeChat">
+                <input class="input" type="text" v-model="weChat" @change="updateWeChat">
                 <div class="name">微信</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="github" @keydown.enter.down="updateGitHub">
+                <input class="input" type="text" v-model="github" @change="updateGitHub">
                 <div class="name">猫网</div>
             </div>
         </div>
         <div class="col4">
             <div>
                 <textarea class="signature" v-model="signature" @change="updateSignature"/>
+            </div>
+            <div>
+                <div class="input"></div>
+                <button class="name click" @click="updatePassword">密码</button>
             </div>
         </div>
         <PH2></PH2>
@@ -56,6 +60,7 @@ import {Response} from "../../common/interface";
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
 import {parseBoolean} from "../../util/base";
+import {useStore} from "vuex";
 
 const name = ref<string>("User")
 const router = useRouter()
@@ -200,6 +205,11 @@ const updateSignature = function () {
         }
     })
 }
+
+const updatePassword = function () {
+    useStore().commit("updateOperation", "update_password")
+    router.push("/sign")
+}
 </script>
 
 <style scoped>
@@ -302,7 +312,7 @@ const updateSignature = function () {
 
 .signature {
     width: 280px;
-    height: 145px;
+    height: 140px;
     border: none;
     box-sizing: border-box;
     border-radius: 16px;
@@ -317,5 +327,16 @@ const updateSignature = function () {
     outline: none;
     resize: none;
     background-color: rgba(0,0,0,0.05);
+}
+
+.click {
+}
+
+.click:hover {
+    background-color: lightgray;
+}
+
+.click:active {
+    background-color: gainsboro;
 }
 </style>

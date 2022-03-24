@@ -118,15 +118,17 @@ const fetchArticles = function () {
                 articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary))
                 storage.set(Constant.ARTICLE_ID_PREFIX + l.article_id, JSON.stringify(l))
             }
-            if (articleList.length > 0) {
+            if (!endPage) {
                 displayStr.value = "inline-block"
+            } else {
+                displayStr.value = "none"
             }
         }
     })
 }
 
 watch(articleList, () => {
-    if (articleList.length > 0) {
+    if (!endPage) {
         displayStr.value = "inline-block"
     } else {
         displayStr.value = "none"

@@ -59,6 +59,7 @@ func Route() {
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
+		versionOne.GET("/article/:id", articleApi.GetArticle)
 
 		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)

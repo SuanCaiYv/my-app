@@ -36,6 +36,11 @@ const routes: Array<RouteRecordRaw> = [
         name: "sign",
         component: () => import("../views/Sign.vue")
     },
+    {
+        path: "/sign/update_password",
+        name: "update_password",
+        component: () => import("../views/Sign.vue")
+    },
     // 文章管理
     {
         path: "/article_list",
@@ -88,6 +93,9 @@ router.beforeEach((to, from) => {
     if (from.name === "editor") {
         let cancel = parseInt(storage.get(Constant.DRAFT_INTERVAL_CANCEL))
         clearInterval(cancel)
+    }
+    if (to.name === "update_password") {
+        to.params.operation = "update_password"
     }
 })
 

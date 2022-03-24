@@ -18,7 +18,7 @@ const props = defineProps({
 
 const del = function () {
     // @ts-ignore
-    props.deleteFuncs(props.id)
+    props.deleteFunc(props.id)
 }
 </script>
 

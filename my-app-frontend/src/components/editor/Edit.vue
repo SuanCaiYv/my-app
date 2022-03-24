@@ -11,7 +11,6 @@ import {Response} from "../../common/interface";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import {useRoute} from "vue-router";
-import alert from "../../util/alert";
 
 const name = ref<string>("Edit")
 const content = inject("content") as Ref<string>

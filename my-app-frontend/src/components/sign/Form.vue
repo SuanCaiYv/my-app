@@ -13,8 +13,8 @@
             <input class="value-input" type="text" v-model="verCode" placeholder='点击"验证码"以发送'/>
         </div>
         <div class="l4">
-            <button class="name-show click" @click="login">登录</button>
-            <button class="name-show click" @click="signup">注册</button>
+            <button class="name-show click" @click="login" :class="{disabled: disableSignIn}">登录</button>
+            <button class="name-show click" @click="signup">{{ btnName }}</button>
         </div>
     </div>
 </template>
@@ -27,18 +27,35 @@ import alertFunc from "../../util/alert";
 import router from "../../router";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
+import {useStore} from "vuex";
+import {useRoute} from "vue-router";
 
 const name = ref<string>("Form")
 
 let username = ref<string>("")
 let password = ref<string>("")
 let verCode = ref<string>("")
+let btnName = ref<string>("注册")
+let disableSignIn = ref<boolean>(false)
+let alertMsg = "注册成功"
 
+const operation = useStore().getters.operation
+console.log(useRoute().params)
+if (operation === "update_password" || useRoute().params.operation === "update_password") {
+    btnName.value = "重置密码"
+    disableSignIn.value = true
+    alertMsg = "重置密码成功"
+}
 storage.setOnce(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, (new Date().getTime() - 120 * 1000) + "")
 
 const sendVerCode = function () {
     if (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP)) < 120 * 1000) {
         alertFunc("请" + Math.trunc(120 - (new Date().getTime() - Number(storage.get(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP))) / 1000) + "秒后重试", function () {
+        })
+        return
+    }
+    if (username.value === "") {
+        alertFunc("请输入用户名", function () {
         })
         return
     }
@@ -110,10 +127,11 @@ const signup = function () {
     httpClient.post("/sign", {}, {
         username: username.value,
         credential: password.value,
-        ver_code: verCode.value
+        ver_code: verCode.value,
+        operation: operation
     }, false, function (resp: Response) {
         if (resp.ok) {
-            alertFunc("注册成功", function () {
+            alertFunc(alertMsg, function () {
             })
         } else {
             alertFunc(resp.errMsg, function () {
@@ -202,5 +220,11 @@ const signup = function () {
 
 .click:active {
     background-color: gainsboro;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.4;
 }
 </style>

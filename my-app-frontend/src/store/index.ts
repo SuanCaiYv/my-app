@@ -4,17 +4,24 @@ const store: Store<any> = createStore({
     state() {
         return {
             draftArticleId: String,
+            operation: String,
         }
     },
     mutations: {
-        updatedDraftArticleId(state, draftArticleId) {
+        updateDraftArticleId(state, draftArticleId) {
             state.draftArticleId = draftArticleId
-        }
+        },
+        updateOperation(state, operation) {
+            state.operation = operation
+        },
     },
     getters: {
         draftArticleId: (state) => {
             return state.draftArticleId
-        }
+        },
+        operation: (state) => {
+            return state.operation
+        },
     }
 })
 

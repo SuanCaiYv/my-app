@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/SuanCaiYv/my-app-backend/config"
 	"github.com/SuanCaiYv/my-app-backend/db"
 	"github.com/SuanCaiYv/my-app-backend/entity"
@@ -23,6 +22,8 @@ type ArticleApi interface {
 	UpdateArticle(context *gin.Context)
 
 	DeleteArticle(context *gin.Context)
+
+	GetArticle(context *gin.Context)
 
 	ListArticleNoAuth(context *gin.Context)
 
@@ -145,7 +146,6 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 		}
 		ss2 = append(ss2, arr2[i])
 	}
-	fmt.Println(article.FulltextTitle)
 	article.FulltextTitle = strings.Join(ss1, " ")
 	article.FulltextContent = strings.Join(ss2, " ")
 	if article.ReleaseTime.IsZero() {
@@ -270,7 +270,6 @@ func (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {
 		}
 		ss2 = append(ss2, arr2[i])
 	}
-	fmt.Println(article.FulltextTitle)
 	article.FulltextTitle = strings.Join(ss1, " ")
 	article.FulltextContent = strings.Join(ss2, " ")
 	err = a.articleDao.Update(article)
@@ -292,6 +291,22 @@ func (a *ArticleApiHandler) DeleteArticle(context *gin.Context) {
 		return
 	}
 	context.JSON(200, resp.NewBoolean(true))
+}
+
+func (a *ArticleApiHandler) GetArticle(context *gin.Context) {
+	articleId := context.Param("article_id")
+	article, err := a.articleDao.Select(articleId)
+	if err != nil {
+		a.logger.Errorf("获取文章失败: %v", err)
+		context.JSON(200, resp.NewInternalError("获取文章失败"))
+		return
+	}
+	if article.Visibility != entity.VisibilityPublic {
+		a.logger.Errorf("此文章为私密文章: %s", articleId)
+		context.JSON(200, resp.NewBadRequest("此文章为私密文章"))
+		return
+	}
+	context.JSON(200, resp.NewOk(article))
 }
 
 func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {

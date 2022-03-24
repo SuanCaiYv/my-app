@@ -37,3 +37,11 @@
     height: 100%;
     object-fit: contain;
 }
+
+:deep(td) {
+    border: 1px solid black;
+}
+
+:deep(th) {
+    border: 1px solid black;
+}

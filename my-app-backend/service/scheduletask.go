@@ -20,8 +20,8 @@ type Func func(params Params)
 type FuncMap map[string]Func
 
 var (
-	funcMap              = make(FuncMap)
-	lock                 sync.Mutex
+	funcMap                    = make(FuncMap)
+	lock                       = sync.Mutex{}
 	wakeupSignal               = make(chan struct{}, 0)
 	cancelLastTaskSignal       = make(chan struct{}, 1)
 	lastTaskStatus       int64 = ReadyStart

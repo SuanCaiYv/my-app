@@ -2,20 +2,19 @@ package config
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/SuanCaiYv/my-app-backend/util"
 	"os"
-	"path/filepath"
-	"runtime"
 )
 
 func init() {
-	path := "config.json"
-	if runtime.GOOS == "linux" {
-		path = "/home/my_app/backend/config.json"
+	configPath := flag.String("config", "", "config file path")
+	flag.StringVar(configPath, "c", "", "config file path")
+	flag.Parse()
+	if *configPath == "" {
+		util.JustPanic("config path is empty")
 	}
-	absPath, err := filepath.Abs(path)
-	util.JustPanic(err)
-	confFile, err := os.OpenFile(absPath, os.O_RDONLY, os.ModePerm)
+	confFile, err := os.OpenFile(*configPath, os.O_RDONLY, os.ModePerm)
 	util.JustPanic(err)
 	fileInfo, err := confFile.Stat()
 	util.JustPanic(err)
@@ -49,6 +48,7 @@ func init() {
 		})
 		accountSet[tmpAccount["username"].(string)] = struct{}{}
 	}
+	email := configObject["email"].(map[string]interface{})
 	config = &Configuration{
 		Owner: configObject["owner"].(string),
 		DatabaseConfig: &DatabaseConfig{
@@ -69,6 +69,12 @@ func init() {
 		Roles:      roles,
 		Accounts:   accounts,
 		AccountSet: accountSet,
+		Email: &Email{
+			Host:       email["host"].(string),
+			Port:       int(email["port"].(float64)),
+			Sender:     email["sender"].(string),
+			Credential: email["credential"].(string),
+		},
 	}
 }
 
@@ -81,6 +87,7 @@ type Configuration struct {
 	Roles          []Role
 	Accounts       []Account
 	AccountSet     Set
+	Email          *Email
 }
 
 type DatabaseConfig struct {
@@ -109,6 +116,13 @@ type Account struct {
 	Username   string
 	Credential string
 	VerCode    string
+}
+
+type Email struct {
+	Host       string
+	Port       int
+	Sender     string
+	Credential string
 }
 
 var config *Configuration
