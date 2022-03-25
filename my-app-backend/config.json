@@ -1,12 +1,12 @@
 {
   "owner": "2508826394@qq.com",
   "database": {
-    "url": "mongodb://1.117.182.211",
+    "url": "mongodb://127.0.0.1",
     "port": 27017,
     "db": "my_app",
     "grid_fs_db": "my_app_grid_fs",
-    "user": "my_app_user",
-    "password": "cwb.123456"
+    "user": "",
+    "password": ""
   },
   "redis": {
     "url": "localhost",
@@ -36,5 +36,11 @@
       "credential": "123123",
       "ver_code": "000000"
     }
-  ]
+  ],
+  "email": {
+    "sender": "codewithbuff@163.com",
+    "credential": "EXVPIPZVMLEBFQJC",
+    "host": "smtp.163.com",
+    "port": 25
+  }
 }

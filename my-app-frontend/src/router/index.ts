@@ -86,8 +86,11 @@ const router: Router = createRouter({
 
 router.beforeEach((to, from) => {
     if (from.name === "editor") {
-        let cancel = parseInt(storage.get(Constant.DRAFT_INTERVAL_CANCEL))
-        clearInterval(cancel)
+        storage.get(Constant.DRAFT_INTERVAL_CANCEL_LIST).split(";").forEach(id => {
+            if (id !== "") {
+                clearInterval(parseInt(id));
+            }
+        })
     }
     if (to.name === "update_password") {
         to.params.operation = "update_password"

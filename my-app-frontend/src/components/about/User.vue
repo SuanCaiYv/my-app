@@ -6,39 +6,39 @@
                 <img class="img" :src="avatar"/>
             </label>
             <input type="file" id="avatar" hidden @change="updateAvatar($event)">
-            <input class="nickname" v-model="nickname" @change="updateNickname"/>
+            <input class="nickname indicate" v-model="nickname" @change="updateNickname"/>
         </div>
         <div class="col2">
             <div>
-                <input class="input" type="email" v-model="email" @change="updateEmail">
+                <input class="input indicate" type="email" v-model="email" @change="updateEmail">
                 <div class="name">邮箱</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="phone" @change="updatePhone">
+                <input class="input indicate" type="text" v-model="phone" @change="updatePhone">
                 <div class="name">手机</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="location" @change="updateLocation">
+                <input class="input indicate" type="text" v-model="location" @change="updateLocation">
                 <div class="name">地址</div>
             </div>
         </div>
         <div class="col3">
             <div>
-                <input class="input" type="text" v-model="qq" @change="updateQQ">
+                <input class="input indicate" type="text" v-model="qq" @change="updateQQ">
                 <div class="name">Q&nbsp;Q</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="weChat" @change="updateWeChat">
+                <input class="input indicate" type="text" v-model="weChat" @change="updateWeChat">
                 <div class="name">微信</div>
             </div>
             <div>
-                <input class="input" type="text" v-model="github" @change="updateGitHub">
+                <input class="input indicate" type="text" v-model="github" @change="updateGitHub">
                 <div class="name">猫网</div>
             </div>
         </div>
         <div class="col4">
             <div>
-                <textarea class="signature" v-model="signature" @change="updateSignature"/>
+                <textarea class="signature indicate" v-model="signature" @change="updateSignature"/>
             </div>
             <div>
                 <div class="input"></div>
@@ -339,5 +339,12 @@ const updatePassword = function () {
 
 .click:active {
     background-color: gainsboro;
+}
+
+.indicate {
+}
+
+.indicate:hover {
+    background-color: lightgray;
 }
 </style>

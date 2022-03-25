@@ -4,7 +4,7 @@
         <div class="statistic">
             <div>
                 <div class="name" @click="router.push('/article_list')">你的地区</div>
-                <input type="text" class="value" v-model="region" placeholder="手动输入格式(全拼): [省份/城市c]-[区/县]" @keydown.enter.down="getCoordinate"/>
+                <input type="text" class="value indicate" v-model="region" placeholder="手动输入格式(全拼): [省份/城市c]-[区/县]" @keydown.enter.down="getCoordinate"/>
             </div>
             <div>
                 <div class="name">实况天气</div>
@@ -246,7 +246,7 @@ if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
 }
 
 .value {
-    max-width: calc(100% - 168px);
+    max-width: calc(100% - 176px);
     min-width: 30px;
     height: 50px;
     margin-top: 20px;
@@ -261,6 +261,8 @@ if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
     font-weight: bolder;
     line-height: 50px;
     outline: none;
+    overflow-x: auto;
+    overflow-y: hidden;
     background-color: rgba(0,0,0,0.05);
 }
 
@@ -324,5 +326,12 @@ if (parseBoolean(storage.get(Constant.AUTHENTICATED))) {
     text-align: center;
     font-weight: bolder;
     display: inline-block;
+}
+
+.indicate {
+}
+
+.indicate:hover {
+    background-color: lightgray;
 }
 </style>

@@ -2,6 +2,7 @@
     <div class="article">
         <PH1></PH1>
         <div class="title" @click="router.push('/view/' + id)">{{title}}</div>
+        <PH3></PH3>
         <div class="content" @click="router.push('/view/' + id)">{{summary}}</div>
         <PH2></PH2>
         <div class="update">
@@ -20,6 +21,7 @@
 import {onMounted, ref, watch} from "vue"
 import PH1 from "../placeholder/PH1.vue"
 import PH2 from "../placeholder/PH2.vue"
+import PH3 from "../placeholder/PH3.vue";
 import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import {useRouter} from "vue-router";
@@ -88,7 +90,7 @@ const del = function () {
     height: 280px;
     display: grid;
     grid-template-areas:
-        "ph1 title title title"
+        "ph1 title title ph3"
         "ph1 content ph2 update"
         "ph1 content ph2 delete"
         "ph1 content ph2 visible";

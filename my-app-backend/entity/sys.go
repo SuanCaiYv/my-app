@@ -33,7 +33,7 @@ func DefaultSysUser() *SysUser {
 		Salt:       util.GenerateUUID(),
 		Role:       "default-role",
 		Info: UserInfo{
-			Avatar:    "http://127.0.0.1:8190/v1/static/a/my-avatar.png",
+			Avatar:    "http://127.0.0.1:8190/v1/static/a/default-avatar.png",
 			Nickname:  "default-nickname-" + util.GenerateUUID(),
 			Email:     "default-email",
 			Phone:     "15651731700",

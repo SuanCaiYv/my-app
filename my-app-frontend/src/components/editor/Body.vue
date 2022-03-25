@@ -59,7 +59,7 @@ const saveDraft = function () {
 
 saveDraft()
 const cancel = setInterval(saveDraft, 5000)
-storage.set(Constant.DRAFT_INTERVAL_CANCEL, cancel + "")
+storage.set(Constant.DRAFT_INTERVAL_CANCEL_LIST, storage.get(Constant.DRAFT_INTERVAL_CANCEL_LIST) + ";" + cancel)
 </script>
 
 <style scoped>

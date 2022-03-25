@@ -33,7 +33,7 @@ type Result struct {
 	Timestamp time.Time   `json:"timestamp"`
 }
 
-func NewOk(data interface{}) *Result {
+func NewOk(data any) *Result {
 	return &Result{
 		Code:      200,
 		Msg:       "",
@@ -91,16 +91,16 @@ func NewString(result string) *Result {
 }
 
 type l struct {
-	Total       int64       `json:"total"`
-	Count       int64       `json:"count"`
-	PageNum     int64       `json:"page_num"`
-	PageSize    int64       `json:"page_size"`
-	NextPageNum int64       `json:"next_page_num"`
-	EndPage     bool        `json:"end_page"`
-	List        interface{} `json:"list"`
+	Total       int64 `json:"total"`
+	Count       int64 `json:"count"`
+	PageNum     int64 `json:"page_num"`
+	PageSize    int64 `json:"page_size"`
+	NextPageNum int64 `json:"next_page_num"`
+	EndPage     bool  `json:"end_page"`
+	List        any   `json:"list"`
 }
 
-func NewList(total, count, pageNum, pageSize, nextPageNum int64, endPage bool, list interface{}) *Result {
+func NewList(total, count, pageNum, pageSize, nextPageNum int64, endPage bool, list any) *Result {
 	return NewOk(&l{
 		Total:       total,
 		Count:       count,
