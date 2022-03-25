@@ -46,27 +46,32 @@ class ArticleRawClass implements ArticleLiteRaw {
 
 watch(searchKey, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(sort, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(pageSize, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(desc, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 // @ts-ignore
 watch(chosenTagList, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
@@ -112,7 +117,7 @@ const fetchArticles = function () {
         } else {
             const list = toListResult(resp.data)
             endPage = list.endPage
-            pageNum = list.pageNum
+            pageNum = list.nextPageNum
             for (let l of list.list) {
                 // @ts-ignore
                 articleList.push(new ArticleRawClass(l.article_id, l.article_name, l.summary))

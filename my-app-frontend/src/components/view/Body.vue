@@ -26,7 +26,7 @@ import storage from "../../util/storage";
 import {Constant} from "../../common/systemconstant";
 import {httpClient} from "../../net";
 import {ArticleRaw, IdName, Response} from "../../common/interface";
-import {toArticleRaw} from "../../util/base";
+import {parseBoolean, toArticleRaw} from "../../util/base";
 import alertFunc from "../../util/alert";
 import Title from "./Title.vue";
 import {marked} from "marked";
@@ -46,26 +46,46 @@ const articleId = route.params.article_id
 let articleCache = storage.get(Constant.ARTICLE_ID_PREFIX + articleId);
 let article: ArticleRaw | null = null
 if (articleCache === "") {
-    httpClient.get("/article/detail/" + articleId, {}, true, function (resp: Response) {
-        if (!resp.ok) {
-            alertFunc(resp.errMsg, function () {})
-        } else {
-            article = toArticleRaw(JSON.stringify(resp.data))
-        }
-    })
+    if (!parseBoolean(storage.get(Constant.AUTHENTICATED))) {
+        httpClient.get("/article/" + articleId, {}, false, function (resp: Response) {
+            if (!resp.ok) {
+                alertFunc(resp.errMsg, function () {})
+            } else {
+                article = toArticleRaw(JSON.stringify(resp.data))
+                if (article.coverImg === "") {
+                    displayCovImg.value = "none"
+                } else {
+                    displayCovImg.value = "block"
+                }
+                covImg.value = article.coverImg
+                title.value = article.articleName
+                content.value = marked.parse(article.content)
+            }
+        })
+    } else {
+        httpClient.get("/article/detail/" + articleId, {}, true, function (resp: Response) {
+            if (!resp.ok) {
+                alertFunc(resp.errMsg, function () {})
+            } else {
+                article = toArticleRaw(JSON.stringify(resp.data))
+                if (article.coverImg === "") {
+                    displayCovImg.value = "none"
+                } else {
+                    displayCovImg.value = "block"
+                }
+                covImg.value = article.coverImg
+                title.value = article.articleName
+                content.value = marked.parse(article.content)
+            }
+        })
+    }
 } else {
     article = toArticleRaw(articleCache)
-}
-
-if (article === null) {
-    alertFunc("加载文章失败", function () {})
-} else {
     if (article.coverImg === "") {
         displayCovImg.value = "none"
     } else {
         displayCovImg.value = "block"
     }
-
     covImg.value = article.coverImg
     title.value = article.articleName
     content.value = marked.parse(article.content)

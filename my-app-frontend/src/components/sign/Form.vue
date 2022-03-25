@@ -5,7 +5,7 @@
             <input class="value-input" type="email" v-model="username"/>
         </div>
         <div class="l2">
-            <div class="name-show">密&nbsp;&nbsp;&nbsp;&nbsp;码</div>
+            <button class="name-show click" @click="switchFunc">密&nbsp;&nbsp;&nbsp;&nbsp;码</button>
             <input class="value-input" type="password" v-model="password"/>
         </div>
         <div class="l3">
@@ -40,12 +40,26 @@ let disableSignIn = ref<boolean>(false)
 let alertMsg = "注册成功"
 
 const operation = useStore().getters.operation
-console.log(useRoute().params)
+let flag = false
 if (operation === "update_password" || useRoute().params.operation === "update_password") {
     btnName.value = "重置密码"
     disableSignIn.value = true
     alertMsg = "重置密码成功"
+    flag = false
 }
+const switchFunc = function () {
+    flag = !flag
+    if (flag) {
+        btnName.value = "注册"
+        disableSignIn.value = false
+        alertMsg = "注册成功"
+    } else {
+        btnName.value = "重置密码"
+        disableSignIn.value = true
+        alertMsg = "重置密码成功"
+    }
+}
+
 storage.setOnce(Constant.LAST_VERIFY_CODE_SEND_TIMESTAMP, (new Date().getTime() - 120 * 1000) + "")
 
 const sendVerCode = function () {

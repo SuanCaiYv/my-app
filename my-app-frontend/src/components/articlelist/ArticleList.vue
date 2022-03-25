@@ -30,24 +30,26 @@ let pageNum = 1
 let endPage = false
 
 watch(searchKey, () => {
-    console.log(searchKey.value)
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(sort, () => {
-    console.log(sort.value)
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(pageSize, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
 watch(desc, () => {
     endPage = false
+    pageNum = 1
     articleList.splice(0, articleList.length)
     fetchArticles()
 })
@@ -92,7 +94,7 @@ const fetchArticles = function () {
         } else {
             const list = toListResult(resp.data)
             endPage = list.endPage
-            pageNum = list.pageNum
+            pageNum = list.nextPageNum
             for (let l of list.list) {
                 // @ts-ignore
                 articleList.push(toArticleRawWithObject(l))

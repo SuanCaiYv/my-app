@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
 
-const name = ref<String>("Content")
+const name = ref<string>("Content")
 </script>
 
 <style scoped>

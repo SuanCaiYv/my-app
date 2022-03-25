@@ -36,11 +36,6 @@ const routes: Array<RouteRecordRaw> = [
         name: "sign",
         component: () => import("../views/Sign.vue")
     },
-    {
-        path: "/sign/update_password",
-        name: "update_password",
-        component: () => import("../views/Sign.vue")
-    },
     // 文章管理
     {
         path: "/article_list",

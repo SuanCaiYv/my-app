@@ -64,6 +64,7 @@ import {useStore} from "vuex";
 
 const name = ref<string>("User")
 const router = useRouter()
+const store = useStore()
 
 const avatar = ref<string>(BASE_URL + '/static/a/default-avatar.png')
 const nickname = ref<string>('')
@@ -207,7 +208,7 @@ const updateSignature = function () {
 }
 
 const updatePassword = function () {
-    useStore().commit("updateOperation", "update_password")
+    store.commit("updateOperation", "update_password")
     router.push("/sign")
 }
 </script>

@@ -57,7 +57,6 @@ const signButton = function () {
 </script>
 
 <style scoped>
-
 .sign {
     width: 100%;
     height: 100%;

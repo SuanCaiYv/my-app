@@ -146,8 +146,24 @@ func (a *ArticleApiHandler) AddArticle(context *gin.Context) {
 		}
 		ss2 = append(ss2, arr2[i])
 	}
-	article.FulltextTitle = strings.Join(ss1, " ")
-	article.FulltextContent = strings.Join(ss2, " ")
+	arr3 := a.cutter.Cut(article.Name)
+	arr4 := a.cutter.Cut(article.Content)
+	ss3 := make([]string, 0, len(arr3))
+	ss4 := make([]string, 0, len(arr4))
+	for i := range arr3 {
+		if arr3[i] == " " {
+			continue
+		}
+		ss3 = append(ss3, arr3[i])
+	}
+	for i := range arr4 {
+		if arr4[i] == " " {
+			continue
+		}
+		ss4 = append(ss4, arr4[i])
+	}
+	article.FulltextTitle = strings.Join(ss1, " ") + strings.Join(ss3, " ")
+	article.FulltextContent = strings.Join(ss2, " ") + strings.Join(ss4, " ")
 	if article.ReleaseTime.IsZero() {
 		article.ReleaseTime = time.Now()
 	}
@@ -270,8 +286,24 @@ func (a *ArticleApiHandler) UpdateArticle(context *gin.Context) {
 		}
 		ss2 = append(ss2, arr2[i])
 	}
-	article.FulltextTitle = strings.Join(ss1, " ")
-	article.FulltextContent = strings.Join(ss2, " ")
+	arr3 := a.cutter.Cut(article.Name)
+	arr4 := a.cutter.Cut(article.Content)
+	ss3 := make([]string, 0, len(arr3))
+	ss4 := make([]string, 0, len(arr4))
+	for i := range arr3 {
+		if arr3[i] == " " {
+			continue
+		}
+		ss3 = append(ss3, arr3[i])
+	}
+	for i := range arr4 {
+		if arr4[i] == " " {
+			continue
+		}
+		ss4 = append(ss4, arr4[i])
+	}
+	article.FulltextTitle = strings.Join(ss1, " ") + strings.Join(ss3, " ")
+	article.FulltextContent = strings.Join(ss2, " ") + strings.Join(ss4, " ")
 	err = a.articleDao.Update(article)
 	if err != nil {
 		a.logger.Errorf("更新文档失败: %s; %v", username, err)
@@ -299,6 +331,11 @@ func (a *ArticleApiHandler) GetArticle(context *gin.Context) {
 	if err != nil {
 		a.logger.Errorf("获取文章失败: %v", err)
 		context.JSON(200, resp.NewInternalError("获取文章失败"))
+		return
+	}
+	if article == nil {
+		a.logger.Errorf("找不到此文章: %s", articleId)
+		context.JSON(200, resp.NewBadRequest("找不到此文章"))
 		return
 	}
 	if article.Visibility != entity.VisibilityPublic {
@@ -352,7 +389,7 @@ func (a *ArticleApiHandler) ListArticleNoAuth(context *gin.Context) {
 		return
 	}
 	endPage := false
-	if len(articles) != pageSize {
+	if int64(pageNum*pageSize) > total {
 		endPage = true
 	}
 	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))
@@ -401,7 +438,7 @@ func (a *ArticleApiHandler) ListArticle(context *gin.Context) {
 		return
 	}
 	endPage := false
-	if len(articles) != pageSize {
+	if int64(pageNum*pageSize) > total {
 		endPage = true
 	}
 	context.JSON(200, resp.NewList(total, int64(len(articles)), int64(pageNum), int64(pageSize), int64(pageNum+1), endPage, articles))

@@ -20,6 +20,7 @@ var (
 )
 
 func NewEmailService() EmailService {
+	newEmailService()
 	return emailService
 }
 

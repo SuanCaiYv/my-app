@@ -59,7 +59,7 @@ func Route() {
 		versionOne.PUT("/sign", userApiHandler.Login)
 		versionOne.POST("/sign", userApiHandler.SignUp)
 		versionOne.POST("/sign/ver_code", userApiHandler.SendVerCode)
-		versionOne.GET("/article/:id", articleApi.GetArticle)
+		versionOne.GET("/article/:article_id", articleApi.GetArticle)
 
 		// 静态资源接口
 		versionOne.GET("/static/a/:filename", staticSrcApi.ADownloadFile)
@@ -101,7 +101,7 @@ func Route() {
 
 		// 其他接口
 		other := versionOne.Group("")
-		other.GET("/backup", siteApi.BackupSite)
+		other.GET("/backup/:temp_token", siteApi.BackupSite)
 	}
 	err := router.Run(":8190")
 	util.JustPanic(err)
@@ -129,7 +129,12 @@ func trackPath() gin.HandlerFunc {
 }
 
 func authFunc(context *gin.Context) {
-	token := context.GetHeader("Authorization")
+	var token string
+	if token = context.Param("temp_token"); token != "" {
+		token = "Bearer " + token
+	} else {
+		token = context.GetHeader("Authorization")
+	}
 	if !strings.HasPrefix(token, "Bearer ") {
 		context.AbortWithStatusJSON(200, resp.NewMissToken())
 		return
