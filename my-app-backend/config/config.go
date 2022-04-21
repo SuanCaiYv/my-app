@@ -12,7 +12,8 @@ func init() {
 	flag.StringVar(configPath, "c", "", "config file path")
 	flag.Parse()
 	if *configPath == "" {
-		util.JustPanic("config path is empty")
+		path := "config/config.json"
+		configPath = &path
 	}
 	confFile, err := os.OpenFile(*configPath, os.O_RDONLY, os.ModePerm)
 	util.JustPanic(err)

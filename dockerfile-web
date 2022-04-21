@@ -1,0 +1,14 @@
+FROM golang:alpine as builder
+WORKDIR /src
+COPY ./my-app-backend /src
+RUN cd cmd \
+    && go build
+
+FROM alpine as exe
+WORKDIR /target
+COPY --from=builder /src/cmd /target/
+COPY --from=builder /src/config.json /target/
+COPY --from=builder /src/static /target/
+RUN mkdir static \
+    && mv default-avatar.png static/default-avatar.png
+ENTRYPOINT ./cmd -c=config.json
