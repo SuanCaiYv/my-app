@@ -5,21 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4e6e14c2-b2bd-4da7-aa85-0d7519881e9a" name="Changes" comment="第三十天&#10;完善了代码">
-      <change afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dockerfile-vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../dockerfile-web" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../my-app-frontend/nginx.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../restart.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/cmd" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/cmd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entity/resp/http_resp.go" beforeDir="false" afterPath="$PROJECT_DIR$/entity/resp/http_resp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/components/about/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/store/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/store/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../upload_frontend.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../upload_frontend.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../my-app-frontend/src/net/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-app-frontend/src/net/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,18 +51,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/cwb"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/joker&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/service" />
