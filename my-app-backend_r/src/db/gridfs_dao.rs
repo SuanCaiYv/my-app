@@ -49,6 +49,30 @@ impl GridFSDaoStruct {
     async fn upload(&mut self, file_content: Vec<u8>, filename: String, metadata: Document) -> Result<(), Error> {
         todo!()
     }
+
+    async fn modify(&mut self, file: GridFSFile) -> Result<(), Error> {
+        todo!()
+    }
+
+    async fn download(&mut self, filename: String) -> Result<GridFSFile, Error> {
+        todo!()
+    }
+
+    async fn list_by_archive(&mut self, archive: String, page_num: usize, page_size: usize) -> Result<(Vec<GridFSFile>, usize), Error> {
+        todo!()
+    }
+
+    async fn list_by_archive0(&mut self, archive: String) -> Result<Vec<GridFSFile>, Error> {
+        todo!()
+    }
+
+    async fn delete(&mut self, filename: String) -> Result<(), Error> {
+        todo!()
+    }
+
+    async fn exist(&mut self, filename: String) -> Result<bool, Error> {
+        todo!()
+    }
 }
 
 #[cfg(test)]
